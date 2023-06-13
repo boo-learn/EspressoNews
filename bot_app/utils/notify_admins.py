@@ -2,11 +2,11 @@ import logging
 
 from aiogram import Dispatcher
 
-from bot_app.data.settings import admins_id
+from bot_app.data.settings import admins
 
 
 async def on_startup_notify(dp: Dispatcher):
-    for admin in admins_id:
+    for admin in admins:
         try:
             text = 'Бот запущен'
             await dp.bot.send_message(chat_id=admin, text=text)
