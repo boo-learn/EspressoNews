@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  celery1:
+    build:
+      context: .
+      dockerfile: DockerfileCelerySubscription
+    command: celery -A shared.celery_app:subscriptions_celery_app worker --loglevel=info &
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  celery2:
+    build:
+      context: .
+      dockerfile: DockerfileCeleryNewsCollection
+    command: celery -A shared.celery_app:news_collector_celery_app worker --loglevel=info &
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  bot_app:
+    build:
+      context: .
+      dockerfile: DockerfileBotApp
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  subscription_service:
+    build:
+      context: .
+      dockerfile: DockerfileSubscriptionService
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - rabbitmq
+      - celery1
+
+  news_collection_service:
+    build:
+      context: .
+      dockerfile: DockerfileNewsCollectionService
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - rabbitmq
+      - celery2
+
+volumes:
+  postgres_data:
