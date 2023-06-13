@@ -1,14 +1,14 @@
 from telethon.tl.functions.channels import JoinChannelRequest, LeaveChannelRequest
 from telethon.tl.types import InputChannel
 
-from shared.celery_app import celery_app
+from shared.celery_app import subscriptions_celery_app
 from shared.database import SessionLocal
 from shared.models import Subscription, Channel, TelegramAccount
 from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import GetChannelsRequest
 
 
-@celery_app.task
+@subscriptions_celery_app.task
 def subscribe(user_id, channel_id):
     session = SessionLocal()
     account = session.query(TelegramAccount).filter(TelegramAccount.is_active is True).first()
@@ -30,7 +30,7 @@ def subscribe(user_id, channel_id):
                 session.commit()
 
 
-@celery_app.task
+@subscriptions_celery_app.task
 def unsubscribe(user_id, channel_id):
     session = SessionLocal()
     account = session.query(TelegramAccount).filter(TelegramAccount.is_active is True).first()
