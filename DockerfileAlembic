@@ -20,4 +20,4 @@ EXPOSE 80
 
 
 # Run scripts when the container launches
-CMD ["alembic upgrade head"]
+CMD alembic upgrade head
