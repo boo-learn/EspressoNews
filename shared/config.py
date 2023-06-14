@@ -1,9 +1,9 @@
 import os
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-POSTGRES_USER = os.getenv("DB_USERNAME")
-POSTGRES_PASSWORD = os.getenv("DB_PASSWORD")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
-POSTGRES_DB = os.getenv("DB_NAME")
+POSTGRES_DB = os.getenv("POSTGRES_DB")
 ADMIN_ID = os.getenv("ADMIN_ID")
 
