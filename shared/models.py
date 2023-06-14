@@ -6,7 +6,7 @@ from .database import Base
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'default'
 
     user_id = Column(Integer, primary_key=True)
     username = Column(String(50), nullable=True)
@@ -28,7 +28,7 @@ class User(Base):
 class Subscription(Base):
     __tablename__ = 'subscriptions'
 
-    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('default.user_id'), primary_key=True)
     channel_id = Column(Integer, ForeignKey('channels.channel_id'))
     subscription_date = Column(DateTime, nullable=False, default=datetime.now)
     is_active = Column(Boolean, default=True)
@@ -102,7 +102,7 @@ class Digest(Base):
     __tablename__ = 'digests'
 
     digest_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('default.user_id'), primary_key=True)
     generation_date = Column(DateTime, nullable=False, default=datetime.now)
 
     user = relationship('User', back_populates='digest')
