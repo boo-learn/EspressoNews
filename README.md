@@ -6,7 +6,9 @@
 `docker compose up -d`
 
 ### Подключиться к контейнеру терминалом
-`docker run -it --entrypoint bash <image id/name>`
+`docker run -it <image id> bash`
+С подключение переменных окружения:
+`docker run --env-file .env -it <image id> bash`
 
 ### Подключение к запущенному контейнеру
 `docker exec -it <image id/name> bash`
