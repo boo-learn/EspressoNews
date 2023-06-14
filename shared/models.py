@@ -21,7 +21,6 @@ class User(Base):
     join_date = Column(DateTime, nullable=False, default=datetime.now)
 
     subscriptions = relationship('Subscription', back_populates='user')
-    digests = relationship('Digest', back_populates='user')
     access_channels = relationship('Channel', back_populates='access_users')
 
 
@@ -71,7 +70,6 @@ class Post(Base):
     channel = relationship('Channel', back_populates='posts')
     rubric = relationship('Rubric', back_populates='posts')
     files = relationship('File', back_populates='post')
-    digests = relationship('Digest', back_populates='posts')
 
 
 class Rubric(Base):
@@ -91,18 +89,6 @@ class File(Base):
     video = Column(LargeBinary, nullable=False)
     post_id = Column(Integer, ForeignKey('posts.post_id'))
     post = relationship('Post', back_populates='files')
-
-
-class Digest(Base):
-    __tablename__ = 'digests'
-
-    digest_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
-    generation_date = Column(DateTime, nullable=False, default=datetime.now)
-
-    user = relationship('User', back_populates='digests')
-    post_id = Column(Integer, ForeignKey('posts.post_id'))
-    post = relationship('Post', back_populates='digests')
 
 
 class TelegramAccount(Base):
