@@ -12,7 +12,7 @@ class User(Base):
     username = Column(String(50), nullable=True)
     first_name = Column(String(50), nullable=True)
     last_name = Column(String(50), nullable=True)
-    language_code = Column(Enum('ru', 'en'), nullable=True)
+    language_code = Column(Enum('ru', 'en', name='language_code'), nullable=True)
 
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
@@ -20,25 +20,8 @@ class User(Base):
 
     join_date = Column(DateTime, nullable=False, default=datetime.now)
 
-    subscriptions = relationship('Subscription', back_populates='user')
     digests = relationship('Digest', back_populates='user')
-    access_channels = relationship('Channel', back_populates='user')
-
-
-class Subscription(Base):
-    __tablename__ = 'subscriptions'
-
-    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
-    channel_id = Column(Integer, ForeignKey('channels.channel_id'))
-    subscription_date = Column(DateTime, nullable=False, default=datetime.now)
-    is_active = Column(Boolean, default=True)
-
-    user = relationship('User', back_populates='subscriptions')
-    channel = relationship('Channel', back_populates='subscriptions')
-
-    __table_args__ = (
-        PrimaryKeyConstraint('user_id', 'channel_id'),
-    )
+    subscriptions = relationship('Subscription', back_populates='user')
 
 
 class Channel(Base):
@@ -53,9 +36,20 @@ class Channel(Base):
 
     is_active = Column(Boolean, default=True)
 
-    access_users = relationship('User', back_populates='channel')
-    subscriptions = relationship('Subscription', back_populates='channel')
     posts = relationship('Post', back_populates='channel')
+    subscribers = relationship('Subscription', back_populates='channel')
+
+
+class Subscription(Base):
+    __tablename__ = 'user_subscriptions'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'))
+    channel_id = Column(Integer, ForeignKey('channels.channel_id'))
+    subscribe_date = Column(DateTime, nullable=False, default=datetime.now)
+
+    user = relationship('User', back_populates='subscriptions')
+    channel = relationship('Channel', back_populates='subscribers')
 
 
 class Post(Base):
@@ -63,7 +57,7 @@ class Post(Base):
 
     post_id = Column(Integer, primary_key=True)
     channel_id = Column(Integer, ForeignKey('channels.channel_id'))
-    rubric_id = Column(Integer, ForeignKey('rubrics.rubric_id'))
+    rubric_id = Column(Integer, ForeignKey('posts_rubrics.rubric_id'))
 
     title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
