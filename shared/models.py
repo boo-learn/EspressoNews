@@ -57,8 +57,8 @@ class Channel(Base):
 class Post(Base):
     __tablename__ = 'posts'
 
-    post_id = Column(Integer, primary_key=True)
-    channel_id = Column(Integer, ForeignKey('channels.channel_id'), primary_key=True)
+    post_id = Column(Integer, primary_key=True, unique=True)
+    channel_id = Column(Integer, ForeignKey('channels.channel_id'))
     rubric_id = Column(Integer, ForeignKey('posts_rubrics.rubric_id'))
 
     title = Column(String, nullable=False)

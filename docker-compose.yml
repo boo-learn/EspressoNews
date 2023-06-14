@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  postgres:
+  db:
     image: postgres
     env_file:
       - .env
@@ -24,7 +24,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - db
       - rabbitmq
 
   celery2:
@@ -35,7 +35,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - db
       - rabbitmq
 
   bot_app:
@@ -45,7 +45,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - db
       - rabbitmq
 
   alembic:
@@ -55,7 +55,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - db
 
   subscription_service:
     build:
@@ -64,7 +64,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - db
       - rabbitmq
       - celery1
 
@@ -75,7 +75,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - db
       - rabbitmq
       - celery2
 
