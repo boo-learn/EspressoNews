@@ -48,6 +48,15 @@ services:
       - postgres
       - rabbitmq
 
+  alembic:
+    build:
+      context: .
+      dockerfile: DockerfileAlembic
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
   subscription_service:
     build:
       context: .

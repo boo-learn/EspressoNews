@@ -12,7 +12,7 @@ class User(Base):
     username = Column(String(50), nullable=True)
     first_name = Column(String(50), nullable=True)
     last_name = Column(String(50), nullable=True)
-    language_code = Column(Enum('ru', 'en'), nullable=True)
+    language_code = Column(Enum('ru', 'en', name='language_code'), nullable=True)
 
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
@@ -63,7 +63,7 @@ class Post(Base):
 
     post_id = Column(Integer, primary_key=True)
     channel_id = Column(Integer, ForeignKey('channels.channel_id'))
-    rubric_id = Column(Integer, ForeignKey('rubrics.rubric_id'))
+    rubric_id = Column(Integer, ForeignKey('posts_rubrics.rubric_id'))
 
     title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
@@ -130,5 +130,3 @@ class GPTAccount(Base):
 
     is_active = Column(Boolean, default=True)
     last_connected = Column(DateTime, nullable=False)
-
-
