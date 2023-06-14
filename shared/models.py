@@ -20,8 +20,21 @@ class User(Base):
 
     join_date = Column(DateTime, nullable=False, default=datetime.now)
 
-    digests = relationship('Digest', back_populates='user')
     subscriptions = relationship('Subscription', back_populates='user')
+    digests = relationship('Digest', back_populates='user')
+    access_channels = relationship('Channel', back_populates='access_users')
+
+
+class Subscription(Base):
+    __tablename__ = 'subscriptions'
+
+    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
+    channel_id = Column(Integer, ForeignKey('channels.channel_id'), primary_key=True)
+    subscription_date = Column(DateTime, nullable=False, default=datetime.now)
+    is_active = Column(Boolean, default=True)
+
+    user = relationship('User', back_populates='subscriptions')
+    channel = relationship('Channel', back_populates='subscriptions')
 
 
 class Channel(Base):
@@ -36,27 +49,16 @@ class Channel(Base):
 
     is_active = Column(Boolean, default=True)
 
+    access_users = relationship('User', back_populates='access_channels')
+    subscriptions = relationship('Subscription', back_populates='channel')
     posts = relationship('Post', back_populates='channel')
-    subscribers = relationship('Subscription', back_populates='channel')
-
-
-class Subscription(Base):
-    __tablename__ = 'user_subscriptions'
-
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
-    channel_id = Column(Integer, ForeignKey('channels.channel_id'))
-    subscribe_date = Column(DateTime, nullable=False, default=datetime.now)
-
-    user = relationship('User', back_populates='subscriptions')
-    channel = relationship('Channel', back_populates='subscribers')
 
 
 class Post(Base):
     __tablename__ = 'posts'
 
     post_id = Column(Integer, primary_key=True)
-    channel_id = Column(Integer, ForeignKey('channels.channel_id'))
+    channel_id = Column(Integer, ForeignKey('channels.channel_id'), primary_key=True)
     rubric_id = Column(Integer, ForeignKey('posts_rubrics.rubric_id'))
 
     title = Column(String, nullable=False)
@@ -66,13 +68,10 @@ class Post(Base):
 
     post_date = Column(DateTime, nullable=False)
 
-    channel = relationship('Channel', back_populates='post')
-    rubric = relationship('Rubric', back_populates='post')
+    channel = relationship('Channel', back_populates='posts')
+    rubric = relationship('Rubric', back_populates='posts')
     files = relationship('File', back_populates='post')
-
-    __table_args__ = (
-        PrimaryKeyConstraint('post_id', 'channel_id'),
-    )
+    digests = relationship('Digest', back_populates='posts')
 
 
 class Rubric(Base):
@@ -90,18 +89,20 @@ class File(Base):
     file_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     video = Column(LargeBinary, nullable=False)
+    post_id = Column(Integer, ForeignKey('posts.post_id'))
+    post = relationship('Post', back_populates='files')
 
 
 class Digest(Base):
     __tablename__ = 'digests'
 
     digest_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'))
     generation_date = Column(DateTime, nullable=False, default=datetime.now)
 
-    user = relationship('User', back_populates='digest')
-    posts = relationship('Post', back_populates='digest')
-    access_users = relationship('User', back_populates='digest')
+    user = relationship('User', back_populates='digests')
+    post_id = Column(Integer, ForeignKey('posts.post_id'))
+    post = relationship('Post', back_populates='digests')
 
 
 class TelegramAccount(Base):
@@ -124,5 +125,3 @@ class GPTAccount(Base):
 
     is_active = Column(Boolean, default=True)
     last_connected = Column(DateTime, nullable=False)
-
-
