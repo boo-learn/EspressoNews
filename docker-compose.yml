@@ -16,6 +16,11 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  redis:
+    image: "redis:6.2"
+    ports:
+      - "6379:6379"
+
   celery1:
     build:
       context: .
