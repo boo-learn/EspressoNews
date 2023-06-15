@@ -4,7 +4,7 @@ services:
   db:
     image: postgres
     env_file:
-      - .env
+      - .env.dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -22,7 +22,7 @@ services:
       dockerfile: DockerfileCelerySubscription
     command: celery -A shared.celery_app:subscriptions_celery_app worker --loglevel=info &
     env_file:
-      - .env
+      - .env.dev
     depends_on:
       - db
       - rabbitmq
@@ -33,7 +33,7 @@ services:
       dockerfile: DockerfileCeleryNewsCollection
     command: celery -A shared.celery_app:news_collector_celery_app worker --loglevel=info &
     env_file:
-      - .env
+      - .env.dev
     depends_on:
       - db
       - rabbitmq
@@ -43,7 +43,7 @@ services:
       context: .
       dockerfile: DockerfileBotApp
     env_file:
-      - .env
+      - .env.dev
     depends_on:
       - db
       - rabbitmq
@@ -53,7 +53,7 @@ services:
       context: .
       dockerfile: DockerfileAlembic
     env_file:
-      - .env
+      - .env.dev
     depends_on:
       - db
 
@@ -62,7 +62,7 @@ services:
       context: .
       dockerfile: DockerfileSubscriptionService
     env_file:
-      - .env
+      - .env.dev
     depends_on:
       - db
       - rabbitmq
@@ -73,7 +73,7 @@ services:
       context: .
       dockerfile: DockerfileNewsCollectionService
     env_file:
-      - .env
+      - .env.dev
     depends_on:
       - db
       - rabbitmq
