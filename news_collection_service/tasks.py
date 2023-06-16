@@ -1,17 +1,14 @@
 import asyncio
-from aio_pika import connect_robust, Message
 from celery import shared_task
+
+from shared.rabbitmq import Producer, QueuesType
+from shared.config import RABBIT_HOST
 
 
 async def collect_news_async():
-    connection = await connect_robust()
-    channel = await connection.channel()
-
-    await channel.declare_queue('news_collection_queue', durable=True)
-    message = Message(body='collect_news'.encode())
-    await channel.default_exchange.publish(message, routing_key='news_collection_queue')
-
-    await connection.close()
+    producer = Producer(host=RABBIT_HOST)
+    await producer.send_message(message='collect_news', queue=QueuesType.news_collection_service)
+    await producer.close()
 
 
 @shared_task

@@ -30,3 +30,11 @@ To delete all the images:
 `alembic revision --autogenerate -m "init"`
 
 ### Применение миграции
+`alembic upgrade head`
+
+# RabbitMQ
+
+### Просмотр очереди
+
+http://localhost:15672/
+

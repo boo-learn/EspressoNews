@@ -7,6 +7,8 @@ from db_utils import (get_first_active_account_from_db_async, get_subscribed_cha
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon.errors import SessionRevokedError
+from shared.rabbitmq import Subscriber, QueuesType
+from shared.config import RABBIT_HOST
 
 
 async def check_subscriptions():
@@ -51,19 +53,10 @@ async def check_subscriptions():
         print("Account not found")
 
 
-async def on_message(message: IncomingMessage):
-    print("Received message:", message.body.decode())
-    await message.ack()
-
-    if message.body.decode() == "subscribe" or message.body.decode() == "unsubscribe":
-        await check_subscriptions()
-
-
 async def main():
-    connection = await connect("amqp://guest:guest@localhost/")
-    channel = await connection.channel()
-    queue = await channel.declare_queue("subscriptions", durable=True)
-    await queue.consume(on_message)
+    subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.news_collection_service)
+    subscriber.subscribe("subscribe", check_subscriptions)
+    subscriber.subscribe("unsubscribe", check_subscriptions)
 
 
 if __name__ == "__main__":
