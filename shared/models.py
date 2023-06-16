@@ -21,7 +21,7 @@ class User(Base):
     join_date = Column(DateTime, nullable=False, default=datetime.now)
 
     subscriptions = relationship('Subscription', back_populates='user')
-    access_channels = relationship('Channel', back_populates='access_users')
+    access_channels = relationship("Channel", back_populates="user")
 
 
 class Subscription(Base):
@@ -37,9 +37,10 @@ class Subscription(Base):
 
 
 class Channel(Base):
-    __tablename__ = 'channels'
+    __tablename__ = 'channels'  # Change this line
 
     channel_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'))  # Add this line
     channel_name = Column(String, nullable=False)
     channel_username = Column(String(50), nullable=False)
     description = Column(Text, nullable=False)
@@ -48,7 +49,7 @@ class Channel(Base):
 
     is_active = Column(Boolean, default=True)
 
-    access_users = relationship('User', back_populates='access_channels')
+    user = relationship("User", back_populates="access_channels")
     subscriptions = relationship('Subscription', back_populates='channel')
     posts = relationship('Post', back_populates='channel')
 
@@ -58,12 +59,11 @@ class Post(Base):
 
     post_id = Column(Integer, primary_key=True, unique=True)
     channel_id = Column(Integer, ForeignKey('channels.channel_id'))
-    rubric_id = Column(Integer, ForeignKey('posts_rubrics.rubric_id'))
+    rubric_id = Column(Integer, ForeignKey('posts_rubrics.rubric_id'), nullable=True)
 
     title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
     summary = Column(Text, nullable=True)
-    post_url = Column(String, nullable=False)
 
     post_date = Column(DateTime, nullable=False)
 
@@ -98,6 +98,7 @@ class TelegramAccount(Base):
     api_id = Column(Integer)
     api_hash = Column(String(100), nullable=False)
     phone_number = Column(String(15), nullable=False)
+    session_string = Column(String, nullable=True)
 
     is_active = Column(Boolean, default=True)
     last_connected = Column(DateTime, nullable=False)
