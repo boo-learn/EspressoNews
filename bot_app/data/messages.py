@@ -67,8 +67,9 @@ def gen_error_mess():
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# adding channels message
+# channels messages
 # ---------------------------------------------------------------------------------------------------------------------
+# add channel
 def gen_adding_users_channels():
     message = 'Так, тут уже придётся немного подумать. \n \n'
     message += 'Каналы какой категории тебе интересны, говоришь?'
@@ -76,10 +77,22 @@ def gen_adding_users_channels():
     return message
 
 
-# ---------------------------------------------------------------------------------------------------------------------
 # unsubscribe from the channel
-# ---------------------------------------------------------------------------------------------------------------------
-def gen_sure_unsubscribe_mess(channel_name):
-    message = f'Вы уверены, что хотите удалить канал {channel_name}  \n \n'
+def gen_sure_unsubscribe_mess(channel_title):
+    message = f'Вы уверены, что хотите удалить канал {channel_title}  \n \n'
+
+    return message
+
+
+# subscribe to the channel
+def gen_sure_subscribe_mess(original_channel):
+    message = f"Вы точно хотите подписаться на канал \"{original_channel.title}\"?"
+
+    return message
+
+
+# subscribe success
+def gen_success_subscribe_mess():
+    message = f"Подписка оформлена успешно"
 
     return message

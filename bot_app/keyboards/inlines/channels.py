@@ -23,6 +23,17 @@ ikb_unsubscribe = InlineKeyboardMarkup(
     ]
 )
 
+# вторая кнопка добавляется динамически
+ikb_subscribe = InlineKeyboardMarkup(
+    row_width=2,
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text='Нет', callback_data='do not subscribe'),
+        ]
+
+    ]
+)
+
 rubrics = ['Животные', 'Война', 'Ужасы']
 
 ikb_choose_category = InlineKeyboardMarkup(row_width=2)

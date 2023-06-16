@@ -3,6 +3,7 @@ from .help import dp
 from .menu import dp
 from .error import dp
 from .channels import dp
+from .forward_message import dp
 
 __all__ = ['dp']
 

@@ -1,1 +1,1 @@
-from .channels import DeleteChannelStates
+from .channels import ChannelStates
