@@ -2,5 +2,7 @@ import pika
 
 
 def create_rabbitmq_connection():
-    connection_params = pika.ConnectionParameters(host='localhost')
-    return pika.BlockingConnection(connection_params)
+    # amqp: // rabbit_user: rabbit_password @ host:port / vhost
+    host = "localhost"
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
+    return connection
