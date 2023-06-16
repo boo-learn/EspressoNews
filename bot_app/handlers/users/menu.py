@@ -5,9 +5,9 @@ from aiogram.dispatcher.filters import Command
 
 from bot_app.data.messages import gen_menu_mess
 from bot_app.keyboards.default import kb_menu
-from bot_app.keyboards.inlines import ikb_my_channels
+from bot_app.keyboards.inlines import ikb_my_channels, ikb_help
 from bot_app.loader import dp
-from bot_app.utils import delete_previus_message_for_default
+from bot_app.states import DeleteChannelStates
 
 
 @dp.message_handler(Command('menu'))
@@ -18,7 +18,11 @@ async def cmd_menu(message: types.Message):
 
 @dp.message_handler(regexp=re.compile(r'^Мои каналы$', re.IGNORECASE))
 async def menu_button_my_channels(message: types.Message):
-    await message.answer(text='Список каналов:', reply_markup=ikb_my_channels)
+    if ikb_my_channels.inline_keyboard[0]:
+        await message.answer(text='Список каналов:', reply_markup=ikb_my_channels)
+        await DeleteChannelStates.choose_channel_for_delete.set()
+    else:
+        await message.answer(text='Пока что вы не подписаны не на какие каналы.')
 
 
 @dp.message_handler(regexp=re.compile(r'^Настройки$', re.IGNORECASE))
@@ -26,11 +30,12 @@ async def menu_button_my_channels(message: types.Message):
     await message.answer('Список настроек')
 
 
-@dp.message_handler(regexp=re.compile(r'^Подписка$', re.IGNORECASE))
+@dp.message_handler(regexp=re.compile(r'^Донат$', re.IGNORECASE))
 async def menu_button_my_channels(message: types.Message):
-    await message.answer('Вы подписаны:')
+    await message.answer('Перевод на карту:')
+    await message.answer('<b>1111 2222 3333 4444</b>')
 
 
 @dp.message_handler(regexp=re.compile(r'^Помощь$', re.IGNORECASE))
 async def menu_button_my_channels(message: types.Message):
-    await message.answer('Вот и помощь')
+    await message.answer('Частые вопросы', reply_markup=ikb_help)

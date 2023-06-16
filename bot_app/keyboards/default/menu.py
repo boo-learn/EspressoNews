@@ -7,7 +7,7 @@ kb_menu = ReplyKeyboardMarkup(
             KeyboardButton(text='Настройки'),
         ],
         [
-            KeyboardButton(text='Подписка'),
+            KeyboardButton(text='Донат'),
             KeyboardButton(text='Помощь'),
         ],
     ],
