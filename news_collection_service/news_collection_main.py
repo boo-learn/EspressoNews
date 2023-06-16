@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 
-from aio_pika import connect, IncomingMessage
 from telethon import TelegramClient
 from telethon.errors import SessionRevokedError
 from telethon.sessions import StringSession
@@ -9,6 +8,8 @@ from telethon.sessions import StringSession
 from db_utils import get_subscribed_channels, \
     remove_account_from_db_async, get_first_active_account_from_db_async, add_post_async
 from shared.models import Post
+from shared.rabbitmq import Subscriber, QueuesType
+from shared.config import RABBIT_HOST
 
 
 async def collect_news():
@@ -58,19 +59,9 @@ async def collect_news():
         print("Account not found")
 
 
-async def on_message(message: IncomingMessage):
-    print("Received message:", message.body.decode())
-    await message.ack()
-
-    if message.body.decode() == "collect_news":
-        await collect_news()
-
-
 async def main():
-    connection = await connect("amqp://guest:guest@localhost/")
-    channel = await connection.channel()
-    queue = await channel.declare_queue("news_queue", durable=True)
-    await queue.consume(on_message)
+    subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.news_collection_service)
+    subscriber.subscribe("collect_news", collect_news)
 
 
 if __name__ == "__main__":
