@@ -7,6 +7,10 @@ from bot_app.loader import dp
 from bot_app.states import ChannelStates
 from bot_app.utils import delete_previus_message_for_feedback
 from bot_app.utils.find_button_index import find_button_index
+from shared.config import RABBIT_HOST
+from shared.models import Channel, Subscription
+from shared.database import SessionLocal
+from shared.rabbitmq import Producer, QueuesType
 
 
 @dp.callback_query_handler(text_contains='choose_channel_')
@@ -24,11 +28,35 @@ async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext)
     await delete_previus_message_for_feedback(call)
     await call.message.delete()
 
-    # Удаление канала из бд
-    print(f'{state_data["choose_channel_for_delete"]} удалён')
+    channel_name = state_data["choose_channel_for_delete"]
+    session = SessionLocal()
 
-    # Удаление кнопки с каналом из frontend части
-    button_index = find_button_index(state_data["choose_channel_for_delete"], ikb_my_channels)
+    # Get the channel and subscription objects
+    channel = session.query(Channel).filter(Channel.channel_name == channel_name).first()
+    subscription = session.query(Subscription).filter(Subscription.channel_id == channel.channel_id,
+                                                      Subscription.user_id == call.from_user.id).first()
+
+    # Delete the subscription from the database
+    session.delete(subscription)
+    session.commit()
+    print(f'Subscription for {channel_name} deleted')
+
+    # Check if there are no remaining subscriptions for the channel
+    remaining_subscriptions = session.query(Subscription).filter(Subscription.channel_id == channel.channel_id).count()
+
+    if remaining_subscriptions == 0:
+        # Delete the channel from the database
+        session.delete(channel)
+        session.commit()
+        print(f'{channel_name} deleted')
+
+        # Шлем сообщение в редис
+        producer = Producer(host=RABBIT_HOST)
+        await producer.send_message(message='unsubscribe', queue=QueuesType.subscription_service)
+        await producer.close()
+
+    # Delete the button with the channel from the frontend part
+    button_index = find_button_index(channel_name, ikb_my_channels)
 
     if button_index:
         ikb_my_channels.inline_keyboard[button_index[0]].pop(button_index[1])
@@ -48,6 +76,3 @@ async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext)
 
     await state.finish()
     await call.message.answer(text='Список каналов:', reply_markup=ikb_my_channels)
-
-
-
