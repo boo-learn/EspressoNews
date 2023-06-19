@@ -2,8 +2,8 @@ import json
 import asyncio
 from aio_pika import connect, IncomingMessage
 from tasks import subscribe_task, unsubscribe_task
-from db_utils import (get_first_active_account_from_db_async, get_subscribed_channels,
-                      get_unique_channel_ids_async, remove_account_from_db_async)
+from shared.db_utils import (get_first_active_account_from_db_async, get_subscribed_channels,
+                             get_unique_channel_ids_async, remove_account_from_db_async)
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon.errors import SessionRevokedError
