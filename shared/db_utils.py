@@ -26,12 +26,12 @@ async def get_subscribed_channels(client):
 
 
 async def get_first_active_account_from_db_async():
-    async with async_session() as db:  # Replace SessionLocal() with async_session()
+    async with async_session() as db:
         return await db.query(TelegramAccount).filter(TelegramAccount.is_active == True).first()
 
 
 async def get_unique_channel_ids_async():
-    async with async_session() as db:  # Replace SessionLocal() with async_session()
+    async with async_session() as db:
         stmt = select(Channel.channel_id).distinct()
         result = await db.execute(stmt)
         channel_ids = result.scalars().all()
