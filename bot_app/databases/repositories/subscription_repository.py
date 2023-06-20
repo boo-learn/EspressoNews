@@ -28,9 +28,10 @@ class SubscriptionRepository:
             except SQLAlchemyError as e:
                 raise e
 
-    async def get_channels_count(self, channel: Channel):
+    async def get_channels_count(self, channel_id):
         async with async_session() as session:
-            return await select(Subscription).filter(Subscription.channel_id == channel.channel_id).count()
+            return await select(Subscription).filter(Subscription.channel_id == channel_id).count().scalar_one_or_none(
+                session)
 
     async def get_channels(self, user_id: int):
         async with async_session() as session:

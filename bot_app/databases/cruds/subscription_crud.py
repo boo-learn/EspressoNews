@@ -31,7 +31,7 @@ class SubscriptionCRUD:
         return await self.repository.delete(subscription)
 
     async def check_channel_and_delete_if_empty(self, channel):
-        remaining_subscriptions = await self.repository.get_channels_count(channel)
+        remaining_subscriptions = await self.repository.get_channels_count(channel.channel_id)
 
         if remaining_subscriptions == 0:
             channel_crud = ChannelCRUD()
