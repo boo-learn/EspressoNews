@@ -14,7 +14,7 @@ class ChannelRepository:
         try:
             async with async_session() as session:
                 channel = Channel(**kwargs)
-                session.add(channel)
+                await session.add(channel)
                 await session.commit()
                 return channel
         except SQLAlchemyError as e:
@@ -37,7 +37,7 @@ class ChannelRepository:
     async def delete(self, channel: Channel):
         try:
             async with async_session() as session:
-                session.delete(channel)
+                await session.delete(channel)
                 await session.commit()
                 return True
         except SQLAlchemyError as e:

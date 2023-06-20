@@ -7,10 +7,10 @@ from sqlalchemy.future import select
 
 
 class UserRepository:
-    async def create(self, *args) -> User:
+    async def create(self, **kwargs) -> User:
         try:
             async with async_session() as session:
-                user = User(*args)
+                user = User(**kwargs)
                 session.add(user)
                 await session.commit()
                 return user
@@ -50,7 +50,7 @@ class UserRepository:
     async def delete(self, user: User):
         try:
             async with async_session() as session:
-                session.delete(user)
+                await session.delete(user)
                 await session.commit()
                 return True
         except SQLAlchemyError as e:

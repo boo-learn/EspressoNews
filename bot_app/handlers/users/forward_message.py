@@ -49,7 +49,7 @@ async def action_forward_message(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(text_contains='do not subscribe')
 async def subscribe_to_the_channel(call: types.CallbackQuery):
-    channel_username = call.data.split('&shash&')[-1]
+    channel_username = call.data.split('&slash&')[-1]
 
     await delete_previus_message_for_feedback(call)
     await call.message.delete()
@@ -58,7 +58,9 @@ async def subscribe_to_the_channel(call: types.CallbackQuery):
     subscription_crud = SubscriptionCRUD()
 
     # отпишись и удались
+
+
     channel = await channel_crud.get_channel(channel_username)
-    await subscription_crud.update_subscription(call.message.from_user.id, channel)
+    await subscription_crud.update_subscription(call.from_user.id, channel, False)
     await channel_crud.check_channel_and_delete_if_empty(channel)
 

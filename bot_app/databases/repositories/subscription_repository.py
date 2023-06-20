@@ -12,7 +12,7 @@ class SubscriptionRepository:
         async with async_session() as session:
             try:
                 subscription = Subscription(user_id=user_id, channel_id=channel.channel_id)
-                session.add(subscription)
+                await session.add(subscription)
                 await session.commit()
                 return subscription
             except SQLAlchemyError as e:
@@ -67,7 +67,7 @@ class SubscriptionRepository:
     async def delete(self, subscription: Subscription) -> bool:
         async with async_session() as session:
             try:
-                session.delete(subscription)
+                await session.delete(subscription)
                 await session.commit()
                 return True
             except SQLAlchemyError as e:

@@ -18,8 +18,16 @@ class UserCRUD:
     ) -> Optional[User]:
         user = await self.repository.get(user_id)
 
+        data = {
+            'user_id': user_id,
+            'username': username,
+            'first_name': first_name,
+            'last_name': last_name,
+            'language_code': language_code
+        }
+
         if not user:
-            user = await self.repository.create(user_id, username, first_name, last_name, language_code)
+            user = await self.repository.create(**data)
 
         # producer = Producer(host=RABBIT_HOST)
         # await producer.send_message(message='subscribe', queue=QueuesType.subscription_service)
