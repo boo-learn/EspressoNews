@@ -8,7 +8,7 @@ class ChannelLogicHandler:
         user_id = message.from_user.id
 
         subscription_crud = SubscriptionCRUD()
-        subscribed_channels = subscription_crud.get_subscribed_channels(user_id)
+        subscribed_channels = await subscription_crud.get_subscribed_channels(user_id)
 
         ikb_my_channels = get_choose_channels_ikb(subscribed_channels)
 
@@ -21,7 +21,7 @@ class ChannelLogicHandler:
         user_id = message.from_user.id
 
         subscription_crud = SubscriptionCRUD()
-        subscribed_channels = subscription_crud.get_subscribed_channels(user_id)
+        subscribed_channels = await subscription_crud.get_subscribed_channels(user_id)
 
         ikb_my_channels = get_choose_channels_ikb(subscribed_channels)
 

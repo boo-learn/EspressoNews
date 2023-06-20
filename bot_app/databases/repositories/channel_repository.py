@@ -3,6 +3,8 @@ from shared.database import async_session
 from shared.models import Channel
 from sqlalchemy.exc import SQLAlchemyError
 
+from sqlalchemy.future import select
+
 
 class ChannelRepository:
     async def create(self, **kwargs) -> Channel:
@@ -19,7 +21,9 @@ class ChannelRepository:
     async def get(self, channel_username: str) -> Optional[Channel]:
         try:
             async with async_session() as session:
-                return await session.query(Channel).filter_by(channel_username=channel_username).first()
+                stmt = select(Channel).where(Channel.channel_username == channel_username)
+                result = await session.execute(stmt)
+                return result.scalars().first()
         except SQLAlchemyError as e:
             raise e
 

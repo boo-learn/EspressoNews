@@ -29,8 +29,7 @@ async def action_forward_message(message: types.Message, state: FSMContext):
         channel_crud = ChannelCRUD()
         subscription_crud = SubscriptionCRUD()
 
-        channel = channel_crud.check_channel_and_create_if_empty(
-            message.from_user.id,
+        channel = await channel_crud.check_channel_and_create_if_empty(
             channel_username,
             message.forward_from_chat.full_name,
             message.forward_from_chat.invite_link,
@@ -38,7 +37,7 @@ async def action_forward_message(message: types.Message, state: FSMContext):
             members_count
         )
 
-        subscription_crud.update_subscription(message.from_user.id, channel, True)
+        await subscription_crud.update_subscription(message.from_user.id, channel, True)
 
         await message.reply(
             gen_success_subscribe_mess(message.forward_from_chat.full_name),
@@ -59,7 +58,7 @@ async def subscribe_to_the_channel(call: types.CallbackQuery):
     subscription_crud = SubscriptionCRUD()
 
     # отпишись и удались
-    channel = channel_crud.get_channel(channel_username)
-    subscription_crud.update_subscription(call.message.from_user.id, channel)
-    channel_crud.check_channel_and_delete_if_empty(channel)
+    channel = await channel_crud.get_channel(channel_username)
+    await subscription_crud.update_subscription(call.message.from_user.id, channel)
+    await channel_crud.check_channel_and_delete_if_empty(channel)
 

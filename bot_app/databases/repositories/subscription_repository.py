@@ -3,6 +3,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from shared.database import async_session
 from shared.models import Subscription, Channel
 
+from sqlalchemy.future import select
+
 
 class SubscriptionRepository:
     async def create(self, user_id: int, channel: Channel) -> Subscription:
@@ -19,22 +21,22 @@ class SubscriptionRepository:
     async def get(self, user_id: int, channel: Channel):
         async with async_session() as session:
             try:
-                return await session.query(Subscription).filter_by(
+                return (await session.execute(select(Subscription).filter_by(
                     user_id=user_id,
                     channel_id=channel.channel_id
-                ).one_or_none()
+                ))).scalar_one_or_none()
             except SQLAlchemyError as e:
                 raise e
 
     async def get_channels_count(self, channel: Channel):
         async with async_session() as session:
-            return await session.query(Subscription).filter(Subscription.channel_id == channel.channel_id).count()
+            return await select(Subscription).filter(Subscription.channel_id == channel.channel_id).count()
 
     async def get_channels(self, user_id: int):
         async with async_session() as session:
             try:
                 return (
-                    await session.query(Channel)
+                    await select(Channel)
                     .join(Subscription, Channel.channel_id == Subscription.channel_id)
                     .filter(Subscription.user_id == user_id, Subscription.is_active is True)
                     .all()
