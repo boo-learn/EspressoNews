@@ -1,12 +1,6 @@
-import asyncio
 from logging.config import fileConfig
-import greenlet
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.util import greenlet_spawn
-import asyncio
 from shared.models import Base
-from shared.database import DATABASE_URI
+from shared.database import sync_DATABASE_URI
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -31,9 +25,8 @@ target_metadata = Base.metadata
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
-config.set_main_option("sqlalchemy.url", DATABASE_URI)
-print(f"{DATABASE_URI=}")
-
+config.set_main_option("sqlalchemy.url", sync_DATABASE_URI)
+print(f"{sync_DATABASE_URI=}")
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -65,23 +58,22 @@ def run_migrations_online() -> None:
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
+
     """
     print("****online")
-    connectable = create_async_engine(config.get_main_option("sqlalchemy.url"))
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
 
-    async def async_migration():
-        async with connectable.begin() as connection:
-            await connection.run_sync(Base.metadata.create_all)
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
 
-            def configure_context(sync_connection):
-                context.configure(
-                    connection=sync_connection, target_metadata=target_metadata
-                )
-
-            await connection.run_sync(configure_context)
+        with context.begin_transaction():
             context.run_migrations()
-
-    greenlet_spawn(asyncio.run, async_migration())
 
 
 if context.is_offline_mode():
