@@ -1,4 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import joinedload
 
 from shared.database import async_session
 from shared.models import Subscription, Channel
@@ -21,7 +22,7 @@ class SubscriptionRepository:
     async def get(self, user_id: int, channel: Channel):
         async with async_session() as session:
             try:
-                return (await session.execute(select(Subscription).filter_by(
+                return (await session.execute(select(Subscription).options(joinedload(Subscription.channel)).filter_by(
                     user_id=user_id,
                     channel_id=channel.channel_id
                 ))).scalar_one_or_none()
