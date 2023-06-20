@@ -44,9 +44,9 @@ class Channel(Base):
     # user_id = Column(Integer, ForeignKey('users.user_id'))  # Add this line
     channel_name = Column(String, nullable=False)
     channel_username = Column(String(50), nullable=False)
-    description = Column(Text, nullable=False)
-    member_count = Column(Integer, nullable=False)
-    channel_invite_link = Column(String(65), nullable=False)
+    channel_description = Column(Text, nullable=True)
+    member_count = Column(Integer, nullable=True)
+    channel_invite_link = Column(String(65), nullable=True)
 
     is_active = Column(Boolean, default=True)
 

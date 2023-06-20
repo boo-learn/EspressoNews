@@ -37,7 +37,7 @@ load_env() {
 }
  
 load_auto_env() {
-  if [ -f .env.local ]; then
+  if [ -f .env ]; then
       load_env local;
   elif [ -f .env.test ]; then
       load_env test;
