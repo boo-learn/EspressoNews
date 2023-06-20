@@ -21,12 +21,13 @@ class User(Base):
     join_date = Column(DateTime, nullable=False, default=datetime.now)
 
     subscriptions = relationship('Subscription', back_populates='user')
-    access_channels = relationship("Channel", back_populates="user")
+    # access_channels = relationship("Channel", back_populates="user")
 
 
 class Subscription(Base):
     __tablename__ = 'subscriptions'
 
+    # +
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
     channel_id = Column(Integer, ForeignKey('channels.channel_id'), primary_key=True)
     subscription_date = Column(DateTime, nullable=False, default=datetime.now)
@@ -40,7 +41,7 @@ class Channel(Base):
     __tablename__ = 'channels'  # Change this line
 
     channel_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))  # Add this line
+    # user_id = Column(Integer, ForeignKey('users.user_id'))  # Add this line
     channel_name = Column(String, nullable=False)
     channel_username = Column(String(50), nullable=False)
     description = Column(Text, nullable=False)
@@ -49,7 +50,7 @@ class Channel(Base):
 
     is_active = Column(Boolean, default=True)
 
-    user = relationship("User", back_populates="access_channels")
+    # user = relationship("User", back_populates="access_channels")
     subscriptions = relationship('Subscription', back_populates='channel')
     posts = relationship('Post', back_populates='channel')
 
