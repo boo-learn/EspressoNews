@@ -1,11 +1,11 @@
-from shared.database import SessionLocal
+from shared.database import async_session
 from shared.models import Subscription, Channel
 from sqlalchemy.exc import SQLAlchemyError
 
 
 class SubscriptionRepository:
     def __init__(self):
-        self.session = SessionLocal()
+        self.session = async_session()
 
     def create(self, user_id: int, channel: Channel) -> Subscription:
         try:

@@ -1,12 +1,12 @@
 from typing import Optional
-from shared.database import SessionLocal
+from shared.database import async_session
 from shared.models import Channel
 from sqlalchemy.exc import SQLAlchemyError
 
 
 class ChannelRepository:
     def __init__(self):
-        self.session = SessionLocal()
+        self.session = async_session()
 
     def create(self, **kwargs) -> Channel:
         try:
