@@ -5,30 +5,30 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 class ChannelRepository:
-    def __init__(self):
-        self.session = async_session()
-
-    def create(self, **kwargs) -> Channel:
+    async def create(self, **kwargs) -> Channel:
         try:
-            channel = Channel(**kwargs)
-            self.session.add(channel)
-            self.session.commit()
-            return channel
+            async with async_session() as session:
+                channel = Channel(**kwargs)
+                session.add(channel)
+                await session.commit()
+                return channel
         except SQLAlchemyError as e:
-            self.session.rollback()
+            await session.rollback()
             raise e
 
-    def get(self, channel_username: str) -> Optional[Channel]:
+    async def get(self, channel_username: str) -> Optional[Channel]:
         try:
-            return self.session.query(Channel).filter_by(channel_username=channel_username).first()
+            async with async_session() as session:
+                return await session.query(Channel).filter_by(channel_username=channel_username).first()
         except SQLAlchemyError as e:
             raise e
 
-    def delete(self, channel: Channel):
+    async def delete(self, channel: Channel):
         try:
-            self.session.delete(channel)
-            self.session.commit()
-            return True
+            async with async_session() as session:
+                session.delete(channel)
+                await session.commit()
+                return True
         except SQLAlchemyError as e:
-            self.session.rollback()
+            await session.rollback()
             raise e
