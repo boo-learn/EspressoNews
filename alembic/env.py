@@ -2,7 +2,9 @@ import asyncio
 from logging.config import fileConfig
 import greenlet
 from sqlalchemy.ext.asyncio import create_async_engine
-
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.util import greenlet_spawn
+import asyncio
 from shared.models import Base
 from shared.database import DATABASE_URI
 
@@ -67,22 +69,19 @@ def run_migrations_online() -> None:
     print("****online")
     connectable = create_async_engine(config.get_main_option("sqlalchemy.url"))
 
-    def run_async_migration():
-        async def async_migration():
-            async with connectable.begin() as connection:
-                await connection.run_sync(Base.metadata.create_all)
+    async def async_migration():
+        async with connectable.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
 
-                def configure_context(sync_connection):
-                    context.configure(
-                        connection=sync_connection, target_metadata=target_metadata
-                    )
+            def configure_context(sync_connection):
+                context.configure(
+                    connection=sync_connection, target_metadata=target_metadata
+                )
 
-                await connection.run_sync(configure_context)
-                context.run_migrations()
+            await connection.run_sync(configure_context)
+            context.run_migrations()
 
-        asyncio.run(async_migration())
-
-    greenlet.greenlet(run_async_migration).run()
+    greenlet_spawn(asyncio.run, async_migration())
 
 
 if context.is_offline_mode():
