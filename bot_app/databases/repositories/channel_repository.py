@@ -1,4 +1,7 @@
 from typing import Optional
+
+from sqlalchemy.orm import selectinload
+
 from shared.database import async_session
 from shared.models import Channel
 from sqlalchemy.exc import SQLAlchemyError
@@ -21,7 +24,11 @@ class ChannelRepository:
     async def get(self, channel_username: str) -> Optional[Channel]:
         try:
             async with async_session() as session:
-                stmt = select(Channel).where(Channel.channel_username == channel_username)
+                stmt = (
+                    select(Channel)
+                    .where(Channel.channel_username == channel_username)
+                    .options(selectinload(Channel.subscriptions))
+                )
                 result = await session.execute(stmt)
                 return result.scalars().first()
         except SQLAlchemyError as e:
