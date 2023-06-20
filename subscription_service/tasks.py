@@ -3,7 +3,7 @@ from telethon.sessions import StringSession
 
 from shared.db_utils import (get_account_from_db_async)
 from shared.celery_app import subscriptions_celery_app
-from subscription_service.db_utils import subscribe_to_channel, unsubscribe_from_channel
+from db_utils import subscribe_to_channel, unsubscribe_from_channel
 
 
 @subscriptions_celery_app.task
