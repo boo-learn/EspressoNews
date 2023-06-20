@@ -5,8 +5,9 @@ from telethon import TelegramClient
 from telethon.errors import SessionRevokedError
 from telethon.sessions import StringSession
 
-from db_utils import get_subscribed_channels, \
-    remove_account_from_db_async, get_first_active_account_from_db_async, add_post_async
+from shared.db_utils import get_subscribed_channels, \
+    remove_account_from_db_async, get_first_active_account_from_db_async
+from db_utils import add_post_async
 from shared.models import Post
 from shared.rabbitmq import Subscriber, QueuesType
 from shared.config import RABBIT_HOST
