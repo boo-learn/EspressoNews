@@ -32,6 +32,7 @@ target_metadata = Base.metadata
 config.set_main_option("sqlalchemy.url", DATABASE_URI)
 print(f"{DATABASE_URI=}")
 
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -70,9 +71,12 @@ async def run_migrations_online() -> None:
     async with connectable.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
 
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        def configure_context(sync_connection):
+            context.configure(
+                connection=sync_connection, target_metadata=target_metadata
+            )
+
+        await connection.run_sync(configure_context)
 
         context.run_migrations()
 
