@@ -1,14 +1,18 @@
 import asyncio
 from celery import shared_task
 
-from shared.rabbitmq import Producer, QueuesType
+from shared.rabbitmq import Producer, QueuesType, MessageData
 from shared.config import RABBIT_HOST
 
 
 async def collect_news_async():
+    # Пример отправки:
     producer = Producer(host=RABBIT_HOST)
-    await producer.send_message(message='collect_news', queue=QueuesType.news_collection_service)
-    await producer.close()
+    message: MessageData = {
+        "type": "collect_news",
+        "data": None
+    }
+    await producer.send_message(message_with_data=message, queue=QueuesType.news_collection_service)
 
 
 @shared_task
