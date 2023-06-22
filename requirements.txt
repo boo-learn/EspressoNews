@@ -45,6 +45,7 @@ numexpr==2.8.4
 numpy==1.25.0
 openai==0.27.8
 openapi-schema-pydantic==1.2.4
+opentele==1.15.1
 packaging==23.1
 pamqp==3.2.1
 pandas==2.0.2
@@ -61,6 +62,9 @@ pyaes==1.6.1
 pyasn1==0.5.0
 pydantic==1.10.9
 Pygments==2.15.1
+PyQt5==5.15.9
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.12.1
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 python-Levenshtein==0.21.1
@@ -76,6 +80,7 @@ SQLAlchemy==2.0.16
 stack-data==0.6.2
 Telethon==1.28.5
 tenacity==8.2.2
+TgCrypto==1.2.5
 tiktoken==0.4.0
 tqdm==4.65.0
 traitlets==5.9.0
