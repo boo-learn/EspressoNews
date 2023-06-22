@@ -9,7 +9,7 @@ from shared.db_utils import get_subscribed_channels, \
     remove_account_from_db_async, get_first_active_account_from_db_async
 from db_utils import add_post_async
 from shared.models import Post
-from shared.rabbitmq import Subscriber, QueuesType
+from shared.rabbitmq import Subscriber, QueuesType, MessageData
 from shared.config import RABBIT_HOST
 
 
@@ -61,8 +61,9 @@ async def collect_news():
 
 
 async def main():
+    # Пример подписки:
     subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.news_collection_service)
-    subscriber.subscribe("collect_news", collect_news)
+    subscriber.subscribe(message_type="collect_news", callback=collect_news)
 
 
 if __name__ == "__main__":
