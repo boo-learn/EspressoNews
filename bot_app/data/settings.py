@@ -1,11 +1,8 @@
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+from shared.config import TELEGRAM_TOKEN
 
-TELEGRAM_BOT_TOKEN = str(os.getenv("TELEGRAM_BOT_TOKEN"))
-
-OPENAI_API_KEY = str(os.getenv("OPENAI_API_KEY"))
+TELEGRAM_BOT_TOKEN = TELEGRAM_TOKEN
 
 admins = [
     714582939,

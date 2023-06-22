@@ -12,3 +12,4 @@ bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 storage = MemoryStorage()
 
 dp = Dispatcher(bot, storage=storage)
+
