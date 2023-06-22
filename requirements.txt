@@ -86,3 +86,7 @@ urllib3==1.26.16
 vine==5.0.0
 wcwidth==0.2.6
 yarl==1.9.2
+
+python-dotenv~=1.0.0
+pathspec~=0.11.1
+httpx~=0.24.1
