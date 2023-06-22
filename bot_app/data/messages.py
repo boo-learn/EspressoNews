@@ -84,15 +84,15 @@ def gen_sure_unsubscribe_mess(channel_title):
     return message
 
 
-# subscribe to the channel
-def gen_sure_subscribe_mess(original_channel):
-    message = f"Вы точно хотите подписаться на канал \"{original_channel.title}\"?"
+# not subscribe, cause hidden channel
+def gen_subscribe_failed_mess():
+    message = f"К сожалению, вы не можете подписаться на закрытый канал!"
 
     return message
 
 
 # subscribe success
-def gen_success_subscribe_mess():
-    message = f"Подписка оформлена успешно"
+def gen_success_subscribe_mess(channel_title):
+    message = f"Вы подписались на канал {channel_title}"
 
     return message

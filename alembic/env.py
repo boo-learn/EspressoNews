@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 from shared.models import Base
-from shared.database import DATABASE_URI
+from shared.database import sync_DATABASE_URI
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -25,8 +25,8 @@ target_metadata = Base.metadata
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
-config.set_main_option("sqlalchemy.url", DATABASE_URI)
-print(f"{DATABASE_URI=}")
+config.set_main_option("sqlalchemy.url", sync_DATABASE_URI)
+print(f"{sync_DATABASE_URI=}")
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
