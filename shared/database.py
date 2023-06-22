@@ -3,10 +3,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from .config import POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, POSTGRES_DB
+from shared.config import POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, POSTGRES_DB, DB_PORT
 
 # Замените следующие значения настройками вашей базы данных
-DATABASE_URI = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}/{POSTGRES_DB}'
+DATABASE_URI = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}'
 
 # Асинхронный движок и сессия
 engine = create_async_engine(DATABASE_URI)
