@@ -46,7 +46,6 @@ numpy==1.25.0
 openai==0.27.8
 openapi-schema-pydantic==1.2.4
 packaging==23.1
-opentele==1.15.1
 pamqp==3.2.1
 pandas==2.0.2
 parso==0.8.3
@@ -63,6 +62,7 @@ pyasn1==0.5.0
 pydantic==1.10.9
 Pygments==2.15.1
 python-dateutil==2.8.2
+python-dotenv==1.0.0
 python-Levenshtein==0.21.1
 pytz==2023.3
 PyYAML==6.0

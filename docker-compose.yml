@@ -84,5 +84,16 @@ services:
       - rabbitmq
       - celery2
 
+  digest_service:
+    build:
+      context: .
+      dockerfile: DockerfileDigestService
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+      - rabbitmq
+      - celery2
+
 volumes:
   postgres_data:
