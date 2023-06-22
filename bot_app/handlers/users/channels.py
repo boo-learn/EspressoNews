@@ -20,7 +20,8 @@ async def choose_channel_callback(call: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text='unsubscribe', state=ChannelStates.choose_channel_for_delete)
 async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext):
-    channel_username = await state.get_data('choose_channel_for_delete')
+    state_data = await state.get_data('choose_channel_for_delete')
+    channel_username = state_data['choose_channel_for_delete']
 
     await delete_previus_message_for_feedback(call)
     await call.message.delete()
@@ -28,14 +29,12 @@ async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext)
     subscription_crud = SubscriptionCRUD()
     channel_crud = ChannelCRUD()
 
-    channel = channel_crud.get_channel(channel_username)
+    channel = await channel_crud.get_channel(channel_username)
 
-    subscription_for_delete = subscription_crud.get_subscription(call.message.from_user.id, channel)
-    SubscriptionCRUD.delete_subscription(subscription_for_delete)
+    subscription_for_delete = await subscription_crud.get_subscription(call.from_user.id, channel)
+    await subscription_crud.delete_subscription(subscription_for_delete)
 
-    print(f'Subscription for {channel_username} deleted')
-
-    SubscriptionCRUD.check_channel_and_delete_if_empty(channel)
+    await subscription_crud.check_channel_and_delete_if_empty(channel)
 
     logic_handler = ChannelLogicHandler()
     await logic_handler.send_channels_list_to_user_after_remove(channel.channel_name, call.message, state)
@@ -49,4 +48,4 @@ async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext)
     await state.finish()
 
     logic_handler = ChannelLogicHandler()
-    await logic_handler.send_channels_list_to_user(call.message)
+    await logic_handler.send_channels_list_to_user(call, True)

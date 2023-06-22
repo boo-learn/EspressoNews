@@ -4,18 +4,20 @@ from bot_app.keyboards.inlines.channels import get_choose_channels_ikb
 
 class ChannelLogicHandler:
     @staticmethod
-    async def send_channels_list_to_user(message):
-        user_id = message.from_user.id
+    async def send_channels_list_to_user(call_or_message, if_callback_func=False):
+        user_id = call_or_message.from_user.id
+
+        if if_callback_func:
+            call_or_message = call_or_message.message
 
         subscription_crud = SubscriptionCRUD()
         subscribed_channels = await subscription_crud.get_subscribed_channels(user_id)
 
-        ikb_my_channels = get_choose_channels_ikb(subscribed_channels)
-
-        if ikb_my_channels.inline_keyboard[0]:
-            await message.answer(text="Список каналов:", reply_markup=ikb_my_channels)
+        if subscribed_channels:
+            ikb_my_channels = get_choose_channels_ikb(subscribed_channels)
+            await call_or_message.answer(text="Список каналов:", reply_markup=ikb_my_channels)
         else:
-            await message.answer(text="Пока что вы не подписаны не на какие каналы.")
+            await call_or_message.answer(text="Пока что вы не подписаны не на какие каналы.")
 
     async def send_channels_list_to_user_after_remove(self, channel_name, message, state):
         user_id = message.from_user.id
@@ -32,7 +34,7 @@ class ChannelLogicHandler:
 
         await state.finish()
 
-        if ikb_my_channels.inline_keyboard[0]:
+        if subscribed_channels:
             await message.answer(text='Список каналов:', reply_markup=ikb_my_channels)
         else:
             await message.answer(text='Пока что вы не подписаны не на какие каналы.')

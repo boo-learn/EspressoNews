@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 
@@ -12,7 +13,7 @@ class SubscriptionRepository:
         async with async_session() as session:
             try:
                 subscription = Subscription(user_id=user_id, channel_id=channel.channel_id)
-                await session.add(subscription)
+                session.add(subscription)
                 await session.commit()
                 return subscription
             except SQLAlchemyError as e:
@@ -22,35 +23,31 @@ class SubscriptionRepository:
     async def get(self, user_id: int, channel: Channel):
         async with async_session() as session:
             try:
-                result = await session.execute(
+                stmt = (
                     select(Subscription)
-                    .options(
-                        joinedload(Subscription.user),
-                        joinedload(Subscription.channel)
-                    )
-                    .filter_by(
-                        user_id=user_id,
-                        channel_id=channel.channel_id
-                    )
+                    .options(joinedload(Subscription.user), joinedload(Subscription.channel))
+                    .filter_by(user_id=user_id, channel_id=channel.channel_id)
                 )
-                return result.scalar_one_or_none()
+                result = await session.execute(stmt)
+                return result.scalars().first()
             except SQLAlchemyError as e:
                 raise e
 
     async def get_channels_count(self, channel_id):
         async with async_session() as session:
-            return await select(Subscription).filter(Subscription.channel_id == channel_id).count().scalar_one_or_none(
-                session)
+            stmt = select(func.count()).select_from(Subscription).where(Subscription.channel_id == channel_id)
+            count = await session.scalar(stmt)
+            return count
 
     async def get_channels(self, user_id: int):
         async with async_session() as session:
             try:
-                return (
-                    await select(Channel)
-                    .join(Subscription, Channel.channel_id == Subscription.channel_id)
-                    .filter(Subscription.user_id == user_id, Subscription.is_active is True)
-                    .all()
+                stmt = select(Channel).join(Subscription, Channel.channel_id == Subscription.channel_id).filter(
+                    Subscription.user_id == user_id, Subscription.is_active == True
                 )
+                result = await session.execute(stmt)
+                channels = result.fetchall()
+                return channels
             except SQLAlchemyError as e:
                 raise e
 
@@ -65,6 +62,7 @@ class SubscriptionRepository:
                 raise e
 
     async def delete(self, subscription: Subscription) -> bool:
+        print(subscription)
         async with async_session() as session:
             try:
                 await session.delete(subscription)

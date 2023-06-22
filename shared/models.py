@@ -51,7 +51,7 @@ class Channel(Base):
     is_active = Column(Boolean, default=True)
 
     # user = relationship("User", back_populates="access_channels")
-    subscriptions = relationship('Subscription', back_populates='channel')
+    subscriptions = relationship('Subscription', back_populates='channel', cascade='all, delete-orphan')
     posts = relationship('Post', back_populates='channel')
 
 

@@ -6,7 +6,7 @@ def get_choose_channels_ikb(subscribed_channels):
     ikb_my_channels = InlineKeyboardMarkup(row_width=2)
     for channel in subscribed_channels:
         channel_button = InlineKeyboardButton(
-            text=channel.channel_name, callback_data=f"choose_channel_{channel.channel_username}"
+            text=channel[0].channel_name, callback_data=f"choose_channel_{channel[0].channel_username}"
         )
         ikb_my_channels.insert(channel_button)
 

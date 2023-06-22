@@ -14,7 +14,7 @@ class ChannelRepository:
         try:
             async with async_session() as session:
                 channel = Channel(**kwargs)
-                await session.add(channel)
+                session.add(channel)
                 await session.commit()
                 return channel
         except SQLAlchemyError as e:
