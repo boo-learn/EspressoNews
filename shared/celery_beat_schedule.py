@@ -13,4 +13,8 @@ beat_schedule = {
         'task': 'subscriptions.tasks.unsubscribe',
         'schedule': timedelta(minutes=1),
     },
+    'summarize_news_every_minute': {
+        'task': 'summary_service.tasks.summarize_news',
+        'schedule': timedelta(minutes=1),
+    },
 }
