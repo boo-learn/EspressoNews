@@ -1,6 +1,15 @@
 import asyncio
 from shared.rabbitmq import Subscriber, QueuesType
 from shared.config import RABBIT_HOST
+from shared.database import async_session
+from shared.models import User
+
+
+async def create_user():
+    session = async_session()
+    user = User(username="test_user")
+    session.add(user)
+    session.commit()
 
 
 async def update_digest():
