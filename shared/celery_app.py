@@ -19,7 +19,12 @@ news_collector_task_routes = {
     "news_collector.tasks.collect_news": {"queue": "news_queue"},
 }
 
+summarize_task_routes = {
+    "summary_service.tasks.summarize_news": {"queue": "summary_queue"},
+}
+
 subscriptions_celery_app = create_celery_app('subscriptions', 'redis://redis:6379/0', subscriptions_task_routes)
 news_collector_celery_app = create_celery_app('news_collector', 'redis://redis:6379/0',
                                               news_collector_task_routes)
+summarize_celery_app = create_celery_app('summary_service', 'redis://redis:6379/0', summarize_task_routes)
 news_collector_celery_app.conf.beat_schedule = beat_schedule
