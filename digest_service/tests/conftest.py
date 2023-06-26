@@ -10,9 +10,10 @@ from shared import config
 # pytest digest_service/tests/testsconf.py -v -o log_cli=true
 from shared.models import Base
 
-logging.basicConfig()
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+pytest_plugins = ['db_fixtures']
+# logging.basicConfig()
+# logger = logging.getLogger()
+# logger.setLevel(logging.DEBUG)
 
 test_db = factories.postgresql_noproc(
     host=config.DB_HOST.split(":")[0],
