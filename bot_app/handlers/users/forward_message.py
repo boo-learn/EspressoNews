@@ -59,8 +59,6 @@ async def subscribe_to_the_channel(call: types.CallbackQuery):
 
     # отпишись и удались
 
-
     channel = await channel_crud.get_channel(channel_username)
     await subscription_crud.update_subscription(call.from_user.id, channel, False)
     await channel_crud.check_channel_and_delete_if_empty(channel)
-

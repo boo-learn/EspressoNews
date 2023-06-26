@@ -123,7 +123,6 @@ class TelegramAccount(Base):
     session_string = Column(String, nullable=True)
 
     is_active = Column(Boolean, default=True)
-    last_connected = Column(DateTime, nullable=False)
 
 
 class GPTAccount(Base):
@@ -133,4 +132,3 @@ class GPTAccount(Base):
     api_key = Column(String(100))
 
     is_active = Column(Boolean, default=True)
-    last_connected = Column(DateTime, nullable=False)

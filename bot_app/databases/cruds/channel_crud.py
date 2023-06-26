@@ -31,6 +31,7 @@ class ChannelCRUD:
 
         if not channel:
             channel = await self.create_channel(username, name, description, invite_link, members_count)
+            channel = await self.repository.get(username)
 
         # producer = Producer(host=RABBIT_HOST)
         # await producer.send_message(message='subscribe', queue=QueuesType.subscription_service)
