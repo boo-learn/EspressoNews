@@ -9,6 +9,7 @@ COPY ./alembic.ini /app
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
+ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run scripts when the container launches
 CMD alembic upgrade head
