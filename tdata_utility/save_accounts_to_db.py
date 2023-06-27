@@ -1,12 +1,13 @@
 import asyncio
 import os
+import glob
 
 from telethon.sessions import StringSession
 from telethon.sync import TelegramClient
 
 from shared.models import TelegramAccount
 
-from tdata_utility.db_utils import save_account_to_db_sync
+from db_utils import save_account_to_db_sync
 import configparser
 import asyncio
 from telethon import TelegramClient
@@ -46,26 +47,25 @@ async def main(config_file):
     api_hash = str(api_hash)
     api_id = int(api_id)
 
-    phone = config['Telegram']['phone']
     username = config['Telegram']['username']
+    session_string = config['Telegram']['session_string']
 
     # Create the client and connect
-    client = TelegramClient(username, api_id, api_hash)
+    client = TelegramClient(StringSession(session_string), api_id, api_hash)
     await client.connect()
     print(f"Client Created for {config_file}")
 
     # Ensure you're authorized
     if not await client.is_user_authorized():
-        await client.send_code_request(phone)
-        try:
-            await client.sign_in(phone, input(f'Enter the code for {config_file}: '))
-        except SessionPasswordNeededError:
-            await client.sign_in(password=input(f'Password for {config_file}: '))
+        raise SessionPasswordNeededError
+    
+    await save_account(client)
 
 
-# List of config files
-Accounts = ["config1.ini"]
+# Получаем список всех файлов с расширением .ini в папке accounts
+accounts_path = os.path.join(os.path.dirname(__file__), 'accounts')
+config_files = glob.glob(os.path.join(accounts_path, '*.ini'))
 
-# Run the main function for each config file
-for config_file in Accounts:
+# Запускаем main функцию для каждого файла конфигурации
+for config_file in config_files:
     asyncio.run(main(config_file))

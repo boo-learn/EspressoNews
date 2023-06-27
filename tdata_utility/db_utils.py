@@ -1,4 +1,4 @@
-from shared.database import SessionLocal
+from shared.database import sync_session
 from shared.models import TelegramAccount
 from sqlalchemy.orm import Session
 
@@ -16,7 +16,7 @@ def save_account_to_db(db: Session, account: TelegramAccount):
 
 
 def save_account_to_db_sync(account: TelegramAccount):
-    db = SessionLocal()
+    db = sync_session()
     try:
         save_account_to_db(db, account)
     finally:
