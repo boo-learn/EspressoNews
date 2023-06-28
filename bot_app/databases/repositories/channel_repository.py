@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Optional
 
 from sqlalchemy.orm import selectinload
@@ -16,6 +17,7 @@ class ChannelRepository:
                 channel = Channel(**kwargs)
                 session.add(channel)
                 await session.commit()
+                session.expunge(channel)  # Отсоединяем объект от сессии
                 return channel
         except SQLAlchemyError as e:
             await session.rollback()

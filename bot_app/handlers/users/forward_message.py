@@ -12,7 +12,7 @@ from bot_app.utils import delete_previus_message_for_feedback
 # в функцию не передаётся members count
 @dp.message_handler(content_types=types.ContentTypes.ANY)
 async def action_forward_message(message: types.Message, state: FSMContext):
-    if message.forward_from_chat:
+    if message.forward_from_chat['type'] == 'channel':
         channel_username = message.forward_from_chat.username
         members_count = await message.forward_from_chat.get_members_count()
 
@@ -59,8 +59,6 @@ async def subscribe_to_the_channel(call: types.CallbackQuery):
 
     # отпишись и удались
 
-
     channel = await channel_crud.get_channel(channel_username)
     await subscription_crud.update_subscription(call.from_user.id, channel, False)
     await channel_crud.check_channel_and_delete_if_empty(channel)
-

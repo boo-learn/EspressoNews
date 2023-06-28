@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.types import CallbackQuery
 
-from bot_app.data.messages import gen_start_mess, gen_mess_after_start_btn, gen_manual_mess
+from bot_app.data.messages import gen_start_mess, gen_mess_after_start_btn, gen_manual_mess, gen_return_message
 from bot_app.databases.cruds import UserCRUD
 from bot_app.keyboards.inlines import ikb_start, get_posts_rubrics
 from bot_app.loader import dp
@@ -31,3 +31,11 @@ async def action_after_start_btn(call: CallbackQuery):
         gen_mess_after_start_btn(call.from_user.first_name),
         reply_markup=get_posts_rubrics()
     )
+
+
+@dp.callback_query_handler(text='return')
+async def action_after_start_btn(call: CallbackQuery):
+    await delete_previus_message_for_feedback(call)
+    await call.message.delete()
+
+    await call.message.answer(gen_return_message())

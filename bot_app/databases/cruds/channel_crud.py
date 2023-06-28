@@ -1,6 +1,7 @@
+import asyncio
+
 from bot_app.databases.repositories import ChannelRepository
-from shared.config import RABBIT_HOST
-from shared.rabbitmq import Producer, QueuesType
+from bot_app.tasks.subscription.tasks import new_subscribe, waiting_subscribe
 
 
 class ChannelCRUD:
@@ -31,10 +32,10 @@ class ChannelCRUD:
 
         if not channel:
             channel = await self.create_channel(username, name, description, invite_link, members_count)
+            channel = await self.repository.get(username)
 
-        # producer = Producer(host=RABBIT_HOST)
-        # await producer.send_message(message='subscribe', queue=QueuesType.subscription_service)
-        # await producer.close()
+        # send_message_subscribe
+
 
         return channel
 
