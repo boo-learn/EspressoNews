@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 async def check_subscriptions():
+    logger.info("I received a command.")
     loaded_account = await get_first_active_account_from_db_async()
 
     if loaded_account:
