@@ -1,28 +1,30 @@
 import pytest
-# from .testsconf import db_session, logger, test_db
 from shared.models import User
+from conftest import logger
 
+
+# @pytest.fixture(scope="module", params=["Winifred", "Sarah", "Mary"])
+# def create_test_data(request):
+#     return User(username=request.param, language_code="ru")
 
 @pytest.fixture(scope="module")
-def create_test_data():
-    """Let's create the test data with the three witches names."""
-    names = ["Winifred", "Sarah", "Mary"]
-    test_objs = []
-    for name in names:
-        test_objs.append(User(username=name, language_code="ru"))
+def create_user(db_session):
+    def _create_user(user_data):
+        user = User(**user_data)
+        session = db_session()
+        session.add(user)
+        session.commit()
+        return user
 
-    return test_objs
+    return _create_user
 
 
-def test_create_user(db_session, create_test_data):
-    s = db_session()
-    for obj in create_test_data:
-        s.add(obj)
-    s.commit()
-    logger.info("Added test data to the database.")
+def test_create_user(db_session, create_user):
+    session = db_session()
+    user = create_user({"username": "Ivan"})
+    logger.info("Added user to the database.")
 
-    query_result = s.query(User).all()
-    print(f"{query_result}")
-    s.close()
+    query_result = session.query(User).first()
+    session.close()
 
-    assert create_test_data[0].username in query_result[0].username
+    assert user.username == query_result.username

@@ -42,7 +42,6 @@ def db_session(setup_database, connection):
     yield scoped_session(
         sessionmaker(autocommit=False, autoflush=False, bind=connection)
     )
-
     # transaction.rollback()
 
 

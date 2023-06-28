@@ -1,5 +1,5 @@
 import pytest
-from digest_service.tests.testsconf import logger
+from digest_service.tests.conftest import logger
 
 
 @pytest.fixture
@@ -18,6 +18,13 @@ class TestB:
     def test_c(self):
         with pytest.raises(ZeroDivisionError):
             1 / 0
+
+
+# fixture scopes
+# @pytest.fixture(scope="session")
+# @pytest.fixture(scope="module")
+# @pytest.fixture(scope="class")
+# @pytest.fixture(scope="function")
 
 
 # fixture factory
@@ -58,4 +65,3 @@ def open_file():
 def test_file(open_file):
     assert open_file("file1.txt").read() == "data1"
     assert open_file("file2.txt").read() == "data2"
-
