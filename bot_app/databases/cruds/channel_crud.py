@@ -1,7 +1,7 @@
 import asyncio
 
 from bot_app.databases.repositories import ChannelRepository
-from bot_app.tasks.subscription.tasks import new_subscribe, waiting_subscribe
+from bot_app.tasks.subscription.tasks import subscribe_to_channel
 
 
 class ChannelCRUD:
@@ -35,7 +35,7 @@ class ChannelCRUD:
             channel = await self.repository.get(username)
 
         # send_message_subscribe
-
+        await subscribe_to_channel()
 
         return channel
 
