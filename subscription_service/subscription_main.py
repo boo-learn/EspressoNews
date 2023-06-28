@@ -55,14 +55,10 @@ async def check_subscriptions(message_data):
             logger.info(f"Channels to unsubscribe: {channels_to_unsubscribe}")
 
             for channel_username in channels_to_subscribe:
-                subscribe_task.apply_async(
-                    args=(loaded_account.account_id, channel_username),
-                    task_id='subscriptions.tasks.subscribe_task')
+                subscribe_task.apply_async(args=[loaded_account.account_id, channel_username], countdown=60)
 
             for channel_username in channels_to_unsubscribe:
-                unsubscribe_task.apply_async(
-                    args=(loaded_account.account_id, channel_username),
-                    task_id="subscriptions.tasks.unsubscribe_task")
+                unsubscribe_task.apply_async(args=[loaded_account.account_id, channel_username], countdown=60)
 
         except SessionRevokedError:
             logger.error("The session has been revoked by the user.")

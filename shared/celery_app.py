@@ -28,5 +28,4 @@ news_collector_celery_app = create_celery_app('news_collector', 'redis://redis:6
                                               news_collector_task_routes)
 summarize_celery_app = create_celery_app('summary_service', 'redis://redis:6379/0', summarize_task_routes)
 news_collector_celery_app.conf.beat_schedule = beat_schedule
-subscriptions_celery_app.conf.beat_schedule = beat_schedule
 
