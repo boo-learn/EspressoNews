@@ -84,7 +84,6 @@ venv.bak/
 
 # End of https://www.toptal.com/developers/gitignore/api/venv,python,visualstudiocode
 /utility/
-/tdata_utility/accounts/
 /tmp/
 /project_structure.txt
 /project_tree.ps1

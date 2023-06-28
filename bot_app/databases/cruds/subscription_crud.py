@@ -9,10 +9,10 @@ class SubscriptionCRUD:
         self.repository = SubscriptionRepository()
 
     async def get_subscription(self, user_id, channel):
-        return await self.repository.get(user_id, channel)
+        return await self.repository.get(user_id, channel.channel_id)
 
     async def update_subscription(self, user_id, channel, switch=True):
-        subscription = await self.repository.get(user_id, channel)
+        subscription = await self.repository.get(user_id, channel.channel_id)
 
         if switch:
             if not subscription:

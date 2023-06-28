@@ -20,13 +20,13 @@ class SubscriptionRepository:
                 await session.rollback()
                 raise e
 
-    async def get(self, user_id: int, channel: Channel):
+    async def get(self, user_id: int, channel_id: int):
         async with async_session() as session:
             try:
                 stmt = (
                     select(Subscription)
                     .options(joinedload(Subscription.user), joinedload(Subscription.channel))
-                    .filter_by(user_id=user_id, channel_id=channel.channel_id)
+                    .filter_by(user_id=user_id, channel_id=channel_id)
                 )
                 result = await session.execute(stmt)
                 return result.scalars().first()

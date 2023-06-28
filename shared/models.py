@@ -1,8 +1,10 @@
+from typing import List
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Enum, Text, LargeBinary, \
-    PrimaryKeyConstraint, BigInteger
+    PrimaryKeyConstraint, BigInteger, Table, func
 from sqlalchemy.orm import relationship
-from .database import Base
+from shared.database import Base
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class User(Base):
@@ -21,6 +23,7 @@ class User(Base):
     join_date = Column(DateTime, nullable=True, default=datetime.now)
 
     subscriptions = relationship('Subscription', back_populates='user')
+    digests: Mapped[List["Digest"]] = relationship(back_populates="user")
     # access_channels = relationship("Channel", back_populates="user")
 
 
@@ -55,6 +58,24 @@ class Channel(Base):
     posts = relationship('Post', back_populates='channel')
 
 
+association_table = Table(
+    "digests_posts",
+    Base.metadata,
+    Column("digest_id", ForeignKey("digests.id")),
+    Column("post_id", ForeignKey("posts.post_id")),
+)
+
+
+class Digest(Base):
+    __tablename__ = 'digests'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
+    user: Mapped["User"] = relationship(back_populates="digests")
+    posts: Mapped[List["Post"]] = relationship(secondary=association_table)
+    # generation_date = Column(DateTime, nullable=False, default=datetime.now)
+    generation_date: Mapped[datetime] = mapped_column(insert_default=func.now())
+
+
 class Post(Base):
     __tablename__ = 'posts'
 
@@ -66,7 +87,7 @@ class Post(Base):
     content = Column(Text, nullable=False)
     summary = Column(Text, nullable=True)
 
-    post_date = Column(DateTime, nullable=False)
+    post_date = Column(DateTime, nullable=False, default=datetime.now)
 
     channel = relationship('Channel', back_populates='posts')
     rubric = relationship('Rubric', back_populates='posts')
@@ -102,7 +123,6 @@ class TelegramAccount(Base):
     session_string = Column(String, nullable=True)
 
     is_active = Column(Boolean, default=True)
-    last_connected = Column(DateTime, nullable=False)
 
 
 class GPTAccount(Base):
@@ -112,4 +132,3 @@ class GPTAccount(Base):
     api_key = Column(String(100))
 
     is_active = Column(Boolean, default=True)
-    last_connected = Column(DateTime, nullable=False)

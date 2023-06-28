@@ -1,0 +1,71 @@
+import asyncio
+import os
+import glob
+
+from telethon.sessions import StringSession
+from telethon.sync import TelegramClient
+
+from shared.models import TelegramAccount
+
+from db_utils import save_account_to_db_sync
+import configparser
+import asyncio
+from telethon import TelegramClient
+from telethon.errors import SessionPasswordNeededError
+
+
+async def save_account(client):
+    me = await client.get_me()
+    phone_number = me.phone
+    username = me.username
+
+    account = TelegramAccount(
+        api_id=client.api_id,
+        api_hash=client.api_hash,
+        phone_number=phone_number,
+        session_string=StringSession.save(client.session),
+    )
+    save_account_to_db_sync(account)
+    print(account.account_id)
+
+    # Close and delete the session
+    await client.disconnect()
+    session_file = f"{username}.session"
+    if os.path.exists(session_file):
+        os.remove(session_file)
+
+
+async def main(config_file):
+    # Reading Configs
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    # Setting configuration values
+    api_id = config['Telegram']['api_id']
+    api_hash = config['Telegram']['api_hash']
+
+    api_hash = str(api_hash)
+    api_id = int(api_id)
+
+    username = config['Telegram']['username']
+    session_string = config['Telegram']['session_string']
+
+    # Create the client and connect
+    client = TelegramClient(StringSession(session_string), api_id, api_hash)
+    await client.connect()
+    print(f"Client Created for {config_file}")
+
+    # Ensure you're authorized
+    if not await client.is_user_authorized():
+        raise SessionPasswordNeededError
+    
+    await save_account(client)
+
+
+# Получаем список всех файлов с расширением .ini в папке accounts
+accounts_path = os.path.join(os.path.dirname(__file__), 'accounts')
+config_files = glob.glob(os.path.join(accounts_path, '*.ini'))
+
+# Запускаем main функцию для каждого файла конфигурации
+for config_file in config_files:
+    asyncio.run(main(config_file))
