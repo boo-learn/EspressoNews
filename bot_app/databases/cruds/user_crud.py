@@ -1,6 +1,7 @@
 from typing import Optional
 
 from bot_app.databases.repositories import UserRepository
+from bot_app.tasks.subscription.tasks import send_to_subscribe_channel
 from shared.models import User
 
 
@@ -29,8 +30,6 @@ class UserCRUD:
         if not user:
             user = await self.repository.create(**data)
 
-        # producer = Producer(host=RABBIT_HOST)
-        # await producer.send_message(message='subscribe', queue=QueuesType.subscription_service)
-        # await producer.close()
+        await send_to_subscribe_channel("subscribe")
 
         return user

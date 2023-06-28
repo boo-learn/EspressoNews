@@ -10,14 +10,14 @@ services:
     ports:
       - "5432:5432"
 
-    pgadmin:
-      image: dpage/pgadmin4:latest
-      env_file:
-        - .env.dev
-      ports:
-        - "8080:80"
-      depends_on:
-        - db
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file:
+      - .env.dev
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
 
   rabbitmq:
     image: rabbitmq:3-management

@@ -1,3 +1,4 @@
+import logging
 import json
 import asyncio
 from aio_pika import connect, IncomingMessage
@@ -11,32 +12,40 @@ from shared.rabbitmq import Subscriber, QueuesType
 from shared.config import RABBIT_HOST
 
 
+# Configuring logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+logger = logging.getLogger(__name__)
+
+
 async def check_subscriptions():
     loaded_account = await get_first_active_account_from_db_async()
 
     if loaded_account:
+        logger.info("Found an active account. Starting a client...")
         loaded_client = TelegramClient(StringSession(loaded_account.session_string), loaded_account.api_id,
                                        loaded_account.api_hash)
         await loaded_client.connect()
 
         try:
             subscribed_channels = await get_subscribed_channels(loaded_client)
-            print("Bot is subscribed to the following channels:")
+            logger.info(f"Bot is subscribed to the following channels: {subscribed_channels}")
 
             channels_to_subscribe = []
             channels_to_unsubscribe = []
 
             for channel in subscribed_channels:
                 needed_unique_channel_ids = await get_unique_channel_ids_async()
-                print(channel.channel_id)
+                logger.info(f"Channel ID: {channel.channel_id}")
 
                 if channel.channel_id not in needed_unique_channel_ids:
                     channels_to_unsubscribe.append(channel.username)
                 else:
                     channels_to_subscribe.append(channel.username)
 
-            print("Channels to subscribe:", channels_to_subscribe)
-            print("Channels to unsubscribe:", channels_to_unsubscribe)
+            logger.info(f"Channels to subscribe: {channels_to_subscribe}")
+            logger.info(f"Channels to unsubscribe: {channels_to_unsubscribe}")
 
             for channel_username in channels_to_subscribe:
                 subscribe_task.apply_async(args=(loaded_account.account_id, channel_username))
@@ -45,23 +54,29 @@ async def check_subscriptions():
                 unsubscribe_task.apply_async(args=(loaded_account.account_id, channel_username))
 
         except SessionRevokedError:
-            print("The session has been revoked by the user.")
+            logger.error("The session has been revoked by the user.")
             await remove_account_from_db_async(loaded_account.account_id)
 
         await loaded_client.disconnect()
     else:
-        print("Account not found")
+        logger.warning("Account not found")
 
 
 async def main():
-    subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.news_collection_service)
+    logger.info("Starting main function...")
+    subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.subscription_service)
     subscriber.subscribe("subscribe", check_subscriptions)
     subscriber.subscribe("unsubscribe", check_subscriptions)
+    logger.info("Main function has been started...")
 
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     try:
-        loop.run_until_complete(main())
+        logger.info("Creating task...")
+        loop.create_task(main())
+        logger.info("Running the event loop...")
+        loop.run_forever()
     finally:
+        logger.info("Closing the event loop...")
         loop.close()
