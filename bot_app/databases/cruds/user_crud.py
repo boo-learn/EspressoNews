@@ -30,6 +30,4 @@ class UserCRUD:
         if not user:
             user = await self.repository.create(**data)
 
-        await send_to_subscribe_channel("subscribe")
-
         return user
