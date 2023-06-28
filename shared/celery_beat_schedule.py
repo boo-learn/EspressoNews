@@ -6,11 +6,11 @@ beat_schedule = {
         'schedule': timedelta(hours=1),
     },
     'subscribe_task_every_minute': {
-        'task': 'subscriptions.tasks.subscribe',
+        'task': 'subscriptions.tasks.subscribe_task',
         'schedule': timedelta(minutes=1),
     },
     'unsubscribe_task_every_minute': {
-        'task': 'subscriptions.tasks.unsubscribe',
+        'task': 'subscriptions.tasks.unsubscribe_task',
         'schedule': timedelta(minutes=1),
     },
     'summarize_news_every_minute': {

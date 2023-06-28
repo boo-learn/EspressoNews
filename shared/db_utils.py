@@ -6,7 +6,8 @@ from shared.models import TelegramAccount, Channel
 
 async def get_account_from_db_async(account_id: int):
     async with async_session() as db:
-        return await db.query(TelegramAccount).filter(TelegramAccount.account_id == account_id).first()
+        result = await db.execute(select(TelegramAccount).filter(TelegramAccount.account_id == account_id))
+        return result.scalars().first()
 
 
 async def remove_account_from_db_async(account_id: int):
@@ -27,7 +28,8 @@ async def get_subscribed_channels(client):
 
 async def get_first_active_account_from_db_async():
     async with async_session() as db:
-        return await db.query(TelegramAccount).filter(TelegramAccount.is_active == True).first()
+        result = await db.execute(select(TelegramAccount).filter(TelegramAccount.is_active == True))
+        return result.scalars().first()
 
 
 async def get_unique_channel_ids_async():

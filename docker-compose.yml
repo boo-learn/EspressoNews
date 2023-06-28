@@ -52,6 +52,18 @@ services:
       - db
       - rabbitmq
 
+  flower:
+    build:
+      context: .
+      dockerfile: DockerfileFlower
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery1
+      - celery2
+
   bot_app:
     build:
       context: .
@@ -61,6 +73,7 @@ services:
     depends_on:
       - db
       - rabbitmq
+      - alembic
 
   alembic:
     build:

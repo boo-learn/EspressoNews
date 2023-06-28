@@ -6,7 +6,7 @@ from shared.celery_app import subscriptions_celery_app
 from db_utils import subscribe_to_channel, unsubscribe_from_channel
 
 
-@subscriptions_celery_app.task
+@subscriptions_celery_app.task(name='subscriptions.tasks.subscribe_task')
 async def subscribe_task(account_id, channel_username):
     loaded_account = await get_account_from_db_async(account_id)
     if loaded_account:
@@ -19,7 +19,7 @@ async def subscribe_task(account_id, channel_username):
         print("Account not found")
 
 
-@subscriptions_celery_app.task
+@subscriptions_celery_app.task(name='subscriptions.tasks.unsubscribe_task')
 async def unsubscribe_task(account_id, channel_username):
     loaded_account = await get_account_from_db_async(account_id)
     if loaded_account:

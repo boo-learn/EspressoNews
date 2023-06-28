@@ -11,8 +11,8 @@ def create_celery_app(name, broker, task_routes, timezone='UTC'):
 
 
 subscriptions_task_routes = {
-    'subscriptions.tasks.subscribe': {'queue': 'subscriptions', 'rate_limit': '1/m'},
-    'subscriptions.tasks.unsubscribe': {'queue': 'subscriptions', 'rate_limit': '1/m'},
+    'subscriptions.tasks.subscribe_task': {'queue': 'subscriptions', 'rate_limit': '1/m'},
+    'subscriptions.tasks.unsubscribe_task': {'queue': 'subscriptions', 'rate_limit': '1/m'},
 }
 
 news_collector_task_routes = {
@@ -28,3 +28,5 @@ news_collector_celery_app = create_celery_app('news_collector', 'redis://redis:6
                                               news_collector_task_routes)
 summarize_celery_app = create_celery_app('summary_service', 'redis://redis:6379/0', summarize_task_routes)
 news_collector_celery_app.conf.beat_schedule = beat_schedule
+subscriptions_celery_app.conf.beat_schedule = beat_schedule
+
