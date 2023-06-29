@@ -1,31 +1,6 @@
 from celery import Celery
 
-from shared.celery_beat_schedule import beat_schedule
+broker_url = 'redis://redis:6379/0'
+backend_url = 'redis://redis:6379/0'
 
-
-def create_celery_app(name, broker, task_routes, timezone='UTC'):
-    app = Celery(name, broker=broker)
-    app.conf.task_routes = task_routes
-    app.conf.timezone = timezone
-    return app
-
-
-subscriptions_task_routes = {
-    'subscription_service.tasks.subscribe_task': {'queue': 'subscriptions'},
-    'subscription_service.tasks.unsubscribe_task': {'queue': 'subscriptions'},
-}
-
-
-news_collector_task_routes = {
-    "news_collector.tasks.collect_news": {"queue": "news_queue"},
-}
-
-summarize_task_routes = {
-    "summary_service.tasks.summarize_news": {"queue": "summary_queue"},
-}
-
-subscriptions_celery_app = create_celery_app('subscriptions', 'redis://redis:6379/0', subscriptions_task_routes)
-news_collector_celery_app = create_celery_app('news_collector', 'redis://redis:6379/0',
-                                              news_collector_task_routes)
-summarize_celery_app = create_celery_app('summary_service', 'redis://redis:6379/0', summarize_task_routes)
-news_collector_celery_app.conf.beat_schedule = beat_schedule
+celery_app = Celery('tasks', broker=broker_url, backend=backend_url)

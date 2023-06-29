@@ -1,16 +1,10 @@
-# Use an official Python runtime as a parent image
+# Dockerfile
 FROM hobrus/espresso_news_base:latest
 
-# Copy the news_collection_service folder into the container at /app
+WORKDIR /app
+
 COPY ./shared /app/shared
 COPY ./subscription_service /app/subscription_service
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+CMD ["celery", "-A", "subscription_service.tasks", "worker", "--loglevel=info"]
 
-# Define environment variable
-ENV NAME World
-ENV PYTHONPATH "${PYTHONPATH}:/app"
-
-# Run news_collection_main.py when the container launches
-CMD ["python", "shared/celery_app.py"]
