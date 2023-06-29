@@ -10,6 +10,7 @@ EXPOSE 80
 
 # Define environment variable
 ENV NAME World
+ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run news_collection_main.py when the container launches
-CMD ["python", "subscription_main.py"]
+CMD ["python", "subscription_service/subscription_main.py"]

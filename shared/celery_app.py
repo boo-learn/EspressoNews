@@ -2,16 +2,19 @@ from celery import Celery
 
 from shared.celery_beat_schedule import beat_schedule
 
+
 def create_celery_app(name, broker, task_routes, timezone='UTC'):
     app = Celery(name, broker=broker)
     app.conf.task_routes = task_routes
     app.conf.timezone = timezone
     return app
 
+
 subscriptions_task_routes = {
-    'subscription_service.tasks.subscribe_task': {'queue': 'subscriptions', 'rate_limit': '1/m'},
-    'subscription_service.tasks.unsubscribe_task': {'queue': 'subscriptions', 'rate_limit': '1/m'},
+    'subscription_service.tasks.subscribe_task': {'queue': 'subscriptions'},
+    'subscription_service.tasks.unsubscribe_task': {'queue': 'subscriptions'},
 }
+
 
 news_collector_task_routes = {
     "news_collector.tasks.collect_news": {"queue": "news_queue"},
