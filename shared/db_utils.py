@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from shared.database import async_session
+from shared.database import async_session, sync_session
 from shared.models import TelegramAccount, Channel
 
 
@@ -9,6 +9,12 @@ async def get_account_from_db_async(account_id: int):
         result = await db.execute(select(TelegramAccount).filter(TelegramAccount.account_id == account_id))
         return result.scalars().first()
 
+
+def get_account_from_db(account_id: int):
+    with sync_session() as db:
+        result = db.execute(select(TelegramAccount).filter(TelegramAccount.account_id == account_id))
+        return result.scalars().first()
+    
 
 async def remove_account_from_db_async(account_id: int):
     async with async_session() as db:
