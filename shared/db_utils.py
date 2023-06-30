@@ -48,6 +48,6 @@ async def get_unique_channel_ids_async():
 
 async def get_channel_name_by_id(channel_id):
     async with async_session() as db:
-        result = await db.execute(select(Channel.channel_username).filter(Channel.channel_id == channel_id))
+        result = await db.execute(select(Channel).filter(Channel.channel_id == channel_id))
         channel = result.scalars().first()
         return channel.channel_username if channel else None
