@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from telethon import TelegramClient
@@ -26,7 +27,9 @@ def subscribe_task(account_id, channel_username):
     else:
         logger.error(f'Account {account_id} not found')
 
+
 def connect_and_subscribe(loaded_account, channel_username):
+    asyncio.set_event_loop(asyncio.new_event_loop())
     loaded_client = TelegramClient(StringSession(loaded_account.session_string), loaded_account.api_id,
                                    loaded_account.api_hash)
     logger.info('Get telegram client')
