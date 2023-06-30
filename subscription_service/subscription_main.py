@@ -3,7 +3,7 @@ import json
 import asyncio
 from aio_pika import connect, IncomingMessage
 from tasks import subscribe_task
-from shared.db_utils import (get_first_active_account_from_db_async, get_subscribed_channels,
+from shared.db_utils import (get_channel_name_by_id, get_first_active_account_from_db_async, get_subscribed_channels,
                              get_unique_channel_ids_async, remove_account_from_db_async)
 from telethon import TelegramClient
 from telethon.sessions import StringSession
@@ -54,7 +54,8 @@ async def check_subscriptions(message_data):
             logger.info(f"Channels to subscribe: {channels_to_subscribe}")
             logger.info(f"Channels to unsubscribe: {channels_to_unsubscribe}")
 
-            for channel_username in channels_to_subscribe:
+            for channel_id in channels_to_subscribe:
+                channel_username = await get_channel_name_by_id(channel_id)
                 subscribe_task.apply_async(args=[loaded_account.account_id, channel_username])
 
             # for channel_username in channels_to_unsubscribe:
