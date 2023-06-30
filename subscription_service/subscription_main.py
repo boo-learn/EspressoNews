@@ -2,8 +2,7 @@ import logging
 import json
 import asyncio
 from aio_pika import connect, IncomingMessage
-# from tasks import subscribe_task, unsubscribe_task
-from tasks import add
+from tasks import subscribe_task
 from shared.db_utils import (get_first_active_account_from_db_async, get_subscribed_channels,
                              get_unique_channel_ids_async, remove_account_from_db_async)
 from telethon import TelegramClient
@@ -56,14 +55,10 @@ async def check_subscriptions(message_data):
             logger.info(f"Channels to unsubscribe: {channels_to_unsubscribe}")
 
             for channel_username in channels_to_subscribe:
-                result = add.apply_async(args=[1, 2], queue='normal_priority')
-                logger.info(f'Result for channel {channel_username}: {result.get()}')
-                # subscribe_task.apply_async(args=[loaded_account.account_id, channel_username])
+                subscribe_task.apply_async(args=[loaded_account.account_id, channel_username])
 
-            for channel_username in channels_to_unsubscribe:
-                add.apply_async(args=[1, 2], queue='normal_priority')
-                logger.info(f'Result for channel {channel_username}: {result.get()}')
-                # unsubscribe_task.apply_async(args=[loaded_account.account_id, channel_username])
+            # for channel_username in channels_to_unsubscribe:
+            #     unsubscribe_task.delay(loaded_account.account_id, channel_username)
 
         except SessionRevokedError:
             logger.error("The session has been revoked by the user.")
