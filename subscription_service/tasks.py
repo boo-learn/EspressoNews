@@ -10,25 +10,25 @@ from concurrent.futures import ThreadPoolExecutor
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 async def connect_and_subscribe(loaded_account, channel_username):
-    loaded_client = TelegramClient(StringSession(loaded_account.session_string), loaded_account.api_id, loaded_account.api_hash)
-    logger.info('Get telegram client')
-    await loaded_client.connect()
+    loaded_client = TelegramClient(StringSession(loaded_account.session_string), loaded_account.api_id,
+                                   loaded_account.api_hash)
     try:
+        await loaded_client.connect()
+        logger.info('subscribe start ok!')
         await subscribe_to_channel(loaded_client, channel_username)
         logger.info('subscribe start ok!')
     except ValueError as e:
-        logger.error(f'Error subscribing account {loaded_account.id} to channel {channel_username}: {str(e)}')
         logger.error(f'Loaded account details: {loaded_account.__dict__}')
         logger.error(f'Channel username: {channel_username}')
     await loaded_client.disconnect()
 
+
 @celery_app.task(name='tasks.subscribe_task')
 def subscribe_task(account_id, channel_username):
-    logger.info(f'Starting subscription task for account {account_id} and channel {channel_username}')
     loaded_account = get_account_from_db(account_id)
     if loaded_account:
-        logger.info('Have logged account')
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(connect_and_subscribe(loaded_account, channel_username))
