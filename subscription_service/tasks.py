@@ -36,3 +36,8 @@ def subscribe_task(account_id, channel_username):
         logger.info(f'Successfully subscribed account {account_id} to channel {channel_username}')
     else:
         logger.error(f'Account {account_id} not found')
+
+
+@celery_app.task(name='tasks.unsubscribe_task')
+def unsubscribe_task():
+    pass

@@ -26,10 +26,10 @@ async def remove_account_from_db_async(account_id: int):
     return False
 
 
-async def get_subscribed_channels(client):
+async def get_usernames_subscribed_channels(client):
     dialogs = await client.get_dialogs()
-    channels = [dialog.entity for dialog in dialogs if dialog.is_channel]
-    return channels
+    channel_usernames = [dialog.entity.username for dialog in dialogs if dialog.is_channel and dialog.entity.username]
+    return channel_usernames
 
 
 async def get_first_active_account_from_db_async():
@@ -38,16 +38,9 @@ async def get_first_active_account_from_db_async():
         return result.scalars().first()
 
 
-async def get_unique_channel_ids_async():
+async def get_unique_channel_usernames():
     async with async_session() as db:
-        stmt = select(Channel.channel_id).distinct()
+        stmt = select(Channel.channel_username).distinct()
         result = await db.execute(stmt)
-        channel_ids = result.scalars().all()
-        return [channel_id for channel_id in channel_ids]
-
-
-async def get_channel_name_by_id(channel_id):
-    async with async_session() as db:
-        result = await db.execute(select(Channel).filter(Channel.channel_id == channel_id))
-        channel = result.scalars().first()
-        return channel.channel_username if channel else None
+        channel_usernames = result.scalars().all()
+        return [username for username in channel_usernames]
