@@ -78,7 +78,7 @@ async def main():
     logger.info("Starting main function...")
     subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.subscription_service)
     subscriber.subscribe("subscribe", check_subscriptions)
-    # subscriber.subscribe("unsubscribe", check_subscriptions)
+    subscriber.subscribe("unsubscribe", check_subscriptions)
     logger.info("Main function has been started...")
     await subscriber.run()
 
