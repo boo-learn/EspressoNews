@@ -2,9 +2,9 @@ from shared.rabbitmq import Producer, QueuesType, MessageData
 from shared.config import RABBIT_HOST
 
 
-async def subscribe_to_channel():
+async def send_to_subscribe_channel(type: str):
     message: MessageData = {
-        "type": "subscribe",
+        "type": type,
         "data": None
     }
     producer = Producer(host=RABBIT_HOST)

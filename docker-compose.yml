@@ -10,14 +10,14 @@ services:
     ports:
       - "5432:5432"
 
-    pgadmin:
-      image: dpage/pgadmin4:latest
-      env_file:
-        - .env.dev
-      ports:
-        - "8080:80"
-      depends_on:
-        - db
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file:
+      - .env.dev
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -30,27 +30,26 @@ services:
     ports:
       - "6379:6379"
 
-  celery1:
+  celery:
     build:
       context: .
       dockerfile: DockerfileCelerySubscription
-    command: celery -A shared.celery_app:subscriptions_celery_app worker --loglevel=info &
     env_file:
       - .env.dev
     depends_on:
       - db
       - rabbitmq
 
-  celery2:
+  flower:
     build:
       context: .
-      dockerfile: DockerfileCeleryNewsCollection
-    command: celery -A shared.celery_app:news_collector_celery_app worker --loglevel=info &
-    env_file:
-      - .env.dev
+      dockerfile: DockerfileFlower
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports:
+      - "5555:5555"
     depends_on:
-      - db
-      - rabbitmq
+      - redis
+      - celery
 
   bot_app:
     build:
@@ -61,6 +60,7 @@ services:
     depends_on:
       - db
       - rabbitmq
+      - alembic
 
   alembic:
     build:
@@ -80,7 +80,7 @@ services:
     depends_on:
       - db
       - rabbitmq
-      - celery1
+      - celery
 
   subscription_service:
     build:
@@ -91,7 +91,7 @@ services:
     depends_on:
       - db
       - rabbitmq
-      - celery1
+      - celery
       - tdata
 
   news_collection_service:
@@ -103,7 +103,7 @@ services:
     depends_on:
       - db
       - rabbitmq
-      - celery2
+      - celery
       - tdata
 
   digest_service:
@@ -115,7 +115,7 @@ services:
     depends_on:
       - db
       - rabbitmq
-      - celery2
+      - celery
       - tdata
 
 volumes:

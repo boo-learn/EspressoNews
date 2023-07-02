@@ -1,7 +1,11 @@
 import asyncio
+import logging
 
 from bot_app.databases.repositories import ChannelRepository
-from bot_app.tasks.subscription.tasks import subscribe_to_channel
+from bot_app.tasks.subscription.tasks import send_to_subscribe_channel
+
+
+logger = logging.getLogger(__name__)
 
 
 class ChannelCRUD:
@@ -35,17 +39,24 @@ class ChannelCRUD:
             channel = await self.repository.get(username)
 
         # send_message_subscribe
-        await subscribe_to_channel()
+        await send_to_subscribe_channel("subscribe")
 
         return channel
 
     # скорее всего ещё передать user_id
     async def check_channel_and_delete_if_empty(self, channel):
-        if not channel.subscriptions:
-            await self.repository.delete(channel)
+        logger.debug(f"Checking if channel {channel} is empty")
 
-        # producer = Producer(host=RABBIT_HOST)
-        # await producer.send_message(message='unsubscribe', queue=QueuesType.subscription_service)
-        # await producer.close()
+        logger.debug(f"CHANNEL SUBSCRIPTIONS {channel.subscriptions}")
+        if not channel.subscriptions:
+            logger.debug(f"Channel {channel} is empty, deleting")
+            await self.repository.delete(channel)
+            await send_to_subscribe_channel("unsubscribe")
+        else:
+            logger.debug(f"Channel {channel} has subscriptions, not deleting")
+
+        logger.debug("Sending unsubscribe message to subscribe channel")
+
+        logger.debug("Successfully completed check_channel_and_delete_if_empty")
 
         return True
