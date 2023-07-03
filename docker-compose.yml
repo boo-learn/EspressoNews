@@ -40,6 +40,16 @@ services:
       - db
       - rabbitmq
 
+  celery2:
+    build:
+      context: .
+      dockerfile: DockerfileCeleryNewsCollection
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+      - rabbitmq
+
   flower:
     build:
       context: .

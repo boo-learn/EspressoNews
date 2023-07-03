@@ -1,19 +1,25 @@
 import asyncio
 import datetime
+import logging
 
 from telethon import TelegramClient
 from telethon.errors import SessionRevokedError
 from telethon.sessions import StringSession
 
-from shared.db_utils import get_subscribed_channels, \
-    remove_account_from_db_async, get_first_active_account_from_db_async
+from shared.db_utils import remove_account_from_db_async, get_first_active_account_from_db_async
 from db_utils import add_post_async
 from shared.models import Post
-from shared.rabbitmq import Subscriber, QueuesType, MessageData
+from shared.rabbitmq import Subscriber, QueuesType
 from shared.config import RABBIT_HOST
+
+# восстановить или переписать функцию get_subscribed_channels
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 async def collect_news():
+    logger.info(f'START COLLECT NEWS')
     loaded_account = await get_first_active_account_from_db_async()
 
     if loaded_account:
@@ -61,10 +67,10 @@ async def collect_news():
 
 
 async def main():
-    # Пример подписки:
+    logger.info(f'Collect news service run')
     subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.news_collection_service)
     subscriber.subscribe(message_type="collect_news", callback=collect_news)
-
+    await subscriber.run()
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
