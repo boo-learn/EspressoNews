@@ -9,7 +9,7 @@ celery_app = Celery('tasks', broker=broker_url, backend=backend_url)
 celery_app.conf.beat_schedule = {
     'run-every-2-minutes': {
         'task': 'tasks.collect_news',
-        'schedule': 30.0,  # 3600.0,
+        'schedule': 30,  # 3600.0,
         'args': (),
     },
 }

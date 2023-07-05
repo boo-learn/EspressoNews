@@ -6,8 +6,11 @@ from telethon import TelegramClient
 from telethon.errors import SessionRevokedError
 from telethon.sessions import StringSession
 
-from shared.db_utils import remove_account_from_db_async, get_first_active_account_from_db_async
-from db_utils import add_post_async
+from shared.db_utils import (
+    remove_account_from_db_async,
+    get_first_active_account_from_db_async
+)
+from db_utils import add_post_async, get_subscribed_channels
 from shared.models import Post
 from shared.rabbitmq import Subscriber, QueuesType
 from shared.config import RABBIT_HOST
@@ -29,20 +32,23 @@ async def collect_news():
 
         try:
             subscribed_channels = await get_subscribed_channels(loaded_client)
-            print("Bot is subscribed to the following channels:")
+            logger.info(f'get subscribed channels with teleton')
 
             for channel in subscribed_channels:
-                print(channel.channel_id)
+                logger.info(f'channel {channel.channel_id}')
 
             # Gather news from the last hour
             one_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
+            logger.info(f"date one hour ago {one_hour_ago}")
             news = []
 
             for channel in subscribed_channels:
+                logger.info(f"Subscribe channel {channel}")
                 async for message in loaded_client.iter_messages(channel, limit=None, offset_date=one_hour_ago):
+                    logger.info(f"News {message}")
                     news.append(message)
 
-            print(f"News from the last hour: {len(news)} messages")
+            logger.info(f"News from the last hour: {len(news)} messages")
             for message in news:
                 print(f"{message.date}: {message.text}")
 
@@ -58,12 +64,12 @@ async def collect_news():
                 await add_post_async(post)
 
         except SessionRevokedError:
-            print("The session has been revoked by the user.")
+            logger.info(f"The session has been revoked by the user.")
             await remove_account_from_db_async(loaded_account.account_id)
 
         await loaded_client.disconnect()
     else:
-        print("Account not found")
+        logger.info(f"Account not found.")
 
 
 async def main():
@@ -75,6 +81,9 @@ async def main():
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     try:
-        loop.run_until_complete(main())
+        loop.run_until_complete(collect_news())
+        loop.create_task(main())
+        loop.run_forever()
     finally:
+        logger.info("Closing the event loop...")
         loop.close()

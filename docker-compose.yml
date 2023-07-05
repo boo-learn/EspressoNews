@@ -19,6 +19,15 @@ services:
     depends_on:
       - db
 
+  alembic:
+    build:
+      context: .
+      dockerfile: DockerfileAlembic
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -71,15 +80,6 @@ services:
       - db
       - rabbitmq
       - alembic
-
-  alembic:
-    build:
-      context: .
-      dockerfile: DockerfileAlembic
-    env_file:
-      - .env.dev
-    depends_on:
-      - db
 
   tdata:
     build:
