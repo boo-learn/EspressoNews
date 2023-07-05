@@ -34,9 +34,6 @@ async def collect_news():
             subscribed_channels = await get_subscribed_channels(loaded_client)
             logger.info(f'get subscribed channels with teleton')
 
-            for channel in subscribed_channels:
-                logger.info(f'channel {channel.channel_id}')
-
             # Gather news from the last hour
             one_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
             logger.info(f"date one hour ago {one_hour_ago}")
