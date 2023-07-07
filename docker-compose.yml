@@ -25,6 +25,8 @@ services:
       dockerfile: DockerfileAlembic
     env_file:
       - .env.dev
+    ports:
+      - "5000:5000"  # Add the desired port mapping here
     depends_on:
       - db
 
@@ -34,6 +36,8 @@ services:
       dockerfile: DockerfileTdata
     env_file:
       - .env.dev
+    ports:
+      - "5001:5001"  # Add the desired port mapping here
     depends_on:
       - db
       - alembic

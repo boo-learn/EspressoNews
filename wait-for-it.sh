@@ -7,12 +7,18 @@ host="$1"
 shift
 cmd="$@"
 
-sleep 10
-
-while PING=$(ping -c1 $host > /dev/null 2>&1); do
-  >&2 echo "Service is available - sleeping"
-  sleep 1
+while true; do
+  if curl --output /dev/null --head --fail "$host"; then
+    >&2 echo "Service is down - executing command"
+    exec $cmd
+  else
+    ret=$?
+    if [ $ret -eq 7 ]; then
+      >&2 echo "Service is available - sleeping"
+      sleep 1
+    else
+      >&2 echo "Service is down - executing command"
+      exec $cmd
+    fi
+  fi
 done
-
->&2 echo "Service is down - executing command"
-exec $cmd

@@ -12,4 +12,4 @@ EXPOSE 80
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run news_collection_main.py when the container launches
-CMD ["/app/wait-for-it.sh", "alembic:80", "--", "python news_collection_service/news_collection_main.py"]
+CMD ["/app/wait-for-it.sh", "http://tdata:5001", "--", "python news_collection_service/news_collection_main.py"]

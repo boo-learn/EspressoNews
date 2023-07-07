@@ -13,4 +13,4 @@ EXPOSE 80
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run scripts when the container launches
-CMD ["/app/wait-for-it.sh", "alembic:80", "--", "python save_accounts_to_db.py"]
+CMD ["/app/wait-for-it.sh", "http://alembic:5000", "--", "python save_accounts_to_db.py"]
