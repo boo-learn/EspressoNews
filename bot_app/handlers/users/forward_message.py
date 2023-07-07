@@ -34,7 +34,13 @@ async def action_forward_message(message: types.Message, state: FSMContext):
         channel_crud = ChannelCRUD()
         subscription_crud = SubscriptionCRUD()
 
+        channel_id = message.forward_from_chat.id
+        if channel_id < 0:
+            channel_id += 1000000000000
+        channel_id = abs(channel_id)
+
         channel = await channel_crud.check_channel_and_create_if_empty(
+            channel_id,
             channel_username,
             message.forward_from_chat.full_name,
             message.forward_from_chat.invite_link,

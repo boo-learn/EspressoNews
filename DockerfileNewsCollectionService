@@ -4,6 +4,7 @@ FROM hobrus/espresso_news_base:latest
 # Copy the news_collection_service folder into the container at /app
 COPY ./shared /app/shared
 COPY ./news_collection_service /app/news_collection_service
+COPY ./wait-for-it.sh /app
 
 EXPOSE 80
 
@@ -12,4 +13,4 @@ ENV NAME World
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run news_collection_main.py when the container launches
-CMD ["python", "news_collection_service/news_collection_main.py"]
+CMD /app/wait-for-it.sh tdata:80 -- python news_collection_service/news_collection_main.py
