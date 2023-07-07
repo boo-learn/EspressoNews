@@ -13,7 +13,7 @@ from shared.db_utils import (
 )
 from db_utils import add_post_async, get_subscribed_channels
 from shared.models import Post
-from shared.rabbitmq import Subscriber, QueuesType
+from shared.rabbitmq import Subscriber, QueuesType, MessageData, Producer
 from shared.config import RABBIT_HOST
 
 # восстановить или переписать функцию get_subscribed_channels
@@ -74,6 +74,13 @@ async def collect_news():
                 )
                 await add_post_async(post)
 
+            message: MessageData = {
+                "type": 'summarize_news',
+                "data": None
+            }
+
+            producer = Producer(host=RABBIT_HOST)
+            await producer.send_message(message, QueuesType.summary_service)
         except SessionRevokedError:
             logger.info(f"The session has been revoked by the user.")
             await remove_account_from_db_async(loaded_account.account_id)

@@ -92,7 +92,7 @@ class Subscriber(metaclass=SingletonMeta):
                 await self.handlers[message_body["type"]]()
             # print(f"[x] Received message: {message.body.decode()}")
 
-    async def __connect(self, retries=5, delay=5):
+    async def __connect(self, retries=10, delay=5):
         if self.connection:
             return
         for i in range(retries):

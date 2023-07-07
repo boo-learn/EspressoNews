@@ -38,6 +38,16 @@ services:
       - db
       - alembic
 
+  gptdata:
+    build:
+      context: .
+      dockerfile: DockerfileGPTdata
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+      - alembic
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -112,9 +122,15 @@ services:
       dockerfile: DockerfileNewsCollectionService
     env_file:
       - .env.dev
+
+  summary_service:
+    build:
+      context: .
+      dockerfile: DockerfileSummaryService
+    env_file:
+      - .env.dev
     depends_on:
-      - bot_app
-      - subscription_service
+      - news_collection_service
 
   digest_service:
     build:

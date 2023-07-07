@@ -10,8 +10,7 @@ COPY ./wait-for-it.sh /app
 EXPOSE 80
 
 # Define environment variable
-ENV NAME World
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run news_collection_main.py when the container launches
-CMD /app/wait-for-it.sh tdata:80 -- python bot_app/bot.py
+CMD ["/app/wait-for-it.sh", "alembic:80", "--", "python bot_app/bot.py"]

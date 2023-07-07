@@ -3,8 +3,7 @@ FROM hobrus/espresso_news_base:latest
 
 # Copy the news_collection_service folder into the container at /app
 COPY ./shared /app/shared
-COPY ./news_collection_service /app/news_collection_service
-COPY ./wait-for-it.sh /app
+COPY ./summary_service /app/summary_service
 
 EXPOSE 80
 
@@ -12,4 +11,4 @@ EXPOSE 80
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run news_collection_main.py when the container launches
-CMD ["/app/wait-for-it.sh", "alembic:80", "--", "python news_collection_service/news_collection_main.py"]
+CMD ["python", "summary_service/summary_main.py"]

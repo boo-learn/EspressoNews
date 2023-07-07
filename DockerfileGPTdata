@@ -3,7 +3,8 @@ FROM hobrus/espresso_news_base:latest
 
 # Copy the news_collection_service folder into the container at /app
 COPY ./shared /app/shared
-COPY ./tdata_utility /app
+COPY ./gptdata_utility /app
+COPY ./summary_service /app/summary_service
 COPY ./wait-for-it.sh /app
 
 # Make port 80 available to the world outside this container
