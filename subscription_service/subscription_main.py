@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 
-async def check_subscriptions(message_data):
+async def check_subscriptions():
     loaded_account = await get_first_active_account_from_db_async()
 
     if loaded_account:

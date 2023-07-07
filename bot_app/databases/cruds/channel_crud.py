@@ -12,9 +12,10 @@ class ChannelCRUD:
     def __init__(self):
         self.repository = ChannelRepository()
 
-    async def create_channel(self, username: str, name: str, description: str, invite_link: str,
+    async def create_channel(self, id: int, username: str, name: str, description: str, invite_link: str,
                              members_count: int):
         data = {
+            'channel_id': id,
             'channel_username': username,
             'channel_name': name,
             'member_count': members_count,
@@ -30,12 +31,12 @@ class ChannelCRUD:
     async def delete_channel(self, channel):
         return await self.repository.delete(channel)
 
-    async def check_channel_and_create_if_empty(self, username: str, name: str, description: str,
+    async def check_channel_and_create_if_empty(self, id: int, username: str, name: str, description: str,
                                                 invite_link: str, members_count: int):
         channel = await self.repository.get(username)
 
         if not channel:
-            channel = await self.create_channel(username, name, description, invite_link, members_count)
+            channel = await self.create_channel(id, username, name, description, invite_link, members_count)
             channel = await self.repository.get(username)
 
         # send_message_subscribe

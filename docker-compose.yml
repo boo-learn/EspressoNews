@@ -19,49 +19,6 @@ services:
     depends_on:
       - db
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-
-  redis:
-    image: "redis:6.2"
-    ports:
-      - "6379:6379"
-
-  celery:
-    build:
-      context: .
-      dockerfile: DockerfileCelerySubscription
-    env_file:
-      - .env.dev
-    depends_on:
-      - db
-      - rabbitmq
-
-  flower:
-    build:
-      context: .
-      dockerfile: DockerfileFlower
-    command: celery --broker=redis://redis:6379/0 flower --port=5555
-    ports:
-      - "5555:5555"
-    depends_on:
-      - redis
-      - celery
-
-  bot_app:
-    build:
-      context: .
-      dockerfile: DockerfileBotApp
-    env_file:
-      - .env.dev
-    depends_on:
-      - db
-      - rabbitmq
-      - alembic
-
   alembic:
     build:
       context: .
@@ -79,8 +36,66 @@ services:
       - .env.dev
     depends_on:
       - db
+      - alembic
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    depends_on:
+      - tdata
+
+  redis:
+    image: "redis:6.2"
+    ports:
+      - "6379:6379"
+    depends_on:
+      - rabbitmq
+
+  celery:
+    build:
+      context: .
+      dockerfile: DockerfileCelerySubscription
+    env_file:
+      - .env.dev
+    depends_on:
+      - rabbitmq
+
+  celery2:
+    build:
+      context: .
+      dockerfile: DockerfileCeleryNewsCollection
+    env_file:
+      - .env.dev
+    depends_on:
+      - rabbitmq
+
+  flower:
+    build:
+      context: .
+      dockerfile: DockerfileFlower
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery
+      - celery2
+
+  bot_app:
+    build:
+      context: .
+      dockerfile: DockerfileBotApp
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+      - alembic
+      - tdata
       - rabbitmq
       - celery
+      - celery2
 
   subscription_service:
     build:
@@ -89,10 +104,7 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - db
-      - rabbitmq
-      - celery
-      - tdata
+      - bot_app
 
   news_collection_service:
     build:
@@ -101,10 +113,8 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - db
-      - rabbitmq
-      - celery
-      - tdata
+      - bot_app
+      - subscription_service
 
   digest_service:
     build:
@@ -113,10 +123,9 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - db
-      - rabbitmq
-      - celery
-      - tdata
+      - bot_app
+      - subscription_service
+      - news_collection_service
 
 volumes:
   postgres_data:
