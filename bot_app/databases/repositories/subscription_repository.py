@@ -62,7 +62,6 @@ class SubscriptionRepository:
                 raise e
 
     async def delete(self, subscription: Subscription) -> bool:
-        print(subscription)
         async with async_session() as session:
             try:
                 await session.delete(subscription)

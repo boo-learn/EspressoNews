@@ -3,14 +3,12 @@ FROM hobrus/espresso_news_base:latest
 
 # Copy the news_collection_service folder into the container at /app
 COPY ./shared /app/shared
-COPY ./subscription_service /app/subscription_service
+COPY ./summary_service /app/summary_service
 
-# Make port 80 available to the world outside this container
 EXPOSE 80
 
 # Define environment variable
-ENV NAME World
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run news_collection_main.py when the container launches
-CMD ["python", "subscription_service/subscription_main.py"]
+CMD ["python", "summary_service/summary_main.py"]

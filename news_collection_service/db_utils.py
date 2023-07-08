@@ -8,3 +8,10 @@ async def add_post_async(post: Post):
         await db.commit()
         await db.refresh(post)
         return post
+
+
+async def get_subscribed_channels(client):
+    dialogs = await client.get_dialogs()
+    channels = [dialog.entity for dialog in dialogs if dialog.is_channel and dialog.entity.username]
+    return channels
+

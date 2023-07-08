@@ -1,8 +1,11 @@
 # Use an official Python runtime as a parent image
 FROM hobrus/espresso_news_base:latest
 
+WORKDIR /app
+
 # Copy the news_collection_service folder into the container at /app
 COPY ./shared /app/shared
+COPY ./news_collection_service /app/news_collection_service
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
@@ -11,4 +14,5 @@ EXPOSE 80
 ENV NAME World
 
 # Run news_collection_main.py when the container launches
-CMD ["python", "shared/celery_app.py"]
+CMD ["bash", "-c", "celery -A news_collection_service.tasks worker --loglevel=info & celery -A news_collection_service.tasks beat --loglevel=info"]
+
