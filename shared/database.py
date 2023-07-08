@@ -17,4 +17,22 @@ sync_DATABASE_URI = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}
 sync_engine = create_engine(sync_DATABASE_URI)
 sync_session = sessionmaker(autocommit=False, autoflush=False, bind=sync_engine)
 
-Base = declarative_base()
+
+class BaseModel:
+
+    @classmethod
+    def model_lookup_by_table_name(cls, table_name):
+        registry_instance = getattr(cls, "registry")
+        for mapper_ in registry_instance.mappers:
+            model = mapper_.class_
+            if not hasattr(model, "__tablename__"):
+                model_class_name = model.__table__.name
+            else:
+                model_class_name = model.__tablename__
+            if model_class_name == table_name:
+                return model
+
+
+Base = declarative_base(cls=BaseModel)
+
+# Base = declarative_base()

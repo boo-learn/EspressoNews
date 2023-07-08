@@ -30,13 +30,13 @@ async def prepare_digest(user_id: int):
             collect_summary += f"• {post.summary}\n\n"
         digest.total_summary = collect_summary
         await session.commit()
-        producer = Producer(host=RABBIT_HOST)
-
-        message: MessageData = {
-            "type": "send_digest",
-            "data": digest.id
-        }
-        await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
+    # producer = Producer(host=RABBIT_HOST)
+    #
+    # message: MessageData = {
+    #     "type": "send_digest",
+    #     "data": digest.id
+    # }
+    # await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 
 
 async def exclude_duplicates(posts: list[Post]) -> list[Post]:
