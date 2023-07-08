@@ -1,7 +1,6 @@
 import asyncio
 
 from bot_app.databases.repositories import ChannelRepository
-from bot_app.tasks.subscription.tasks import new_subscribe, waiting_subscribe
 
 
 class ChannelCRUD:

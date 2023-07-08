@@ -1,39 +1,60 @@
 import pytest
-from pytest_postgresql import factories
-from pytest_postgresql.janitor import DatabaseJanitor
-from sqlalchemy import create_engine
-from sqlalchemy.orm.session import sessionmaker
-from shared import config
-from conftest import logger
-
-from shared.models import Base
-
-test_db = factories.postgresql_noproc(
-    host=config.DB_HOST.split(":")[0],
-    port=5432,
-    user=config.POSTGRES_USER,
-    password=config.POSTGRES_PASSWORD,
-    dbname=config.POSTGRES_TEST_DB
-)
+from sqlalchemy import create_engine, select, func, insert, Table
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session, sessionmaker
+from shared.models import Base, User
+from sqlalchemy.sql import text as sa_text
+import json
 
 
-@pytest.fixture(scope="session")
-def db_session(test_db):
-    """Session for SQLAlchemy."""
-    pg_host = test_db.host
-    pg_port = test_db.port
-    pg_user = test_db.user
-    pg_password = test_db.password
-    pg_db = test_db.dbname
+@pytest.fixture(scope='session')
+def engine(db_server):
+    port = db_server["db_port"]
+    engine: Engine = create_engine(f'postgresql://postgres:postgres@localhost:{port}/TestDB', future=True)
+    yield engine
 
-    with DatabaseJanitor(
-            pg_user, pg_host, pg_port, pg_db, test_db.version, pg_password
-    ):
-        connection_str = f"postgresql+psycopg2://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}"
-        engine = create_engine(connection_str)
-        with engine.connect() as con:
-            Base.metadata.create_all(con)
-            con.commit()
-            logger.info("yielding a sessionmaker against the test postgres db.")
 
-            yield sessionmaker(bind=engine, expire_on_commit=False)
+@pytest.fixture(scope='function')
+def session(engine: Engine):
+    print("Session start")
+    session_maker = sessionmaker(bind=engine)
+    with session_maker() as session:
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
+        yield session
+
+    # print("session end")
+
+
+@pytest.fixture(scope="function")
+def create_object(session):
+    def _create_object(object_type, object_data):
+        obj = object_type(**object_data)
+        session.add(obj)
+        session.commit()
+        return obj
+
+    return _create_object
+
+
+@pytest.fixture(scope="function")
+def load_data_from_json(path, session):
+    def _load_data_from_json(json_name):
+        file_name = path / "data" / json_name
+        with open(file_name, "r", encoding="UTF-8") as f:
+            data = json.load(f)
+            for table_name, values in data.items():
+                table = Table(table_name, Base.metadata, autoload=True)
+                query_insert = insert(table)
+                for value in values:
+                    query_insert = query_insert.values(value)
+                    session.execute(query_insert)
+                    # session.execute(f"ALTER SEQUENCE {table_name}_{value}_seq RESTART WITH 10")
+                    # print(f"{value.keys()[0]}")
+                    session.commit()
+                if table_name == 'digests':
+                    session.execute(sa_text("ALTER SEQUENCE digests_id_seq RESTART WITH 10"))
+                    # session.execute(sa_text("SELECT pg_get_serial_sequence('digests', 'id');"))
+                    session.commit()
+
+    return _load_data_from_json

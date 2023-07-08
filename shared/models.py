@@ -2,9 +2,11 @@ from typing import List
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Enum, Text, LargeBinary, \
     PrimaryKeyConstraint, BigInteger, Table, func
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
 from shared.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
+from typing import Optional
 
 
 class User(Base):
@@ -58,12 +60,17 @@ class Channel(Base):
     posts = relationship('Post', back_populates='channel')
 
 
-association_table = Table(
+digests_posts = Table(
     "digests_posts",
     Base.metadata,
-    Column("digest_id", ForeignKey("digests.id")),
-    Column("post_id", ForeignKey("posts.post_id")),
+    Column("digest_id", ForeignKey("digests.id"), primary_key=True),
+    Column("post_id", ForeignKey("posts.post_id"), primary_key=True),
 )
+
+
+class DigestAssociation(Base):
+    __table__ = digests_posts
+    digest: Mapped["Digest"] = relationship('Digest', back_populates="digest_recs")
 
 
 class Digest(Base):
@@ -71,9 +78,18 @@ class Digest(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     user: Mapped["User"] = relationship(back_populates="digests")
-    posts: Mapped[List["Post"]] = relationship(secondary=association_table)
+    posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)
     # generation_date = Column(DateTime, nullable=False, default=datetime.now)
     generation_date: Mapped[datetime] = mapped_column(insert_default=func.now())
+    total_summary: Mapped[Optional[str]]
+    digest_recs: Mapped[list["DigestAssociation"]] = relationship("DigestAssociation", back_populates="digest",
+                                                                  cascade="all, delete-orphan")
+    digest_ids: Mapped[list[int]] = association_proxy(
+        "digest_recs", "post_id",
+        creator=lambda uid: DigestAssociation(post_id=uid))
+
+    def __repr__(self):
+        return f"Digest id={self.id} post_ids={[post.post_id for post in self.posts]}"
 
 
 class Post(Base):

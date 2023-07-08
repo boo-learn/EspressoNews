@@ -11,4 +11,4 @@ EXPOSE 80
 ENV NAME World
 
 # Run news_collection_main.py when the container launches
-CMD ["python", "news_collection_main.py"]
+CMD ["python", "digest_main.py"]
