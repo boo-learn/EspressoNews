@@ -4,6 +4,7 @@ FROM hobrus/espresso_news_base:latest
 # Copy the news_collection_service folder into the container at /app
 COPY ./shared /app/shared
 COPY ./tdata_utility /app
+COPY ./wait-for-it.sh /app/wait-for-it.sh
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
@@ -11,4 +12,4 @@ EXPOSE 80
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run scripts when the container launches
-CMD ["python", "save_accounts_to_db.py"]
+CMD ["/app/wait-for-it.sh", "http://alembic:5000", "--", "python save_accounts_to_db.py"]

@@ -86,17 +86,29 @@ class Subscriber(metaclass=SingletonMeta):
         # print(f"Raw message = {message.body.decode()}")
         message_body = json.loads(message.body.decode())
         async with message.process():
-            await self.handlers[message_body["type"]](message_body["data"])
+            if message_body["data"]:
+                await self.handlers[message_body["type"]](message_body["data"])
+            else:
+                await self.handlers[message_body["type"]]()
             # print(f"[x] Received message: {message.body.decode()}")
 
-    async def __connect(self):
+    async def __connect(self, retries=10, delay=5):
         if self.connection:
             return
-        print("Subscriber new connection")
-        self.connection = await aio_pika.connect_robust(self.host_url)
-        self.channel = await self.connection.channel()
-        await self.channel.set_qos(prefetch_count=1)
-        self.queue = await self.channel.declare_queue(self.queue_name)
+        for i in range(retries):
+            try:
+                self.connection = await aio_pika.connect_robust(self.host_url)
+                self.channel = await self.connection.channel()
+                await self.channel.set_qos(prefetch_count=1)
+                self.queue = await self.channel.declare_queue(self.queue_name)
+            except Exception as e:
+                if i < retries - 1:
+                    print(f"Failed to connect to RabbitMQ: {e}. Retrying in {delay} seconds...")
+                    await asyncio.sleep(delay)
+                    continue
+                else:
+                    print("Failed to connect to RabbitMQ after several attempts. Exiting...")
+                    raise
 
     async def __start_subscribe(self):
         if not self.connection or self.connection.is_closed:

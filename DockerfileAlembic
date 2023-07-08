@@ -5,6 +5,7 @@ FROM hobrus/espresso_news_base:latest
 COPY ./shared /app/shared
 COPY ./alembic /app/alembic
 COPY ./alembic.ini /app
+COPY ./db_healthcheck.py /app
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
@@ -12,4 +13,4 @@ EXPOSE 80
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run scripts when the container launches
-CMD alembic upgrade head
+CMD python /app/db_healthcheck.py && alembic upgrade head

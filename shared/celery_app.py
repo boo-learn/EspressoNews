@@ -1,30 +1,15 @@
 from celery import Celery
+from celery.schedules import crontab
 
-from shared.celery_beat_schedule import beat_schedule
+broker_url = 'redis://redis:6379/0'
+backend_url = 'redis://redis:6379/0'
 
+celery_app = Celery('tasks', broker=broker_url, backend=backend_url)
 
-def create_celery_app(name, broker, task_routes, timezone='UTC'):
-    app = Celery(name, broker=broker)
-    app.conf.task_routes = task_routes
-    app.conf.timezone = timezone
-    return app
-
-
-subscriptions_task_routes = {
-    'subscriptions.tasks.subscribe': {'queue': 'subscriptions', 'rate_limit': '1/m'},
-    'subscriptions.tasks.unsubscribe': {'queue': 'subscriptions', 'rate_limit': '1/m'},
+celery_app.conf.beat_schedule = {
+    'run-every-2-minutes': {
+        'task': 'tasks.collect_news',
+        'schedule': 3600,  # 3600.0,
+        'args': (),
+    },
 }
-
-news_collector_task_routes = {
-    "news_collector.tasks.collect_news": {"queue": "news_queue"},
-}
-
-summarize_task_routes = {
-    "summary_service.tasks.summarize_news": {"queue": "summary_queue"},
-}
-
-subscriptions_celery_app = create_celery_app('subscriptions', 'redis://redis:6379/0', subscriptions_task_routes)
-news_collector_celery_app = create_celery_app('news_collector', 'redis://redis:6379/0',
-                                              news_collector_task_routes)
-summarize_celery_app = create_celery_app('summary_service', 'redis://redis:6379/0', summarize_task_routes)
-news_collector_celery_app.conf.beat_schedule = beat_schedule
