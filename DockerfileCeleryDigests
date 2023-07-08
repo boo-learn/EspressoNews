@@ -1,0 +1,12 @@
+# Dockerfile
+FROM hobrus/espresso_news_base:latest
+
+WORKDIR /app
+
+COPY ./shared /app/shared
+COPY ./digest_service /app/digest_service
+
+CMD ["bash", "-c", "celery -A digest_service.tasks worker --loglevel=info & celery -A digest_service.tasks beat --loglevel=info"]
+
+
+

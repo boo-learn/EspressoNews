@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from shared.database import async_session
 from shared.models import User
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,7 +7,8 @@ from sqlalchemy.future import select
 
 
 class UserRepository:
-    async def create(self, **kwargs) -> User:
+    @staticmethod
+    async def create(**kwargs) -> User:
         try:
             async with async_session() as session:
                 user = User(**kwargs)
@@ -18,7 +19,8 @@ class UserRepository:
             await session.rollback()
             raise e
 
-    async def get(self, user_id: int) -> Optional[User]:
+    @staticmethod
+    async def get(user_id: int) -> Optional[User]:
         try:
             async with async_session() as session:
                 stmt = select(User).where(User.user_id == user_id)
@@ -27,7 +29,18 @@ class UserRepository:
         except SQLAlchemyError as e:
             raise e
 
-    async def get_by_username(self, username: str) -> Optional[User]:
+    @staticmethod
+    async def get_all() -> List[Optional[User]]:
+        try:
+            async with async_session() as session:
+                stmt = select(User)
+                result = await session.execute(stmt)
+                return result.scalars().all()
+        except SQLAlchemyError as e:
+            raise e
+
+    @staticmethod
+    async def get_by_username(username: str) -> Optional[User]:
         try:
             async with async_session() as session:
                 stmt = select(User).where(User.username == username)
@@ -36,7 +49,8 @@ class UserRepository:
         except SQLAlchemyError as e:
             raise e
 
-    async def update(self, user: User, **kwargs) -> User:
+    @staticmethod
+    async def update(user: User, **kwargs) -> User:
         try:
             async with async_session() as session:
                 for key, value in kwargs.items():
@@ -47,7 +61,8 @@ class UserRepository:
             await session.rollback()
             raise e
 
-    async def delete(self, user: User):
+    @staticmethod
+    async def delete(user: User):
         try:
             async with async_session() as session:
                 await session.delete(user)

@@ -85,6 +85,15 @@ services:
     depends_on:
       - rabbitmq
 
+  celery3:
+    build:
+      context: .
+      dockerfile: DockerfileCeleryDigests
+    env_file:
+      - .env.dev
+    depends_on:
+      - rabbitmq
+
   flower:
     build:
       context: .
@@ -143,9 +152,7 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - bot_app
-      - subscription_service
-      - news_collection_service
+      - summary_service
 
 volumes:
   postgres_data:

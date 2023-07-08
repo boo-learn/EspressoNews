@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG)  # Устанавливаем общи�
 
 # Создаем и настраиваем отдельный логгер для aiogram
 aiogram_logger = logging.getLogger('aiogram')
-aiogram_logger.setLevel(logging.WARNING)  # Устанавливаем уровень логгирования WARNING для aiogram
+aiogram_logger.setLevel(logging.WARNING)  # Устанавливаем уровень логирования WARNING для aiogram
 
 bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 

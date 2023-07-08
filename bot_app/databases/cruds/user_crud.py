@@ -1,7 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 
 from bot_app.databases.repositories import UserRepository
-from bot_app.tasks.subscription.tasks import send_to_subscribe_channel
 from shared.models import User
 
 
@@ -31,3 +30,8 @@ class UserCRUD:
             user = await self.repository.create(**data)
 
         return user
+
+    async def get_all_users(self) -> List[Optional[User]]:
+        return await self.repository.get_all()
+
+

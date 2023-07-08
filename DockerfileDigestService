@@ -7,8 +7,5 @@ COPY ./digest_service /app
 
 EXPOSE 80
 
-# Define environment variable
-ENV NAME World
-
 # Run news_collection_main.py when the container launches
 CMD ["python", "digest_main.py"]

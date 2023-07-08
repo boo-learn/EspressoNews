@@ -1,3 +1,4 @@
+import logging
 import asyncio
 from sqlalchemy import select
 from shared.rabbitmq import Subscriber, QueuesType, MessageData, Producer
@@ -5,11 +6,16 @@ from shared.config import RABBIT_HOST
 from shared.database import async_session
 from shared.models import User, Digest, Post, digests_posts, Subscription
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 # async def update_digest():
 #     pass
 
+
 async def prepare_digest(user_id: int):
+    logger.info(f"Start digest creating.")
     digest = Digest(user_id=user_id)
     async with async_session() as session:
         already_in_digests = select(digests_posts.c.post_id).join(Digest).where(Digest.user_id == user_id)
@@ -30,13 +36,14 @@ async def prepare_digest(user_id: int):
             collect_summary += f"• {post.summary}\n\n"
         digest.total_summary = collect_summary
         await session.commit()
-        producer = Producer(host=RABBIT_HOST)
 
-        message: MessageData = {
-            "type": "send_digest",
-            "data": digest.id
-        }
-        await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
+    producer = Producer(host=RABBIT_HOST)
+
+    message: MessageData = {
+        "type": "send_digest",
+        "data": digest.id
+    }
+    await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 
 
 async def exclude_duplicates(posts: list[Post]) -> list[Post]:
@@ -45,6 +52,7 @@ async def exclude_duplicates(posts: list[Post]) -> list[Post]:
 
 
 async def main():
+    logger.info(f"Start digest service.")
     # example message "prepare_digest"
     message: MessageData = {
         "type": "prepare_digest",
