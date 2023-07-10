@@ -31,7 +31,9 @@
 ```python
 {
     "type": "no_digest",
-    "data": None
+    "data": {
+        "user_id": 1
+    }
 }
 ```
 в очередь `bot_service`

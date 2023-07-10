@@ -45,12 +45,17 @@ async def prepare_digest(user_id: int):
     if digest:
         message: MessageData = {
             "type": "send_digest",
-            "data": digest.id
+            "data": {
+                "user_id": digest.user_id,
+                "digest_id": digest.id,
+            }
         }
     else:
         message: MessageData = {
             "type": "no_digest",
-            "data": None
+            "data": {
+                "user_id": user_id
+            }
         }
     await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 
