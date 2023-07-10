@@ -1,5 +1,5 @@
 import pytest
-from sqlalchemy import create_engine, select, func, insert, Table
+from sqlalchemy import create_engine, select, func, insert, Table, inspect
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 from shared.models import Base, User
@@ -43,12 +43,20 @@ def load_data_from_json(path, session):
         file_name = path / "data" / json_name
         with open(file_name, "r", encoding="UTF-8") as f:
             data = json.load(f)
+            inspector = inspect(session.bind)
             for table_name, values in data.items():
                 model = Base.model_lookup_by_table_name(table_name)
                 for value in values:
                     obj = model(**value)
                     session.add(obj)
                     session.commit()
+                for column in inspector.get_columns(table_name):
+                    if column['autoincrement']:
+                        session.execute(sa_text(
+                            f"SELECT setval('{table_name}_{column['name']}_seq', "
+                            f"(SELECT MAX({column['name']}) FROM {table_name}))")
+                        )
+                        session.commit()
                 # if table_name == 'digests':
                 #     session.execute(sa_text("ALTER SEQUENCE digests_id_seq RESTART WITH 10"))
             # session.commit()

@@ -10,7 +10,7 @@ DATABASE_URI = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HO
 # print(f"{DATABASE_URI=}")
 # Асинхронный движок и сессия
 engine = create_async_engine(DATABASE_URI)
-async_session = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
+async_session = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit = False)
 
 # Синхронный движок и сессия для Alembic
 sync_DATABASE_URI = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}'
