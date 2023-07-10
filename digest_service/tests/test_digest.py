@@ -53,5 +53,5 @@ async def test_digest_not_created_for_empty_posts(event_loop, session, load_data
     num_digests_after = session.query(func.count(Digest.id)).scalar()
     last_digest = session.scalars(select(Digest).order_by(Digest.id.desc())).first()
     print(last_digest)
-    assert num_digests_after == 3
+    assert num_digests_after == num_digests_before
     assert last_digest.id == 3
