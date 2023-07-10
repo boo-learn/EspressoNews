@@ -132,7 +132,9 @@ def delete_users():
 
 
 @cli.command()
-def dump_db(file_name=BASE_DIR / "data" / "data.json"):
+@click.argument('filename')
+def dump_db(filename="data.json"):
+    full_path = BASE_DIR / "data" / filename
     with session_scope() as session:
         result = {}
         for table in Base.metadata.sorted_tables:
@@ -140,13 +142,15 @@ def dump_db(file_name=BASE_DIR / "data" / "data.json"):
             #     continue
             result[table.name] = list(map(dict, session.execute(table.select()).mappings().all()))
 
-        with open(file_name, "w", encoding="UTF-8") as f:
+        with open(full_path, "w", encoding="UTF-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2, default=str)
 
 
 @cli.command()
-def load_db(file_name=BASE_DIR / "data" / "data_set01.json"):
-    with open(file_name, "r", encoding="UTF-8") as f:
+@click.argument('filename')
+def load_db(filename="data.json"):
+    full_path = BASE_DIR / "data" / filename
+    with open(full_path, "r", encoding="UTF-8") as f:
         data = json.load(f)
         with session_scope() as session:
             for table_name, values in data.items():
@@ -155,12 +159,6 @@ def load_db(file_name=BASE_DIR / "data" / "data_set01.json"):
                     obj = model(**value)
                     session.add(obj)
                     session.commit()
-                # table = Table(table_name, Base.metadata)
-                # query_insert = insert(table)
-                # for value in values:
-                #     query_insert = query_insert.values(value)
-                #     session.execute(query_insert)
-                # session.commit()
 
 
 if __name__ == '__main__':

@@ -4,13 +4,15 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 from shared.models import Base, User
 from sqlalchemy.sql import text as sa_text
+from sqlalchemy.pool import NullPool
 import json
 
 
 @pytest.fixture(scope='session')
 def engine(db_server):
     port = db_server["db_port"]
-    engine: Engine = create_engine(f'postgresql://postgres:postgres@localhost:{port}/TestDB', future=True)
+    engine: Engine = create_engine(f'postgresql://postgres:postgres@localhost:{port}/TestDB', future=True,
+                                   poolclass=NullPool)
     yield engine
 
 

@@ -1,0 +1,145 @@
+{
+  "users": [
+    {
+      "user_id": 1,
+      "username": "user-1"
+    },
+    {
+      "user_id": 2,
+      "username": "user-2"
+    },
+    {
+      "user_id": 3,
+      "username": "user-3"
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": 1,
+      "channel_name": "Channel-1",
+      "channel_username": "Author Channel-1"
+    },
+    {
+      "channel_id": 2,
+      "channel_name": "Channel-2",
+      "channel_username": "Author Channel-2"
+    },
+    {
+      "channel_id": 3,
+      "channel_name": "Channel-3",
+      "channel_username": "Author Channel-3"
+    }
+  ],
+  "posts": [
+    {
+      "post_id": 1,
+      "channel_id": 1,
+      "title": "Post-1 from Channel-1",
+      "content": "Content for Post-1",
+      "summary": "short content for post-1"
+    },
+    {
+      "post_id": 2,
+      "channel_id": 1,
+      "title": "Post-2 from Channel-1",
+      "content": "Content for Post-2"
+    },
+    {
+      "post_id": 3,
+      "channel_id": 1,
+      "title": "Post-3 from Channel-1",
+      "content": "Content for Post-3",
+      "summary": "short content for post-3"
+    },
+    {
+      "post_id": 5,
+      "channel_id": 2,
+      "title": "Post-21 from Channel-2",
+      "content": "Content for Post-21"
+    },
+    {
+      "post_id": 6,
+      "channel_id": 2,
+      "title": "Post-22 from Channel-2",
+      "content": "Content for Post-22",
+      "summary": "short content for post-22"
+    },
+    {
+      "post_id": 7,
+      "channel_id": 2,
+      "title": "Post-23 from Channel-2",
+      "content": "Content for Post-23"
+    },
+    {
+      "post_id": 8,
+      "channel_id": 2,
+      "title": "Post-24 from Channel-2",
+      "content": "Content for Post-24",
+      "summary": "short content for post-24"
+    },
+    {
+      "post_id": 9,
+      "channel_id": 3,
+      "title": "Post-31 from Channel-3",
+      "content": "Content for Post-31",
+      "summary": "short content for post-31"
+    },
+    {
+      "post_id": 10,
+      "channel_id": 3,
+      "title": "Post-32 from Channel-3",
+      "content": "Content for Post-32",
+      "summary": "short content for post-32"
+    }
+  ],
+  "subscriptions": [
+    {
+      "user_id": 1,
+      "channel_id": 1
+    },
+    {
+      "user_id": 2,
+      "channel_id": 2
+    },
+    {
+      "user_id": 3,
+      "channel_id": 3
+    }
+  ],
+  "digests": [
+    {
+      "id": 1,
+      "user_id": 1
+    },
+    {
+      "id": 2,
+      "user_id": 2
+    },
+    {
+      "id": 3,
+      "user_id": 3
+    }
+  ],
+  "digests_posts": [
+    {
+      "digest_id": 1,
+      "post_id": 1
+    },
+    {
+      "digest_id": 1,
+      "post_id": 3
+    },
+    {
+      "digest_id": 2,
+      "post_id": 6
+    },
+    {
+      "digest_id": 3,
+      "post_id": 9
+    },
+    {
+      "digest_id": 3,
+      "post_id": 10
+    }
+  ]
+}

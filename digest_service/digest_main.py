@@ -5,12 +5,13 @@ from shared.rabbitmq import Subscriber, QueuesType, MessageData, Producer
 from shared.config import RABBIT_HOST
 from shared.database import async_session
 from shared.models import User, Digest, Post, digests_posts, Subscription
+from typing import Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-async def create_digest(user_id: int):
+async def create_digest(user_id: int) -> Optional[Digest]:
     logger.info(f"Start digest creating.")
     digest = Digest(user_id=user_id)
     async with async_session() as session:
@@ -24,6 +25,8 @@ async def create_digest(user_id: int):
                 )
         results = await session.execute(stmt)
         new_posts_for_user = results.scalars().all()
+        if not new_posts_for_user:
+            return None
         posts_without_duplicates = await exclude_duplicates(new_posts_for_user)
         session.add(digest)
         digest.digest_ids.extend([post.post_id for post in posts_without_duplicates])
@@ -32,17 +35,23 @@ async def create_digest(user_id: int):
             collect_summary += f"• {post.summary}\n\n"
         digest.total_summary = collect_summary
         await session.commit()
-        return digest.id
+        return digest
 
 
 async def prepare_digest(user_id: int):
     producer = Producer(host=RABBIT_HOST)
-    digest_id = await create_digest(user_id)
+    digest = await create_digest(user_id)
 
-    message: MessageData = {
-        "type": "send_digest",
-        "data": digest_id
-    }
+    if digest:
+        message: MessageData = {
+            "type": "send_digest",
+            "data": digest.id
+        }
+    else:
+        message: MessageData = {
+            "type": "no_digest",
+            "data": None
+        }
     await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 
 
