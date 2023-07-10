@@ -4,7 +4,7 @@ import asyncio
 import pytest_asyncio
 from shared.models import User, Channel, Post, Subscription, Digest
 from sqlalchemy import select
-from digest_service.digest_main import prepare_digest
+from digest_service.digest_main import prepare_digest, create_digest
 
 
 # @pytest.fixture(scope='function')
@@ -83,7 +83,7 @@ def test_create_digest(session, load_data_from_json):
 @pytest.mark.asyncio
 async def test_prepare_digest(session, load_data_from_json):
     load_data_from_json("data_set01.json")
-    await prepare_digest(user_id=3)
+    await create_digest(user_id=3)
 
     last_digest = session.scalars(select(Digest).order_by(Digest.id.desc())).first()
     # all_digests = session.scalars(select(Digest)).all()

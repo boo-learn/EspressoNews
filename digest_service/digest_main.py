@@ -1,6 +1,6 @@
 import logging
 import asyncio
-from sqlalchemy import select
+from sqlalchemy import select, inspect
 from shared.rabbitmq import Subscriber, QueuesType, MessageData, Producer
 from shared.config import RABBIT_HOST
 from shared.database import async_session
@@ -10,11 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# async def update_digest():
-#     pass
-
-
-async def prepare_digest(user_id: int):
+async def create_digest(user_id: int):
     logger.info(f"Start digest creating.")
     digest = Digest(user_id=user_id)
     async with async_session() as session:
@@ -36,12 +32,16 @@ async def prepare_digest(user_id: int):
             collect_summary += f"• {post.summary}\n\n"
         digest.total_summary = collect_summary
         await session.commit()
+        return digest.id
 
+
+async def prepare_digest(user_id: int):
     producer = Producer(host=RABBIT_HOST)
+    digest_id = await create_digest(user_id)
 
     message: MessageData = {
         "type": "send_digest",
-        "data": digest.id
+        "data": digest_id
     }
     await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 

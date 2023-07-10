@@ -150,18 +150,16 @@ def load_db(file_name=BASE_DIR / "data" / "data_set01.json"):
         data = json.load(f)
         with session_scope() as session:
             for table_name, values in data.items():
-                table = Table(table_name, Base.metadata,
-                              autoload_replace=False,
-                              keep_existing=False,
-                              )
-                query_insert = insert(table)
-                # print(values)
-                # session.execute(table.insert(), values)
-            # session.commit()
+                model = Base.model_lookup_by_table_name(table_name)
                 for value in values:
-                    print(f"{value=}")
-                    query_insert = query_insert.values(value)
-                    session.execute(query_insert)
+                    obj = model(**value)
+                    session.add(obj)
+                    session.commit()
+                # table = Table(table_name, Base.metadata)
+                # query_insert = insert(table)
+                # for value in values:
+                #     query_insert = query_insert.values(value)
+                #     session.execute(query_insert)
                 # session.commit()
 
 
