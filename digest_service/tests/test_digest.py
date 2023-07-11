@@ -7,14 +7,6 @@ from sqlalchemy import select, func
 from digest_service.digest_main import prepare_digest, create_digest
 
 
-@pytest.fixture(scope='session')
-def event_loop(request):
-    """Create an instance of the default event loop for each test case."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
 # Mark all test as asyncio
 # pytestmark = pytest.mark.asyncio
 

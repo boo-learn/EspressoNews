@@ -38,7 +38,8 @@ async def create_digest(user_id: int) -> Optional[Digest]:
         return digest
 
 
-async def prepare_digest(user_id: int):
+async def prepare_digest(data: dict):
+    user_id = data["user_id"]
     producer = Producer(host=RABBIT_HOST)
     digest = await create_digest(user_id)
 
@@ -50,6 +51,7 @@ async def prepare_digest(user_id: int):
                 "digest_id": digest.id,
             }
         }
+        print(f"{message=}")
     else:
         message: MessageData = {
             "type": "no_digest",
@@ -57,6 +59,7 @@ async def prepare_digest(user_id: int):
                 "user_id": user_id
             }
         }
+        print(f"{message=}")
     await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 
 
@@ -70,7 +73,7 @@ async def main():
     # example message "prepare_digest"
     message: MessageData = {
         "type": "prepare_digest",
-        "data": "[int]user_id"
+        "data": {"user_id": 1}
     }
     subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.digest_service)
     subscriber.subscribe(message_type="prepare_digest", callback=prepare_digest)
