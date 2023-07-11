@@ -69,8 +69,6 @@ services:
       interval: 5s
       timeout: 20s
       retries: 5
-#    depends_on:
-#      - tdata
 
   redis:
     image: "redis:6.2"
@@ -87,6 +85,7 @@ services:
       - .env.dev
     depends_on:
       - rabbitmq
+      - redis
 
   celery2:
     build:
@@ -96,6 +95,7 @@ services:
       - .env.dev
     depends_on:
       - rabbitmq
+      - redis
 
   celery3:
     build:
@@ -105,6 +105,7 @@ services:
       - .env.dev
     depends_on:
       - rabbitmq
+      - redis
 
   flower:
     build:
@@ -117,6 +118,7 @@ services:
       - redis
       - celery
       - celery2
+      - celery3
 
   bot_app:
     build:
@@ -131,6 +133,7 @@ services:
       - rabbitmq
       - celery
       - celery2
+      - celery3
 
   subscription_service:
     build:
@@ -139,7 +142,10 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - bot_app
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   news_collection_service:
     build:
@@ -147,6 +153,11 @@ services:
       dockerfile: DockerfileNewsCollectionService
     env_file:
       - .env.dev
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   summary_service:
     build:
@@ -155,7 +166,10 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - news_collection_service
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   digest_service:
     build:
@@ -165,7 +179,7 @@ services:
       - .env.dev
     depends_on:
       rabbitmq:
-          condition: service_healthy
+        condition: service_healthy
       db:
         condition: service_healthy
 
