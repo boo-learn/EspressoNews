@@ -83,3 +83,15 @@ docker-compose exec <service_name> <command>
 ```bash
 docker-compose exec bot_app ls
 ```
+
+### 9. Обновляем базовый образ
+
+```bash
+docker build -t hobrus/espresso_news_base:latest -f DockerfileBase .
+```
+
+После этого пушим в Docker Hub
+
+```bash
+docker push hobrus/espresso_news_base:latest
+```
