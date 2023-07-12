@@ -127,13 +127,10 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - db
-      - alembic
-      - tdata
-      - rabbitmq
-      - celery
-      - celery2
-      - celery3
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   subscription_service:
     build:

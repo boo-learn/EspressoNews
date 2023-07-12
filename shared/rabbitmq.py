@@ -89,7 +89,10 @@ class Subscriber(metaclass=SingletonMeta):
         # print(f"Raw message = {message.body.decode()}")
         message_body = json.loads(message.body.decode())
         async with message.process():
-            await self.handlers[message_body["type"]](message_body["data"])
+            if message_body["data"]:
+                await self.handlers[message_body["type"]](message_body["data"])
+            else:
+                await self.handlers[message_body["type"]]()
             # print(f"[x] Received message: {message.body.decode()}")
 
     # async def __connect(self, retries=10, delay=5):
