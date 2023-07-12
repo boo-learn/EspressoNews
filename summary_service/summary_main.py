@@ -1,11 +1,13 @@
 import asyncio
 import logging
+import re
 
 from shared.config import RABBIT_HOST
 from shared.models import Post
 from shared.rabbitmq import Subscriber, QueuesType
 from summary_service.chat_gpt import ChatGPT
-from db_utils import get_posts_without_summary_async, update_post_summary_async, get_active_gpt_accounts_async
+from db_utils import get_posts_without_summary_async, update_post_summary_async, get_active_gpt_accounts_async, \
+    update_chatgpt_account_async
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,28 +27,45 @@ async def generate_summary(chatgpt: ChatGPT, post: Post):
 
         return summary
     except Exception as e:
+        error_message = str(e)
+        if "Error: 429" in error_message:
+            message_match = re.search(r'rate_limit_exceeded', error_message)
+            if message_match:
+                logger.info("Start disabling acc.")
+                await update_chatgpt_account_async(chatgpt.api_key)
+                logger.info("End disabling acc.")
+            else:
+                logger.info("An error occurred, but the message could not be extracted.")
         logger.info(f"Error generating summary for post {post.post_id}: {e}")
         return None
 
 
 async def generate_summaries():
-    chatgpt_accounts = await get_active_gpt_accounts_async()
-    logger.info(f"GPT accounts {chatgpt_accounts}")
-    posts = await get_posts_without_summary_async()
-    tasks = []
+    while True:
+        posts = await get_posts_without_summary_async()
 
-    for post in posts:
-        chatgpt_account = chatgpt_accounts.pop(0)
-        chatgpt_accounts.append(chatgpt_account)
+        if not posts:
+            break
 
-        gpt_instance = ChatGPT(chatgpt_account.api_key)
+        tasks = []
+        chatgpt_accounts = await get_active_gpt_accounts_async()
+        logger.info(f"GPT accounts {chatgpt_accounts}")
 
-        tasks.append(generate_summary(gpt_instance, post))
+        for post in posts:
+            if not chatgpt_accounts:
+                break
 
-    summaries = await asyncio.gather(*tasks)
+            chatgpt_account = chatgpt_accounts.pop(0)
+            chatgpt_accounts.append(chatgpt_account)
 
-    for post, summary in zip(posts, summaries):
-        await update_post_summary_async(post.post_id, summary)
+            gpt_instance = ChatGPT(chatgpt_account.api_key)
+
+            tasks.append(generate_summary(gpt_instance, post))
+
+        summaries = await asyncio.gather(*tasks)
+
+        for post, summary in zip(posts, summaries):
+            await update_post_summary_async(post.post_id, summary)
 
 
 async def main():

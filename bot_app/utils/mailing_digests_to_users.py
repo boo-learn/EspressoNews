@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from bot_app.data.messages import gen_digest_not_exist_mess
 from bot_app.databases.cruds import DigestCRUD
@@ -23,7 +24,12 @@ async def send_digest(data):
     digest_crud = DigestCRUD()
     digest_summary = await digest_crud.get_digest_summary_by_id(data["digest_id"])
     logger.info(f'Digest summary {digest_summary}')
-    await bot.send_message(chat_id=data["user_id"], text=digest_summary)
+
+    max_length = 4096
+    for i in range(0, len(digest_summary), max_length):
+        text_to_send = digest_summary[i:i + max_length]
+        await bot.send_message(chat_id=data["user_id"], text=text_to_send)
+        await asyncio.sleep(1)
 
 
 async def no_digest(data):

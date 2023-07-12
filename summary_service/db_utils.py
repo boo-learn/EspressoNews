@@ -35,3 +35,13 @@ async def get_active_gpt_accounts_async():
     async with async_session() as db:
         result = await db.execute(select(GPTAccount).where(GPTAccount.is_active == True))
         return result.scalars().all()
+
+
+async def update_chatgpt_account_async(api_key: str):
+    async with async_session() as db:
+        result = await db.execute(
+            select(GPTAccount).where(GPTAccount.api_key == api_key)
+        )
+        acc = result.scalar_one()
+        acc.is_active = False
+        await db.commit()

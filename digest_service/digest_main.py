@@ -39,6 +39,7 @@ async def create_digest(user_id: int) -> Optional[Digest]:
 
 
 async def prepare_digest(user_id: int):
+    logger.info(f"Start digest prepare.")
     producer = Producer(host=RABBIT_HOST)
     digest = await create_digest(user_id)
 
@@ -58,6 +59,7 @@ async def prepare_digest(user_id: int):
             }
         }
     await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
+    logger.info(f"End digest prepare.")
 
 
 async def exclude_duplicates(posts: list[Post]) -> list[Post]:

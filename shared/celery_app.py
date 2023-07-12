@@ -13,12 +13,12 @@ celery_app.conf.update({
 celery_app.conf.beat_schedule = {
     'hourly-task-collect-news': {
         'task': 'tasks.collect_news',
-        'schedule': 3600,  # 3600.0,
+        'schedule': crontab(minute='0'),  # каждый час
         'args': (),
     },
     'daily-task-get-digest': {
         'task': 'tasks.generate_all_digests_for_users',
-        'schedule': 600,  # crontab(hour=6, minute=50),
+        'schedule': crontab(minute='*/10'),  # каждые 10 минут
         'args': (),
     },
 }
