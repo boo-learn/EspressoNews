@@ -3,9 +3,11 @@ import sys, os
 
 sys.path.append(os.getcwd())
 import click
+import asyncio
 from shared.models import User, Channel, Subscription, Post, Digest
 from shared.database import sync_session, sync_engine
 from shared.models import Base
+from shared.rabbitmq import Producer, MessageData, QueuesType
 from contextlib import contextmanager
 import contextlib
 from sqlalchemy import select, insert, Table
@@ -159,6 +161,19 @@ def load_db(filename="data.json"):
                     obj = model(**value)
                     session.add(obj)
                     session.commit()
+
+
+@cli.command()
+def send_message():
+    producer = Producer()
+
+    message: MessageData = {
+        "type": 'prepare_digest',
+        "data": {
+            "user_id": 2
+        },
+    }
+    asyncio.run(producer.send_message(message, QueuesType.digest_service))
 
 
 if __name__ == '__main__':

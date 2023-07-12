@@ -9,6 +9,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 5s
+      timeout: 20s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -17,7 +22,8 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - db
+      rabbitmq:
+        condition: service_healthy
 
   alembic:
     build:
@@ -28,7 +34,8 @@ services:
     ports:
       - "5000:5000"  # Add the desired port mapping here
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   tdata:
     build:
@@ -57,8 +64,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-#    depends_on:
-#      - tdata
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 20s
+      retries: 5
 
   redis:
     image: "redis:6.2"
@@ -75,6 +85,7 @@ services:
       - .env.dev
     depends_on:
       - rabbitmq
+      - redis
 
   celery2:
     build:
@@ -84,6 +95,7 @@ services:
       - .env.dev
     depends_on:
       - rabbitmq
+      - redis
 
   celery3:
     build:
@@ -93,6 +105,7 @@ services:
       - .env.dev
     depends_on:
       - rabbitmq
+      - redis
 
   flower:
     build:
@@ -105,6 +118,7 @@ services:
       - redis
       - celery
       - celery2
+      - celery3
 
   bot_app:
     build:
@@ -113,12 +127,10 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - db
-      - alembic
-      - tdata
-      - rabbitmq
-      - celery
-      - celery2
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   subscription_service:
     build:
@@ -127,7 +139,10 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - bot_app
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   news_collection_service:
     build:
@@ -135,6 +150,11 @@ services:
       dockerfile: DockerfileNewsCollectionService
     env_file:
       - .env.dev
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   summary_service:
     build:
@@ -143,7 +163,10 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - news_collection_service
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   digest_service:
     build:
@@ -152,7 +175,10 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      - summary_service
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:
