@@ -16,10 +16,23 @@ from shared.models import Post
 from shared.rabbitmq import Subscriber, QueuesType, MessageData, Producer
 from shared.config import RABBIT_HOST
 
-# восстановить или переписать функцию get_subscribed_channels
-
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+# Set the level of this logger to DEBUG,
+# so that it will log all messages of level DEBUG and above
+logger.setLevel(logging.DEBUG)
+
+# Create a console handler that logs all messages
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+# Create a formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Add the formatter to the handler
+console_handler.setFormatter(formatter)
+
+# Add the handler to the logger
+logger.addHandler(console_handler)
 
 
 async def collect_news():
@@ -79,7 +92,7 @@ async def collect_news():
                 "data": None
             }
 
-            producer = Producer(host=RABBIT_HOST)
+            producer = Producer(host=RABBIT_HOST, queue=QueuesType.summary_service)
             await producer.send_message(message, QueuesType.summary_service)
         except SessionRevokedError:
             logger.info(f"The session has been revoked by the user.")

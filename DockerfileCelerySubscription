@@ -1,4 +1,3 @@
-# Dockerfile
 FROM hobrus/espresso_news_base:latest
 
 WORKDIR /app
@@ -6,5 +5,4 @@ WORKDIR /app
 COPY ./shared /app/shared
 COPY ./subscription_service /app/subscription_service
 
-CMD ["celery", "-A", "subscription_service.tasks", "worker", "--loglevel=info"]
-
+CMD ["celery", "-A", "subscription_service.tasks", "worker", "-Q", "subscription_queue", "--loglevel=info"]

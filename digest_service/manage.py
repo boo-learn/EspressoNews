@@ -165,7 +165,7 @@ def load_db(filename="data.json"):
 
 @cli.command()
 def send_message():
-    producer = Producer()
+    producer = Producer("localhost", QueuesType.digest_service)
 
     message: MessageData = {
         "type": 'prepare_digest',

@@ -19,7 +19,7 @@ async def test_simple_send_receive_message(event_loop):
     def on_message(data):
         print(f"{data=}")
 
-    producer = Producer()
+    producer = Producer(host="localhost", queue=QueuesType.ping)
     message: MessageData = {
         "type": "test_message",
         "data": "test_data"

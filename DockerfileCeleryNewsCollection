@@ -7,5 +7,4 @@ COPY ./news_collection_service /app/news_collection_service
 
 EXPOSE 80
 
-CMD ["bash", "-c", "celery -A news_collection_service.tasks worker --loglevel=info & celery -A news_collection_service.tasks beat --loglevel=info"]
-
+CMD ["bash", "-c", "celery -A news_collection_service.tasks worker -Q news_collection_queue --loglevel=info & celery -A news_collection_service.tasks beat --loglevel=info"]

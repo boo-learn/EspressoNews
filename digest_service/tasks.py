@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-@celery_app.task(name='tasks.generate_all_digests_for_users')
+@celery_app.task(name='tasks.generate_all_digests_for_users', queue='digest_queue')
 def generate_all_digests_for_users():
     logger.info("Task try to start")
     loop = asyncio.get_event_loop()
@@ -30,7 +30,7 @@ async def get_users_and_send_in_digest_service():
     logger.info(f"Got users {users}")
 
     logger.info("Setting up RabbitMQ producer...")
-    producer = Producer(host=RABBIT_HOST)
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.digest_service)
 
     logger.info("Sending messages to RabbitMQ...")
     for user in users:

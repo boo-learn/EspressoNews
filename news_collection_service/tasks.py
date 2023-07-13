@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 async def collect_news_async():
-    producer = Producer(host=RABBIT_HOST)
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.news_collection_service)
     message: MessageData = {
         "type": "collect_news",
         "data": None
@@ -21,7 +21,7 @@ async def collect_news_async():
     logger.info(f'RabbitMq go complete task')
 
 
-@celery_app.task(name='tasks.collect_news')
+@celery_app.task(name='tasks.collect_news', queue='news_collection_queue')
 def collect_news():
     logger.info(f'Test task completed success')
     loop = asyncio.get_event_loop()

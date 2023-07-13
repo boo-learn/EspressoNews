@@ -23,9 +23,11 @@ logger = logging.getLogger(__name__)
 
 
 async def check_subscriptions():
+    logger.info("Проверка подписок начата.")
     loaded_account = await get_first_active_account_from_db_async()
 
     if loaded_account:
+        logger.info(f"Активный аккаунт загружен: {loaded_account}")
         loaded_client = TelegramClient(StringSession(loaded_account.session_string), loaded_account.api_id,
                                        loaded_account.api_hash)
         await loaded_client.connect()

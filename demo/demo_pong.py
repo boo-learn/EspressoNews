@@ -6,7 +6,7 @@ from shared.config import RABBIT_HOST
 async def on_message(message_data):
     print(f"Receive message with data = {message_data}")
     await asyncio.sleep(5)
-    producer = Producer(host=RABBIT_HOST)
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.ping)
 
     message: MessageData = {
         "type": "pong",

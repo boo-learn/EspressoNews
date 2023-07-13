@@ -38,10 +38,11 @@ async def create_digest(user_id: int) -> Optional[Digest]:
         return digest
 
 
-async def prepare_digest(data: dict):
+async def prepare_digest(data: int):
     logger.info(f"Start digest prepare.")
-    user_id = data["user_id"]
-    producer = Producer(host=RABBIT_HOST)
+    logger.info(f"{data}")
+    user_id = data
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
     digest = await create_digest(user_id)
 
     if digest:
