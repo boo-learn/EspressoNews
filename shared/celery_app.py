@@ -11,14 +11,14 @@ celery_app.conf.update({
 })
 
 celery_app.conf.beat_schedule = {
-    'hourly-task-collect-news': {
+    'every-half-hour-task-collect-news': {
         'task': 'tasks.collect_news',
-        'schedule': crontab(minute='0'),
+        'schedule': crontab(minute='*/30'),
         'args': (),
     },
-    'daily-task-get-digest': {
+    'every-six-hours-task-get-digest': {
         'task': 'tasks.generate_all_digests_for_users',
-        'schedule': crontab(minute='*/2'),
+        'schedule': crontab(hour='*/6'),
         'args': (),
     },
 }

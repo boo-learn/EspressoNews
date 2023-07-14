@@ -18,7 +18,7 @@ async def generate_summary(chatgpt: ChatGPT, post: Post):
         truncated_content = post.content[:10000]  # Truncate the content to 10,000 characters
 
         messages = [{"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": f"Summa rize this news article: {truncated_content}"}]
+                    {"role": "user", "content": f"Сделай этот текст максимально кратким и понятным: {truncated_content}"}]
 
         response = await chatgpt.generate_response(messages=messages, user_id=post.post_id, model="gpt-3.5-turbo-16k")
         summary = response['choices'][0]['message']['content']
