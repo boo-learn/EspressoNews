@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from shared.database import async_session
-from shared.models import Digest
+from shared.models import Digest, Post
 
 
 class DigestRepository:

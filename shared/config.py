@@ -13,3 +13,6 @@ RABBIT_HOST = os.getenv("RABBIT_HOST")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
 ADMIN_ID = os.getenv("ADMIN_ID")
 POSTGRES_TEST_DB = os.getenv("POSTGRES_TEST_DB")
+
+# Bot app
+DIGESTS_LIMIT = 7

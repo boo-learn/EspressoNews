@@ -1,9 +1,14 @@
 import asyncio
 import logging
-from bot_app.data.messages import gen_digest_not_exist_mess
+
+from aiogram.types import InlineKeyboardMarkup
+
+from bot_app.data.messages import gen_digest_not_exist_mess, gen_digest_load_more
 from bot_app.databases.cruds import DigestCRUD
+from bot_app.keyboards.inlines import ikb_load_more
 from bot_app.loader import bot
-from shared.config import RABBIT_HOST
+from bot_app.logic.digest_logic_handler import DigestLogicHandler
+from shared.config import RABBIT_HOST, DIGESTS_LIMIT
 from shared.rabbitmq import Subscriber, QueuesType
 
 logging.basicConfig(level=logging.INFO)
@@ -18,18 +23,24 @@ async def mailing_digests_to_users():
     await subscriber.run()
 
 
-async def send_digest(data):
+async def send_digest(data: dict):
     logger.info(f'Digest trying send')
     logger.info(f'Digest data {data}')
-    digest_crud = DigestCRUD()
-    digest_summary = await digest_crud.get_digest_summary_by_id(data["digest_id"])
-    logger.info(f'Digest summary {digest_summary}')
 
-    max_length = 4096
-    for i in range(0, len(digest_summary), max_length):
-        text_to_send = digest_summary[i:i + max_length]
-        await bot.send_message(chat_id=data["user_id"], text=text_to_send)
-        await asyncio.sleep(1)
+    logic_handler = DigestLogicHandler()
+    digest_summary, total_count = await logic_handler.fetch_and_format_digest(data["digest_id"])
+
+    await logic_handler.send_message_parts(
+        lambda text: bot.send_message(chat_id=data["user_id"], text=text),
+        digest_summary
+    )
+
+    await logic_handler.send_load_more(
+        lambda text, reply_markup: bot.send_message(chat_id=data["user_id"], text=text, reply_markup=reply_markup),
+        total_count,
+        data["digest_id"],
+        DIGESTS_LIMIT
+    )
 
 
 async def no_digest(data):
