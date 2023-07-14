@@ -64,7 +64,12 @@ async def collect_news():
                     logger.debug(f"News {message}")
                     # Проверяем, совпадает ли channel_id с channel_id текущего канала
                     if message.peer_id.channel_id == channel.id:
-                        news.append(message)
+                        # Проверяем, что количество слов в сообщении не менее 45
+                        if len(message.text.split()) >= 45:
+                            news.append(message)
+                        else:
+                            logger.info(
+                                f"Skipping message {message.id} from channel {message.peer_id.channel_id} due to insufficient word count.")
                     else:
                         logger.info(f"Skipping message {message.id} from channel {message.peer_id.channel_id}")
 
