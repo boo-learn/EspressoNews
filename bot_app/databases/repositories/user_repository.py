@@ -89,6 +89,16 @@ class UserRepository:
             raise e
 
     @staticmethod
+    async def get_all_users_settings():
+        try:
+            async with async_session() as session:
+                result = await session.execute(select(UserSettings))
+                return result.scalars().all()
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+
+    @staticmethod
     async def update_setting(settings: UserSettings, field: str, value) -> bool:
         try:
             async with async_session() as session:

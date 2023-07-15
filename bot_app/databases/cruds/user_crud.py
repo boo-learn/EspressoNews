@@ -49,7 +49,15 @@ class UserCRUD:
 
         return False
 
+    async def get_settings_option_for_all_users(self, option_name: str):
+        users_settings = await self.repository.get_all_users_settings()
 
+        user_ids = []
+        options = []
 
+        for user_settings in users_settings:
+            if hasattr(user_settings, option_name):
+                user_ids.append(user_settings.user_id)
+                options.append(getattr(user_settings, option_name))
 
-
+        return user_ids, options
