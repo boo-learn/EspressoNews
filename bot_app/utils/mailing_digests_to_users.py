@@ -36,7 +36,8 @@ async def send_digest(data: dict):
             digest_summary
         )
 
-    if len(digest_summary_list) > DIGESTS_LIMIT:
+    logger.info(f'Digest count {len(digest_summary_list)}, total count {DIGESTS_LIMIT}')
+    if total_count > DIGESTS_LIMIT:
         await logic_handler.send_load_more(
             lambda text, reply_markup: bot.send_message(chat_id=data["user_id"], text=text, reply_markup=reply_markup),
             total_count,
