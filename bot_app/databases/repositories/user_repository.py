@@ -2,7 +2,7 @@ from typing import Optional, List
 from shared.database import async_session
 from shared.models import User, UserSettings
 from sqlalchemy.exc import SQLAlchemyError
-
+from sqlalchemy.orm import joinedload
 from sqlalchemy.future import select
 
 from shared.selection_values_for_models import IntonationEnum, PeriodicityEnum, RoleEnum
@@ -39,7 +39,7 @@ class UserRepository:
     async def get(user_id: int) -> Optional[User]:
         try:
             async with async_session() as session:
-                stmt = select(User).where(User.user_id == user_id)
+                stmt = select(User).options(joinedload(User.settings)).where(User.user_id == user_id)
                 result = await session.execute(stmt)
                 return result.scalars().first()
         except SQLAlchemyError as e:

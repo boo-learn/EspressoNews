@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 async def create_mail_rules():
     user_crud = UserCRUD()
-    user_ids, users_list_periodicity_options = user_crud.get_settings_option_for_all_users('periodicity')
+    user_ids, users_list_periodicity_options = await user_crud.get_settings_option_for_all_users('periodicity')
     for user_id, option in zip(user_ids, users_list_periodicity_options):
         task_name = f'generate-digest-for-{str(user_id)}'
         task_schedule = {
