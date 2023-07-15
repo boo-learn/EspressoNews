@@ -2,6 +2,7 @@ from .start import dp
 from .help import dp
 from .menu import dp
 from .channels import dp
+from .settings import dp
 from .forward_message import dp
 from .digests import dp
 

@@ -7,10 +7,12 @@ async def on_startup(dp):
     from utils.notify_admins import on_startup_notify
     from utils.set_bot_commands import set_default_commands
     from bot_app.utils.mailing_digests_to_users import mailing_digests_to_users
+    from bot_app.utils.create_mail_rules import create_mail_rules
 
     await asyncio.gather(
         on_startup_notify(dp),
         set_default_commands(dp),
+        create_mail_rules(),
         mailing_digests_to_users(),
     )
 

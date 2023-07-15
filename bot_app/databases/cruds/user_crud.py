@@ -34,4 +34,30 @@ class UserCRUD:
     async def get_all_users(self) -> List[Optional[User]]:
         return await self.repository.get_all()
 
+    async def update_user_settings_option(
+            self,
+            user_id: int,
+            option: str,
+            value
+    ) -> bool:
+        user = await self.repository.get(user_id)
 
+        if user:
+            settings = user.settings
+            if hasattr(settings, option):
+                return await self.repository.update_setting(settings, option, value)
+
+        return False
+
+    async def get_settings_option_for_all_users(self, option_name: str):
+        users_settings = await self.repository.get_all_users_settings()
+
+        user_ids = []
+        options = []
+
+        for user_settings in users_settings:
+            if hasattr(user_settings, option_name):
+                user_ids.append(user_settings.user_id)
+                options.append(getattr(user_settings, option_name))
+
+        return user_ids, options

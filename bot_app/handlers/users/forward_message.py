@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @dp.message_handler(content_types=types.ContentTypes.ANY)
 async def action_forward_message(message: types.Message, state: FSMContext):
     logger.debug('Starting action_forward_message function')
-    if message.forward_from_chat['type'] == 'channel':
+    if message.forward_from_chat is not None and message.forward_from_chat['type'] == 'channel':
         channel_username = message.forward_from_chat.username
         members_count = await message.forward_from_chat.get_members_count()
 

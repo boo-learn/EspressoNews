@@ -5,11 +5,10 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from data import settings
 
-logging.basicConfig(level=logging.DEBUG)  # Устанавливаем общий уровень логгирования INFO
+logging.basicConfig(level=logging.DEBUG)
 
-# Создаем и настраиваем отдельный логгер для aiogram
 aiogram_logger = logging.getLogger('aiogram')
-aiogram_logger.setLevel(logging.WARNING)  # Устанавливаем уровень логирования WARNING для aiogram
+aiogram_logger.setLevel(logging.WARNING)
 
 bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 
