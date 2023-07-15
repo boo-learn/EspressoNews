@@ -169,9 +169,7 @@ def send_message():
 
     message: MessageData = {
         "type": 'prepare_digest',
-        "data": {
-            "user_id": 2
-        },
+        "data":  335709217,
     }
     asyncio.run(producer.send_message(message, QueuesType.digest_service))
 

@@ -22,6 +22,7 @@ async def generate_summary(chatgpt: ChatGPT, post: Post):
 
         response = await chatgpt.generate_response(messages=messages, user_id=post.post_id, model="gpt-3.5-turbo-16k")
         summary = response['choices'][0]['message']['content']
+        summary += f'<a href="https://t.me/{post.channel.channel_username}/{post.post_id}"> оригинал </a>'
 
         logger.info(f"Summary {summary}")
 
