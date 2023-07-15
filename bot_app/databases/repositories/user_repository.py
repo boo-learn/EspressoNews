@@ -1,19 +1,35 @@
 from typing import Optional, List
 from shared.database import async_session
-from shared.models import User
+from shared.models import User, UserSettings
 from sqlalchemy.exc import SQLAlchemyError
 
 from sqlalchemy.future import select
 
+from shared.selection_values_for_models import IntonationEnum, PeriodicityEnum, RoleEnum
+
 
 class UserRepository:
+    settings_value_mappings = {
+        'Официальная': IntonationEnum.OFFICIAL.value,
+        'Саркастично-шутливая': IntonationEnum.COMEDY_SARCASTIC.value,
+        'Каждый час': PeriodicityEnum.HOURLY.value,
+        'Каждые 3 часа': PeriodicityEnum.EVERY_THREE_HOURS.value,
+        'Каждые 6 часов': PeriodicityEnum.EVERY_SIX_HOURS.value,
+        'Диктор': RoleEnum.ANNOUNCER.value,
+    }
+
     @staticmethod
     async def create(**kwargs) -> User:
         try:
             async with async_session() as session:
                 user = User(**kwargs)
+                user_settings = UserSettings()
+                user.settings = user_settings
+
                 session.add(user)
+                session.add(user_settings)
                 await session.commit()
+
                 return user
         except SQLAlchemyError as e:
             await session.rollback()
@@ -68,6 +84,21 @@ class UserRepository:
                 await session.delete(user)
                 await session.commit()
                 return True
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+
+    @staticmethod
+    async def update_setting(settings: UserSettings, field: str, value) -> bool:
+        try:
+            async with async_session() as session:
+                if field in UserRepository.settings_value_mappings:
+                    mapped_value = UserRepository.settings_value_mappings[value]
+                    setattr(settings, field, mapped_value)
+                    await session.commit()
+                    return True
+                else:
+                    return False
         except SQLAlchemyError as e:
             await session.rollback()
             raise e

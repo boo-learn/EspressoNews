@@ -8,6 +8,8 @@ from shared.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
 
+from shared.selection_values_for_models import RoleEnum, IntonationEnum, PeriodicityEnum
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -25,8 +27,21 @@ class User(Base):
     join_date = Column(DateTime, nullable=True, default=datetime.now)
 
     subscriptions = relationship('Subscription', back_populates='user')
+    settings = relationship("UserSettings", back_populates="user")
     digests: Mapped[List["Digest"]] = relationship(back_populates="user")
     # access_channels = relationship("Channel", back_populates="user")
+
+
+class UserSettings(Base):
+    __tablename__ = 'user_settings'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+
+    periodicity = Column(Enum(PeriodicityEnum), default=PeriodicityEnum.FOR_TEST)
+    role = Column(Enum(RoleEnum), default=RoleEnum.ANNOUNCER)
+    intonation = Column(Enum(IntonationEnum), default=IntonationEnum.OFFICIAL)
+    user = relationship("User", back_populates="settings")
 
 
 class Subscription(Base):
