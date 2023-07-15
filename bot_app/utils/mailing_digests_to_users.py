@@ -28,19 +28,21 @@ async def send_digest(data: dict):
     logger.info(f'Digest data {data}')
 
     logic_handler = DigestLogicHandler()
-    digest_summary, total_count = await logic_handler.fetch_and_format_digest(data["digest_id"])
+    digest_summary_list, total_count = await logic_handler.fetch_and_format_digest(data["digest_id"])
 
-    await logic_handler.send_message_parts(
-        lambda text: bot.send_message(chat_id=data["user_id"], text=text),
-        digest_summary
-    )
+    for digest_summary in digest_summary_list[:DIGESTS_LIMIT]:
+        await logic_handler.send_message_parts(
+            lambda text: bot.send_message(chat_id=data["user_id"], text=text),
+            digest_summary
+        )
 
-    await logic_handler.send_load_more(
-        lambda text, reply_markup: bot.send_message(chat_id=data["user_id"], text=text, reply_markup=reply_markup),
-        total_count,
-        data["digest_id"],
-        DIGESTS_LIMIT
-    )
+    if len(digest_summary_list) > DIGESTS_LIMIT:
+        await logic_handler.send_load_more(
+            lambda text, reply_markup: bot.send_message(chat_id=data["user_id"], text=text, reply_markup=reply_markup),
+            total_count,
+            data["digest_id"],
+            DIGESTS_LIMIT
+        )
 
 
 async def no_digest(data):

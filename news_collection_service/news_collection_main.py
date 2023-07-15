@@ -6,7 +6,7 @@ import pytz
 from telethon import TelegramClient
 from telethon.errors import SessionRevokedError
 from telethon.sessions import StringSession
-
+from sqlalchemy.exc import IntegrityError
 from shared.db_utils import (
     remove_account_from_db_async,
     get_first_active_account_from_db_async
@@ -51,7 +51,7 @@ async def collect_news():
             logger.info(f'Get subscribed channels with teleton {subscribed_channels}')
 
             # Gather news from the last hour
-            one_hour_ago = datetime.datetime.now(pytz.timezone('UTC')) - datetime.timedelta(hours=1)
+            one_hour_ago = datetime.datetime.now(pytz.timezone('UTC')) - datetime.timedelta(hours=100)
             one_hour_ago = one_hour_ago.astimezone(pytz.timezone('Etc/GMT-3'))  # convert to UTC+3
             logger.info(f"date one hour ago {one_hour_ago}")
             news = []
@@ -65,7 +65,7 @@ async def collect_news():
                     # Проверяем, совпадает ли channel_id с channel_id текущего канала
                     if message.peer_id.channel_id == channel.id:
                         # Проверяем, что количество слов в сообщении не менее 45
-                        if len(message.text.split()) >= 45:
+                        if message.text and len(message.text.split()) >= 45:
                             news.append(message)
                         else:
                             logger.info(
@@ -90,7 +90,11 @@ async def collect_news():
                     post_date=message.date.astimezone(pytz.utc).replace(tzinfo=None) + datetime.timedelta(hours=3)
                     # Make the datetime timezone unaware
                 )
-                await add_post_async(post)
+                try:
+                    await add_post_async(post)
+                except IntegrityError as e:
+                    logger.warning(f"Failed to add post due to IntegrityError: {e}")
+                    continue
 
             message: MessageData = {
                 "type": 'summarize_news',
