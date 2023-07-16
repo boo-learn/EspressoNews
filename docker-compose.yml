@@ -75,7 +75,8 @@ services:
     ports:
       - "6379:6379"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
 
   celery:
     build:
@@ -131,6 +132,9 @@ services:
         condition: service_healthy
       db:
         condition: service_healthy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
 
   subscription_service:
     build:

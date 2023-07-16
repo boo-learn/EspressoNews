@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, List
 from shared.database import async_session
 from shared.models import User, UserSettings
@@ -7,15 +8,17 @@ from sqlalchemy.future import select
 
 from shared.selection_values_for_models import IntonationEnum, PeriodicityEnum, RoleEnum
 
+logger = logging.getLogger(__name__)
+
 
 class UserRepository:
     settings_value_mappings = {
-        'Официальная': IntonationEnum.OFFICIAL.value,
-        'Саркастично-шутливая': IntonationEnum.COMEDY_SARCASTIC.value,
-        'Каждый час': PeriodicityEnum.HOURLY.value,
-        'Каждые 3 часа': PeriodicityEnum.EVERY_THREE_HOURS.value,
-        'Каждые 6 часов': PeriodicityEnum.EVERY_SIX_HOURS.value,
-        'Диктор': RoleEnum.ANNOUNCER.value,
+        'Официальная': IntonationEnum.OFFICIAL,
+        'Саркастично-шутливая': IntonationEnum.COMEDY_SARCASTIC,
+        'Каждый час': PeriodicityEnum.HOURLY,
+        'Каждые 3 часа': PeriodicityEnum.EVERY_THREE_HOURS,
+        'Каждые 6 часов': PeriodicityEnum.EVERY_SIX_HOURS,
+        'Диктор': RoleEnum.ANNOUNCER,
     }
 
     @staticmethod
@@ -102,13 +105,28 @@ class UserRepository:
     async def update_setting(settings: UserSettings, field: str, value) -> bool:
         try:
             async with async_session() as session:
-                if field in UserRepository.settings_value_mappings:
+                logging.info(f"Field: {field}, value_mapping: {UserRepository.settings_value_mappings}")
+                logging.info(value in UserRepository.settings_value_mappings)
+                if value in UserRepository.settings_value_mappings:
+                    session.add(settings)
                     mapped_value = UserRepository.settings_value_mappings[value]
                     setattr(settings, field, mapped_value)
+                    logging.info(f"Settings: {settings}, field {field}, mapped_value {mapped_value}")
                     await session.commit()
                     return True
                 else:
                     return False
         except SQLAlchemyError as e:
+            logging.info(f"Rollback")
             await session.rollback()
+            raise e
+
+    @staticmethod
+    async def get_user_settings(user_id: int) -> Optional[UserSettings]:
+        try:
+            async with async_session() as session:
+                stmt = select(UserSettings).where(UserSettings.user_id == user_id)
+                result = await session.execute(stmt)
+                return result.scalars().first()
+        except SQLAlchemyError as e:
             raise e

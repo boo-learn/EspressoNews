@@ -12,7 +12,7 @@ class IntonationEnum(enum.Enum):
 
 
 class PeriodicityEnum(enum.Enum):
-    HOURLY = 3600
+    HOURLY = 60
     EVERY_THREE_HOURS = 10800
     EVERY_SIX_HOURS = 21600
-    FOR_TEST = 90
+    FOR_TEST = 180

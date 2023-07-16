@@ -5,4 +5,8 @@ WORKDIR /app
 COPY ./shared /app/shared
 COPY ./digest_service /app/digest_service
 
-CMD ["bash", "-c", "celery -A digest_service.tasks worker -Q digest_queue --loglevel=info & celery -A digest_service.tasks beat --loglevel=info"]
+# Copy the monitor script into the container
+COPY ./shared/monitor_script.py /app/monitor_script.py
+
+# Run only the monitor script
+CMD ["python", "/app/monitor_script.py"]

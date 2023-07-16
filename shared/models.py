@@ -1,13 +1,16 @@
-from typing import List
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Enum, Text, LargeBinary, \
-    PrimaryKeyConstraint, BigInteger, Table, func
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship
-from shared.database import Base
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import List
 from typing import Optional
 
+from sqlalchemy import Boolean, ForeignKey, Enum, Text, LargeBinary, \
+    BigInteger, Table
+from sqlalchemy import Column, Integer, String, JSON, DateTime, Float
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
+from shared.database import Base
 from shared.selection_values_for_models import RoleEnum, IntonationEnum, PeriodicityEnum
 
 
@@ -163,3 +166,16 @@ class GPTAccount(Base):
     api_key = Column(String(100))
 
     is_active = Column(Boolean, default=True)
+
+
+class BeatSchedule(Base):
+    __tablename__ = 'beat_schedule'
+
+    id = Column(Integer, primary_key=True)
+    task_name = Column(String, nullable=False)  # New field for the task name
+    task = Column(String, nullable=False)  # Field for the task itself
+    schedule = Column(Integer, nullable=False)
+    args = Column(JSON, nullable=True)
+    kwargs = Column(JSON, nullable=True)
+    last_run_at = Column(DateTime, nullable=True)
+    total_run_count = Column(Integer, default=0)

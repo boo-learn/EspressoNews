@@ -5,6 +5,7 @@ from aiogram import types
 from bot_app.databases.cruds import UserCRUD
 from bot_app.keyboards.default import kb_menu, get_kb_periodicity, get_kb_intonation, get_kb_role
 from bot_app.loader import dp
+from bot_app.utils.create_mail_rules import create_mail_rule
 
 
 @dp.message_handler(regexp=re.compile(r'^Главное меню$', re.IGNORECASE))
@@ -49,6 +50,7 @@ async def change_intonation_option(message: types.Message):
 async def change_periodicity_option(message: types.Message):
     user_crud = UserCRUD()
     await user_crud.update_user_settings_option(message.from_user.id, 'periodicity', message.text)
+    await create_mail_rule(message.from_user.id)  # Add this line to call create_mail_rule
     await message.answer('Изменения успешно сохранены!')
 
 
