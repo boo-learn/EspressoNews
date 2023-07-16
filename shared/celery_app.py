@@ -17,8 +17,8 @@ celery_app.conf.beat_schedule = {
         'args': (),
     },
     'every-six-hours-task-get-digest': {
-        'task': 'tasks.generate_all_digests_for_users',
+        'task': 'tasks.generate_digest_for_user',
         'schedule': crontab(minute='*/2'),
-        'args': (),
+        'args': (95396520,),
     },
 }
