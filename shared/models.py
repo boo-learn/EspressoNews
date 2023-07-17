@@ -64,18 +64,19 @@ class Channel(Base):
     __tablename__ = 'channels'  # Change this line
 
     channel_id = Column(BigInteger, primary_key=True)
-    # user_id = Column(Integer, ForeignKey('users.user_id'))  # Add this line
     channel_name = Column(String, nullable=False)
     channel_username = Column(String(50), nullable=False)
     channel_description = Column(Text, nullable=True)
     member_count = Column(Integer, nullable=True)
     channel_invite_link = Column(String(65), nullable=True)
+    account_id = Column(BigInteger, ForeignKey('telegram_accounts.account_id'))  # Add this line
 
     is_active = Column(Boolean, default=True)
 
     # user = relationship("User", back_populates="access_channels")
     subscriptions = relationship('Subscription', back_populates='channel', cascade='all, delete-orphan')
     posts = relationship('Post', back_populates='channel')
+    telegram_account = relationship("TelegramAccount", back_populates="channels")
 
 
 digests_posts = Table(
@@ -157,6 +158,8 @@ class TelegramAccount(Base):
     session_string = Column(String, nullable=True)
 
     is_active = Column(Boolean, default=True)
+
+    channels = relationship("Channel", back_populates="telegram_account")
 
 
 class GPTAccount(Base):

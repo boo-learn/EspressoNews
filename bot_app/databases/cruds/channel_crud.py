@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from bot_app.databases.repositories import ChannelRepository
-from bot_app.tasks.subscription.tasks import send_to_subscribe_channel
+from bot_app.tasks.subscription.tasks import send_to_subscribe_channel, send_to_unsubscribe_channel
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class ChannelCRUD:
             channel = await self.repository.get(username)
 
         # send_message_subscribe
-        await send_to_subscribe_channel("subscribe")
+        await send_to_subscribe_channel("subscribe", username)
 
         return channel
 
@@ -51,7 +51,7 @@ class ChannelCRUD:
         if not channel.subscriptions:
             logger.debug(f"Channel {channel} is empty, deleting")
             await self.repository.delete(channel)
-            await send_to_subscribe_channel("unsubscribe")
+            await send_to_unsubscribe_channel("unsubscribe", (channel.channel_username, channel.account_id))
         else:
             logger.debug(f"Channel {channel} has subscriptions, not deleting")
 

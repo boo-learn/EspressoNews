@@ -1,6 +1,6 @@
 from bot_app.databases.cruds import ChannelCRUD
 from bot_app.databases.repositories import SubscriptionRepository
-from bot_app.tasks.subscription.tasks import send_to_subscribe_channel
+from bot_app.tasks.subscription.tasks import send_to_subscribe_channel, send_to_unsubscribe_channel
 from shared.config import RABBIT_HOST
 from shared.rabbitmq import Producer, QueuesType
 
@@ -38,6 +38,6 @@ class SubscriptionCRUD:
             channel_crud = ChannelCRUD()
             await channel_crud.delete_channel(channel)
 
-            await send_to_subscribe_channel("unsubscribe")
+            await send_to_unsubscribe_channel("unsubscribe", (channel.channel_username, channel.account_id))
 
         return True
