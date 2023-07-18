@@ -13,4 +13,4 @@ EXPOSE 80
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run scripts when the container launches
-CMD python /app/db_healthcheck.py && alembic upgrade heads
+CMD python /app/db_healthcheck.py && alembic upgrade head

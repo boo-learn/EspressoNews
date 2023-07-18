@@ -145,8 +145,8 @@ class Post(Base):
 class Summary(Base):
     __tablename__ = 'summaries'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    content = Mapped[str]
-    for_role = Mapped[str]
+    content: Mapped[str]
+    for_role: Mapped[str]
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.post_id"))
     post: Mapped["Post"] = relationship(back_populates="summaries")
 
