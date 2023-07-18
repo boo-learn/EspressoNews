@@ -10,6 +10,7 @@ from shared.models import BeatSchedule
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+
 async def get_account_from_db_async(account_id: int):
     logger.info(f"Getting account with ID {account_id} from database asynchronously.")
     async with async_session() as db:

@@ -27,3 +27,11 @@ def collect_news():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(collect_news_async())
 
+
+async def send_to_subscribe_channel(type: str, msg: str):
+    message: MessageData = {
+        "type": type,
+        "data": msg
+    }
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.subscription_service)
+    await producer.send_message(message, QueuesType.subscription_service)
