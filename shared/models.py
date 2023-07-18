@@ -11,7 +11,29 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from shared.database import Base
-from shared.selection_values_for_models import RoleEnum, IntonationEnum, PeriodicityEnum
+from shared.selection_values_for_models import PeriodicityEnum
+
+
+class Role(Base):
+    __tablename__ = 'roles'
+
+    id = Column(Integer, primary_key=True)
+    role = Column(String(50), nullable=False)
+    button_name = Column(String(50), nullable=False)
+
+    users = relationship("UserSettings", back_populates="role")
+    summaries = relationship("Summary", back_populates="role")
+
+
+class Intonation(Base):
+    __tablename__ = 'intonations'
+
+    id = Column(Integer, primary_key=True)
+    intonation = Column(String(50), nullable=False)
+    button_name = Column(String(50), nullable=False)
+
+    users = relationship("UserSettings", back_populates="intonation")
+    summaries = relationship("Summary", back_populates="intonation")
 
 
 class User(Base):
@@ -35,18 +57,6 @@ class User(Base):
     # access_channels = relationship("Channel", back_populates="user")
 
 
-# Parent
-class Role(Base):
-    __tablename__ = "roles"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str]
-    gpt_system_content: Mapped[str]
-    gpt_user_content: Mapped[str]
-    # posts = relationship('User', back_populates='role')
-    user_settings: Mapped[List["UserSettings"]] = relationship(back_populates="role")
-
-
-# Child
 class UserSettings(Base):
     __tablename__ = 'user_settings'
 
@@ -54,9 +64,13 @@ class UserSettings(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'))
 
     periodicity = Column(Enum(PeriodicityEnum), default=PeriodicityEnum.FOR_TEST)
+
+    role_id = Column(Integer, ForeignKey('roles.id'))
+    intonation_id = Column(Integer, ForeignKey('intonations.id'))
+
     user = relationship("User", back_populates="settings")
-    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
-    role: Mapped["Role"] = relationship(back_populates="user_settings")
+    role = relationship("Role", back_populates="users")
+    intonation = relationship("Intonation", back_populates="users")
 
 
 class Subscription(Base):
@@ -144,11 +158,16 @@ class Post(Base):
 
 class Summary(Base):
     __tablename__ = 'summaries'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    content: Mapped[str]
-    for_role: Mapped[str]
-    post_id: Mapped[int] = mapped_column(ForeignKey("posts.post_id"))
-    post: Mapped["Post"] = relationship(back_populates="summaries")
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    content = Column(String)
+    role_id = Column(Integer, ForeignKey('roles.id'))
+    intonation_id = Column(Integer, ForeignKey('intonations.id'))
+    post_id = Column(Integer, ForeignKey("posts.post_id"))
+
+    post = relationship("Post", back_populates="summaries")
+    role = relationship("Role", back_populates="summaries")
+    intonation = relationship("Intonation", back_populates="summaries")
 
 
 class Rubric(Base):

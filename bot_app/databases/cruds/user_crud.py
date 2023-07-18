@@ -2,10 +2,24 @@ import logging
 from typing import Optional, List
 
 from bot_app.databases.repositories import UserRepository
+from shared.db_utils import get_role, get_intonation
 from shared.models import User
+from shared.selection_values_for_models import PeriodicityEnum
+
 logger = logging.getLogger(__name__)
 
+
 class UserCRUD:
+    settings_value_mappings = {
+        'Официальная': 'Official',
+        'Саркастично-шутливая': 'Comedy_sarcastic',
+        'Диктор': 'Announcer',
+        'Стандартная': 'You are helpfull assistant.',
+        'Каждый час': PeriodicityEnum.HOURLY,
+        'Каждые 3 часа': PeriodicityEnum.EVERY_THREE_HOURS,
+        'Каждые 6 часов': PeriodicityEnum.EVERY_SIX_HOURS,
+    }
+
     def __init__(self):
         self.repository = UserRepository()
 
@@ -50,7 +64,19 @@ class UserCRUD:
             if hasattr(settings, option):
                 logging.info("Step 2")
                 logging.info(f"Settings {settings}, option {option}, value {value}")
-                return await self.repository.update_setting(settings, option, value)
+                mapped_value = UserCRUD.settings_value_mappings[value]
+
+                if option == 'role':
+                    role = await get_role(mapped_value)
+                    logging.info(f"Updating role setting with value: {role}")
+                    return await self.repository.update_setting(settings, option, role)
+                elif option == 'intonation':
+                    intonation = await get_intonation(mapped_value)
+                    logging.info(f"Updating intonation setting with value: {intonation}")
+                    return await self.repository.update_setting(settings, option, intonation)
+                else:
+                    logging.info(f"Updating setting {option} with value: {mapped_value}")
+                    return await self.repository.update_setting(settings, option, mapped_value)
 
         return False
 
@@ -74,4 +100,3 @@ class UserCRUD:
             return getattr(user_settings, option_name)
 
         return None
-

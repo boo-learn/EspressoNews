@@ -1,9 +1,10 @@
 import logging
 import json
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from shared.database import async_session, sync_session
-from shared.models import TelegramAccount, Channel
+from shared.models import TelegramAccount, Channel, Role, Intonation
 from shared.models import BeatSchedule
 
 # Создаем логгер
@@ -139,3 +140,25 @@ def update_or_create_schedule_in_db_sync(task_name, task_info):
             logger.info(f"Created new schedule with task name {task_name} in database.")
 
         session.commit()
+
+
+async def get_role(role_name: str):
+    try:
+        async with async_session() as session:
+            result = await session.execute(select(Role).filter(Role.role == role_name))
+            return result.scalars().first()
+    except SQLAlchemyError as e:
+        logging.info(f"Rollback")
+        await session.rollback()
+        raise e
+
+
+async def get_intonation(intonation_name: str):
+    try:
+        async with async_session() as session:
+            result = await session.execute(select(Intonation).filter(Intonation.intonation == intonation_name))
+            return result.scalars().first()
+    except SQLAlchemyError as e:
+        logging.info(f"Rollback")
+        await session.rollback()
+        raise e

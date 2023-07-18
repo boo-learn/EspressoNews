@@ -57,6 +57,7 @@ async def change_periodicity_option(message: types.Message):
 @dp.message_handler(
     lambda message: message.text in [
         'Диктор',
+        'Стандартная',
     ]
 )
 async def change_role_option(message: types.Message):

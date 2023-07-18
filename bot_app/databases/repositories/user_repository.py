@@ -6,20 +6,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.future import select
 
-from shared.selection_values_for_models import IntonationEnum, PeriodicityEnum, RoleEnum
-
 logger = logging.getLogger(__name__)
 
 
 class UserRepository:
-    settings_value_mappings = {
-        'Официальная': IntonationEnum.OFFICIAL,
-        'Саркастично-шутливая': IntonationEnum.COMEDY_SARCASTIC,
-        'Каждый час': PeriodicityEnum.HOURLY,
-        'Каждые 3 часа': PeriodicityEnum.EVERY_THREE_HOURS,
-        'Каждые 6 часов': PeriodicityEnum.EVERY_SIX_HOURS,
-        'Диктор': RoleEnum.ANNOUNCER,
-    }
 
     @staticmethod
     async def create(**kwargs) -> User:
@@ -105,17 +95,11 @@ class UserRepository:
     async def update_setting(settings: UserSettings, field: str, value) -> bool:
         try:
             async with async_session() as session:
-                logging.info(f"Field: {field}, value_mapping: {UserRepository.settings_value_mappings}")
-                logging.info(value in UserRepository.settings_value_mappings)
-                if value in UserRepository.settings_value_mappings:
-                    session.add(settings)
-                    mapped_value = UserRepository.settings_value_mappings[value]
-                    setattr(settings, field, mapped_value)
-                    logging.info(f"Settings: {settings}, field {field}, mapped_value {mapped_value}")
-                    await session.commit()
-                    return True
-                else:
-                    return False
+                session.add(settings)
+                setattr(settings, field, value)
+                logging.info(f"Settings: {settings}, field {field}, mapped_value {value}")
+                await session.commit()
+                return True
         except SQLAlchemyError as e:
             logging.info(f"Rollback")
             await session.rollback()

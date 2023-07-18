@@ -39,6 +39,7 @@ def get_kb_intonation():
 def get_kb_role():
     buttons = [
         ['Диктор'],
+        ['Стандартная'],
         ['Главное меню']
     ]
     return generate_keyboard(buttons)
