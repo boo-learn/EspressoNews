@@ -1,3 +1,5 @@
+from random import choice
+
 from sqlalchemy.orm import selectinload, joinedload
 from telethon.tl.functions.channels import JoinChannelRequest, LeaveChannelRequest
 from sqlalchemy import select, func, and_
@@ -16,17 +18,28 @@ async def unsubscribe_from_channel(client, channel_username):
     await client(LeaveChannelRequest(channel=channel_entity))
 
 
-async def get_account_with_least_subscriptions():
+async def get_random_account_exclude_most_subscribed():
     async with async_session() as db:
-        stmt = (
+        # Получаем общее количество аккаунтов
+        total_accounts_stmt = select(func.count(TelegramAccount.account_id))
+        total_accounts = await db.scalar(total_accounts_stmt)
+
+        # Получаем список аккаунтов, исключая аккаунт с наибольшим числом подписок
+        accounts_stmt = (
             select(TelegramAccount)
-            .options(selectinload(TelegramAccount.channels))
             .outerjoin(Channel, TelegramAccount.account_id == Channel.account_id)
             .group_by(TelegramAccount.account_id)
             .order_by(func.count(Channel.channel_id).asc())
+            .limit(total_accounts - 1)
         )
-        result = await db.execute(stmt)
-        return result.scalars().first()
+        result = await db.execute(accounts_stmt)
+        accounts = result.scalars().all()
+
+        # Если нет аккаунтов для выбора, возвращаем None
+        if not accounts:
+            return None
+
+        return choice(accounts)
 
 
 async def add_subscription(account_id: int, channel_username: str):

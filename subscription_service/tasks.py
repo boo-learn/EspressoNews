@@ -1,11 +1,14 @@
 import asyncio
 import logging
+
 from telethon import TelegramClient
 from telethon.sessions import StringSession
-from shared.db_utils import get_account_from_db
-from subscription_service.db_utils import subscribe_to_channel, unsubscribe_from_channel
+
 from shared.celery_app import celery_app
-from concurrent.futures import ThreadPoolExecutor
+from shared.config import RABBIT_HOST
+from shared.db_utils import get_account_from_db
+from shared.rabbitmq import Producer, QueuesType, MessageData
+from subscription_service.db_utils import subscribe_to_channel, unsubscribe_from_channel
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,10 +21,11 @@ async def connect_and_execute(loaded_account, channel_username, action, action_n
         await loaded_client.connect()
         logger.info(f'{action_name} start ok!')
         await action(loaded_client, channel_username)
-    except ValueError as e:
-        logger.error(f'Loaded account details: {loaded_account.__dict__}')
-        logger.error(f'Channel username: {channel_username}')
-    await loaded_client.disconnect()
+    except Exception as e:
+        logger.error(f'Error in subscription {e}')
+        await send_to_subscribe_channel("subscribe", channel_username)
+    finally:
+        await loaded_client.disconnect()
 
 
 def task_executor(account_id, channel_username, action, action_name, task_name):
@@ -45,3 +49,12 @@ def subscribe_task(account_id, channel_username):
 @celery_app.task(name='tasks.unsubscribe_task', rate_limit='1/m', queue='subscription_queue')
 def unsubscribe_task(account_id, channel_username):
     task_executor(account_id, channel_username, unsubscribe_from_channel, 'unsubscribe', 'unsubscribed')
+
+
+async def send_to_subscribe_channel(type: str, msg: str):
+    message: MessageData = {
+        "type": type,
+        "data": msg
+    }
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.subscription_service)
+    await producer.send_message(message, QueuesType.subscription_service)

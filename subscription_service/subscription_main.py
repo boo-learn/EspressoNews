@@ -3,8 +3,9 @@ import logging
 
 from shared.config import RABBIT_HOST
 from shared.rabbitmq import Subscriber, QueuesType
-from subscription_service.db_utils import get_account_with_least_subscriptions, add_subscription, is_have_subscription
-from tasks import subscribe_task, unsubscribe_task
+from subscription_service.db_utils import add_subscription, is_have_subscription, \
+    get_random_account_exclude_most_subscribed
+from tasks import subscribe_task, unsubscribe_task, send_to_subscribe_channel
 
 # Configuring logging
 logging.basicConfig(level=logging.INFO,
@@ -15,15 +16,20 @@ logger = logging.getLogger(__name__)
 
 async def handle_subscription(message: str):
     channel_username = message
-    logging.info(f"Channel username: {channel_username}")
-    is_subscribed = await is_have_subscription(channel_username)
-    if not is_subscribed:
-        account = await get_account_with_least_subscriptions()
-        logging.info(f"Account with least subscriptions: {account.phone_number}")
-        await add_subscription(account.account_id, channel_username)
-        subscribe_task.apply_async(args=[account.account_id, channel_username])
-    else:
-        logging.info(f"Channel {channel_username} already subscribed")
+    try:
+        logging.info(f"Channel username: {channel_username}")
+        is_subscribed = await is_have_subscription(channel_username)
+        if not is_subscribed:
+            account = await get_random_account_exclude_most_subscribed()
+            logging.info(f"Account with least subscriptions: {account.phone_number}")
+            await add_subscription(account.account_id, channel_username)
+            subscribe_task.apply_async(args=[account.account_id, channel_username])
+        else:
+            logging.info(f"Channel {channel_username} already subscribed")
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        await send_to_subscribe_channel("subscribe", channel_username)
+
 
 
 async def handle_unsubscription(message: str):
