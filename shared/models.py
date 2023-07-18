@@ -35,6 +35,18 @@ class User(Base):
     # access_channels = relationship("Channel", back_populates="user")
 
 
+# Parent
+class Role(Base):
+    __tablename__ = "roles"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name = Mapped[str]
+    gpt_system_content = Mapped[str]
+    gpt_user_content = Mapped[str]
+    # posts = relationship('User', back_populates='role')
+    user_settings: Mapped[List["UserSettings"]] = relationship(back_populates="role")
+
+
+# Child
 class UserSettings(Base):
     __tablename__ = 'user_settings'
 
@@ -42,9 +54,9 @@ class UserSettings(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'))
 
     periodicity = Column(Enum(PeriodicityEnum), default=PeriodicityEnum.FOR_TEST)
-    role = Column(Enum(RoleEnum), default=RoleEnum.ANNOUNCER)
-    intonation = Column(Enum(IntonationEnum), default=IntonationEnum.OFFICIAL)
     user = relationship("User", back_populates="settings")
+    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
+    role: Mapped["Role"] = relationship(back_populates="user_settings")
 
 
 class Subscription(Base):
@@ -120,13 +132,23 @@ class Post(Base):
 
     title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
-    summary = Column(Text, nullable=True)
+    # summary = Column(Text, nullable=True)
+    summaries: Mapped[List["Summary"]] = relationship(back_populates="post")
 
     post_date = Column(DateTime, nullable=False, default=datetime.now)
 
     channel = relationship('Channel', back_populates='posts')
     rubric = relationship('Rubric', back_populates='posts')
     files = relationship('File', back_populates='post')
+
+
+class Summary(Base):
+    __tablename__ = 'summaries'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    content = Mapped[str]
+    for_role = Mapped[str]
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.post_id"))
+    post: Mapped["Post"] = relationship(back_populates="summaries")
 
 
 class Rubric(Base):

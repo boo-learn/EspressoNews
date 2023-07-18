@@ -32,6 +32,9 @@ To delete all the images:
 ### Применение миграции
 `alembic upgrade head`
 
+### Откатывание последней миграции
+`alembic downgrade -1`
+
 # RabbitMQ
 
 ### Просмотр очереди
