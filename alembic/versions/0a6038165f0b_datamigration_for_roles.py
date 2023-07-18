@@ -25,7 +25,7 @@ role = table('roles',
 def upgrade():
     op.bulk_insert(role,
                    [
-                       {'id': 1, 'role': 'You are helpfull assistant.', 'button_name': 'Стандартная'},
+                       {'id': 1, 'role': 'Helpfull assistant.', 'button_name': 'Стандартная'},
                        {'id': 2, 'role': 'Announcer', 'button_name': 'Диктор'}
                    ]
                    )
