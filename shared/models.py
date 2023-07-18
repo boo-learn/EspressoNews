@@ -39,9 +39,9 @@ class User(Base):
 class Role(Base):
     __tablename__ = "roles"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name = Mapped[str]
-    gpt_system_content = Mapped[str]
-    gpt_user_content = Mapped[str]
+    name: Mapped[str]
+    gpt_system_content: Mapped[str]
+    gpt_user_content: Mapped[str]
     # posts = relationship('User', back_populates='role')
     user_settings: Mapped[List["UserSettings"]] = relationship(back_populates="role")
 
