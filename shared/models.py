@@ -126,7 +126,6 @@ class Digest(Base):
     posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)
     # generation_date = Column(DateTime, nullable=False, default=datetime.now)
     generation_date: Mapped[datetime] = mapped_column(insert_default=func.now())
-    total_summary: Mapped[Optional[str]]
     digest_recs: Mapped[list["DigestAssociation"]] = relationship("DigestAssociation", back_populates="digest",
                                                                   cascade="all, delete-orphan")
     digest_ids: Mapped[list[int]] = association_proxy(

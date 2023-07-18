@@ -11,8 +11,10 @@ class DigestRepository:
         try:
             async with async_session() as session:
                 stmt = (
-                    select(Digest).options(joinedload(Digest.posts))
-                    .where(Digest.id == digest_id)
+                    select(Digest).options(
+                        joinedload(Digest.posts).
+                        joinedload(Post.summaries)
+                    ).where(Digest.id == digest_id)
                 )
                 result = await session.execute(stmt)
                 return result.scalars().first()

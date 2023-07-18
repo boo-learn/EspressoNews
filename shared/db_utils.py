@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
 from shared.database import async_session, sync_session
-from shared.models import TelegramAccount, Channel, Role, Intonation
+from shared.models import TelegramAccount, Channel, Role, Intonation, UserSettings
 from shared.models import BeatSchedule
 
 # Создаем логгер
@@ -166,3 +166,16 @@ async def get_intonation(intonation_name: str):
         logging.info(f"Rollback")
         await session.rollback()
         raise e
+
+
+async def get_user_settings(user_id: int):
+    logger.info(f"Getting user settings for user ID {user_id} from database asynchronously.")
+    async with async_session() as session:
+        result = await session.execute(select(UserSettings).filter(UserSettings.user_id == user_id))
+        user_settings = result.scalars().first()
+        if user_settings:
+            logger.info(f"Retrieved user settings for user ID {user_id} from database.")
+            return user_settings
+        else:
+            logger.info(f"No user settings found for user ID {user_id}.")
+            return None

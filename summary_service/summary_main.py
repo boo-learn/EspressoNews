@@ -28,7 +28,7 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
 
         logger.info(f"Summary {summary}")
 
-        return summary, role.id, intonation.id
+        return summary, role_obj.id, intonation_obj.id
     except Exception as e:
         error_message = str(e)
         if "Error: 429" in error_message:
@@ -37,42 +37,63 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
                 logger.info("Start disabling acc.")
                 await update_chatgpt_account_async(chatgpt.api_key)
                 logger.info("End disabling acc.")
-            else:
-                logger.info("An error occurred, but the message could not be extracted.")
+        elif "Invalid model" in error_message:  # Add this condition
+            logger.info("Invalid model error occurred. Disabling account.")
+            await update_chatgpt_account_async(chatgpt.api_key)
+        else:
+            logger.info("An error occurred, but the message could not be extracted.")
         logger.info(f"Error generating summary for post {post.post_id}: {e}")
         return None
 
 
 async def generate_summaries():
-    while True:
-        posts = await get_posts_without_summary_async()
-        roles_objects_list = await get_role_settings_options_for_gpt()
-        intonation_objects_list = await get_intonation_settings_options_for_gpt()
+    logger = logging.getLogger('generate_summaries')
 
-        if not posts:
-            break
+    roles_objects_list = await get_role_settings_options_for_gpt()
+    logger.info(f"Fetched {len(roles_objects_list)} role settings options for GPT")
 
-        tasks = []
-        chatgpt_accounts = await get_active_gpt_accounts_async()
-        logger.info(f"GPT accounts {chatgpt_accounts}")
+    intonation_objects_list = await get_intonation_settings_options_for_gpt()
+    logger.info(f"Fetched {len(intonation_objects_list)} intonation settings options for GPT")
 
-        for post in posts:
-            if not chatgpt_accounts:
+    for role_obj, intonation_obj in itertools.product(roles_objects_list, intonation_objects_list):
+        logger.info(f"Processing for role {role_obj} and intonation {intonation_obj}")
+
+        while True:
+            logger.info("Starting new iteration of post summarization loop.")
+            posts = await get_posts_without_summary_async(role_obj=role_obj, intonation_obj=intonation_obj)
+            logger.info(f"Fetched {len(posts)} posts without summary")
+
+            if not posts:
+                logger.info("No posts without summaries found. Breaking loop.")
                 break
 
-            chatgpt_account = chatgpt_accounts.pop(0)
-            chatgpt_accounts.append(chatgpt_account)
-            gpt_instance = ChatGPT(chatgpt_account.api_key)
+            tasks = []
+            chatgpt_accounts = await get_active_gpt_accounts_async()
+            logger.info(f"Fetched {len(chatgpt_accounts)} active GPT accounts")
 
-            tasks.extend(
-                generate_summary(gpt_instance, post, role_obj, intonation_obj)
-                for role_obj, intonation_obj in itertools.product(roles_objects_list, intonation_objects_list)
-            )
+            for post in posts:
+                if not chatgpt_accounts:
+                    logger.warning("No active GPT accounts left. Breaking posts loop.")
+                    break
 
-        results = await asyncio.gather(*tasks)
+                chatgpt_account = chatgpt_accounts.pop(0)
+                chatgpt_accounts.append(chatgpt_account)
+                gpt_instance = ChatGPT(chatgpt_account.api_key)
+                logger.info(f"Processing post with id {post.post_id} using GPT account {chatgpt_account.api_key}")
 
-        for post, (summary, role_id, intonation_id) in zip(posts, results):
-            await update_post_summary_async(post.post_id, summary, role_id, intonation_id)
+                tasks.append(generate_summary(gpt_instance, post, role_obj, intonation_obj))
+                logger.info(f"Created {len(tasks)} tasks to generate summaries")
+
+            logger.info("Start gathering results from tasks.")
+            results = await asyncio.gather(*tasks)
+            results = [result for result in results if result is not None]
+            for post, result in zip(posts, results):
+                if result is not None:
+                    summary, role_id, intonation_id = result
+                    await update_post_summary_async(post.post_id, summary, role_id, intonation_id)
+                    logger.info(f"Updated post with id {post.post_id} with new summary, role id, and intonation id")
+
+        logger.info("Finished summarization process for role and intonation combination.")
 
 
 async def main():

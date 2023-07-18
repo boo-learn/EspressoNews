@@ -115,11 +115,11 @@ async def collect_news_for_account(account):
                     rubric_id=None,
                     title=message.text[:50] if message.text else "No title",
                     content=message.text if message.text else " ",
-                    summary=None,
                     post_date=message.date.astimezone(pytz.utc).replace(tzinfo=None) + datetime.timedelta(hours=3)
                 )
                 try:
                     await add_post_async(post)
+                    logger.info(f"Added post {post.post_id} from channel {post.channel_id}")
                 except IntegrityError as e:
                     logger.warning(f"Failed to add post due to IntegrityError: {e}")
                     continue

@@ -1,6 +1,6 @@
-from sqlalchemy import select
+from sqlalchemy import select, tuple_, and_, not_, exists
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, aliased
 
 from shared.models import Post, GPTAccount, Role, Intonation, Summary
 from shared.database import async_session
@@ -9,17 +9,38 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 
-async def get_posts_without_summary_async(limit: int = 50):
+async def get_posts_without_summary_async(role_obj: Role = None, intonation_obj: Intonation = None, limit: int = None):
     async with async_session() as db:
-        result = await db.execute(
-            select(Post).options(
-                joinedload(Post.channel),
-                joinedload(Post.rubric),
-                joinedload(Post.files)
-            ).where(Post.summary.is_(None)).limit(limit)
+        # Prepare subquery to fetch Post-Summary pairs
+        post_summary_pairs = (
+            select(Summary.post_id)
+            .where(
+                and_(
+                    Summary.role_id == role_obj.id,
+                    Summary.intonation_id == intonation_obj.id
+                )
+            )
+        ).subquery()
+
+        # Query for Posts that don't have a summary for the current combination
+        posts_query = (
+            select(Post)
+            .options(joinedload(Post.channel))  # Load channel eagerly
+            .where(
+                ~Post.post_id.in_(post_summary_pairs)
+            )
         )
 
-        return result.unique().scalars().all()
+        if limit is not None:
+            posts_query = posts_query.limit(limit)
+
+        result = await db.execute(posts_query)
+
+        return result.scalars().all()
+
+
+
+
 
 
 async def update_post_summary_async(post_id: int, summary: str, role_id: str, intonation_id: int):

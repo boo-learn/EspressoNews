@@ -3,6 +3,7 @@ from typing import Optional, List, Tuple
 
 from bot_app.databases.repositories import DigestRepository
 from shared.config import DIGESTS_LIMIT
+from shared.db_utils import get_user_settings
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,20 @@ class DigestCRUD:
         if digest is None:
             return None
 
-        summaries = [post.summary for post in digest.posts[offset:offset + limit]]
+        user_settings = await get_user_settings(digest.user_id)
+
+        if user_settings is None:
+            return None
+
+        user_role = user_settings.role_id
+        user_intonation = user_settings.intonation_id
+
+        summaries = []
+        for post in digest.posts[offset:offset + limit]:
+            for summary in post.summaries:
+                if summary.role_id == user_role and summary.intonation_id == user_intonation:
+                    if summary.content:
+                        summaries.append(summary.content)
+
         total_count = len(digest.posts)
         return summaries, total_count

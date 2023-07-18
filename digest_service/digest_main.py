@@ -20,8 +20,7 @@ async def create_digest(user_id: int) -> Optional[Digest]:
                 .join(Subscription, Post.channel_id == Subscription.channel_id)
                 .join(User, Subscription.user_id == User.user_id)
                 .where(User.user_id == user_id,
-                       ~Post.post_id.in_(already_in_digests),
-                       ~Post.summary.is_(None))
+                       ~Post.post_id.in_(already_in_digests))
                 )
         results = await session.execute(stmt)
         new_posts_for_user = results.scalars().all()
@@ -30,10 +29,6 @@ async def create_digest(user_id: int) -> Optional[Digest]:
         posts_without_duplicates = await exclude_duplicates(new_posts_for_user)
         session.add(digest)
         digest.digest_ids.extend([post.post_id for post in posts_without_duplicates])
-        collect_summary = ""
-        for post in posts_without_duplicates:
-            collect_summary += f"• {post.summary}\n\n"
-        digest.total_summary = collect_summary
         await session.commit()
         return digest
 
