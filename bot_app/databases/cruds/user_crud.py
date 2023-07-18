@@ -14,7 +14,7 @@ class UserCRUD:
         'Официальная': 'Official',
         'Саркастично-шутливая': 'Comedy_sarcastic',
         'Диктор': 'Announcer',
-        'Стандартная': 'You are helpfull assistant.',
+        'Стандартная': 'Helpfull assistant.',
         'Каждый час': PeriodicityEnum.HOURLY,
         'Каждые 3 часа': PeriodicityEnum.EVERY_THREE_HOURS,
         'Каждые 6 часов': PeriodicityEnum.EVERY_SIX_HOURS,
@@ -61,6 +61,7 @@ class UserCRUD:
             logging.info("Step 1")
             settings = user.settings
             logging.info(f"Settings: {settings}")
+            logging.info(f"Option: {option}")
             if hasattr(settings, option):
                 logging.info("Step 2")
                 logging.info(f"Settings {settings}, option {option}, value {value}")

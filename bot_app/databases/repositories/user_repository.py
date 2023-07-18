@@ -1,6 +1,7 @@
 import logging
 from typing import Optional, List
 from shared.database import async_session
+from shared.db_utils import get_role, get_intonation
 from shared.models import User, UserSettings
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
@@ -18,6 +19,8 @@ class UserRepository:
                 user = User(**kwargs)
                 user_settings = UserSettings()
                 user.settings = user_settings
+                user_settings.role = await get_role('Helpfull assistant.')
+                user_settings.intonation = await get_intonation('Official')
 
                 session.add(user)
                 session.add(user_settings)
@@ -32,7 +35,12 @@ class UserRepository:
     async def get(user_id: int) -> Optional[User]:
         try:
             async with async_session() as session:
-                stmt = select(User).options(joinedload(User.settings)).where(User.user_id == user_id)
+                stmt = (select(User)
+                        .options(joinedload(User.settings))
+                        .options(
+                    joinedload(User.settings).joinedload(UserSettings.intonation))  # Use joinedload for intonation
+                        .options(joinedload(User.settings).joinedload(UserSettings.role))  # Use joinedload for role
+                        .where(User.user_id == user_id))
                 result = await session.execute(stmt)
                 return result.scalars().first()
         except SQLAlchemyError as e:
