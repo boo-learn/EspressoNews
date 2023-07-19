@@ -61,7 +61,7 @@ class UserSettings(Base):
     __tablename__ = 'user_settings'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
+    user_id = Column(BigInteger, ForeignKey('users.user_id'))
 
     periodicity = Column(Enum(PeriodicityEnum), default=PeriodicityEnum.FOR_TEST)
 
