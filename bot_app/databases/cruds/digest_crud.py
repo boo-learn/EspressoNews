@@ -32,14 +32,11 @@ class DigestCRUD:
         user_intonation = user_settings.intonation_id
 
         summaries = []
-        total_count = 0
         for post in digest.posts[offset:offset + limit]:
-            post_has_summary = False
             for summary in post.summaries:
                 if summary.role_id == user_role and summary.intonation_id == user_intonation:
-                    if summary.content is not None:
+                    if summary.content:
                         summaries.append(summary.content)
-                        post_has_summary = True
-            if post_has_summary:
-                total_count += 1
+
+        total_count = len(digest.posts)
         return summaries, total_count
