@@ -8,7 +8,6 @@ kb_menu = ReplyKeyboardMarkup(
         ],
         [
             KeyboardButton(text='Донат'),
-            KeyboardButton(text='Помощь'),
         ],
     ],
     resize_keyboard=True

@@ -1,8 +1,8 @@
 """New start
 
-Revision ID: ed37c912789d
+Revision ID: 47f1fbcd214c
 Revises: 
-Create Date: 2023-07-18 19:01:22.681342
+Create Date: 2023-07-19 13:32:31.595399
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ed37c912789d'
+revision = '47f1fbcd214c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -89,14 +89,13 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=False),
     sa.Column('generation_date', sa.DateTime(), nullable=False),
-    sa.Column('total_summary', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user_settings',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('periodicity', sa.Enum('HOURLY', 'EVERY_THREE_HOURS', 'EVERY_SIX_HOURS', 'FOR_TEST', name='periodicityenum'), nullable=True),
+    sa.Column('periodicity', sa.Enum('HOURLY', 'EVERY_THREE_HOURS', 'EVERY_SIX_HOURS', name='periodicityenum'), nullable=True),
     sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('intonation_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['intonation_id'], ['intonations.id'], ),

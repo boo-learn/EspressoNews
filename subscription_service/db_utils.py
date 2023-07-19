@@ -24,6 +24,9 @@ async def get_random_account_exclude_most_subscribed():
         total_accounts_stmt = select(func.count(TelegramAccount.account_id))
         total_accounts = await db.scalar(total_accounts_stmt)
 
+        if total_accounts == 1:
+            total_accounts = 2 # Если аккаунт всего один остался, что бы он воевал до последнего
+
         # Получаем список аккаунтов, исключая аккаунт с наибольшим числом подписок
         accounts_stmt = (
             select(TelegramAccount)
