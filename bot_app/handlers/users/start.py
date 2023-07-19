@@ -24,7 +24,7 @@ async def cmd_start(message: types.Message):
         message.from_user.last_name,
     )
     logger.info('User checked and created if not existing')
-    await message.answer(gen_start_mess(message.from_user.first_name), reply_markup=ikb_start)
+    await message.answer(gen_start_mess(message.from_user.first_name))
     logger.debug('Start message sent')
 
 

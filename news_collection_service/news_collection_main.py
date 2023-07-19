@@ -83,16 +83,16 @@ async def collect_news_for_account(account):
             subscribed_channels = await get_subscribed_channels(client)
             logger.info(f'Get subscribed channels with Telethon {subscribed_channels}')
 
-            one_hour_ago = datetime.datetime.now(pytz.timezone('UTC')) - datetime.timedelta(hours=100)
-            one_hour_ago = one_hour_ago.astimezone(pytz.timezone('Etc/GMT-3'))  # convert to UTC+3
-            logger.info(f"date one hour ago {one_hour_ago}")
+            half_hour_ago = datetime.datetime.now(pytz.timezone('UTC')) - datetime.timedelta(minutes=31) # add 1 minute to avoid missing posts
+            half_hour_ago = half_hour_ago.astimezone(pytz.timezone('Etc/GMT-3'))  # convert to UTC+3
+            logger.info(f"Date ago {half_hour_ago}")
 
             news = []
 
             for channel in subscribed_channels:
                 logger.info(f"Subscribe channel {channel.username}, id {channel.id}")
                 async for message in client.iter_messages(channel, limit=None):
-                    if message.date < one_hour_ago:
+                    if message.date < half_hour_ago:
                         break
                     logger.debug(f"News {message}")
                     if message.peer_id.channel_id == channel.id:

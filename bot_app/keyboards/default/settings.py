@@ -22,7 +22,6 @@ def get_kb_periodicity():
         ['Каждый час', 'Каждые 3 часа'],
         ['Каждые 6 часов'],
         ['Главное меню'],
-        ['Тест'],
     ]
     return generate_keyboard(buttons)
 
