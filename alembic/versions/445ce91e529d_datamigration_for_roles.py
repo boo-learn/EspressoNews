@@ -1,19 +1,20 @@
-"""Datamigration roles
+"""Datamigration for roles
 
-Revision ID: a807fac7dbb3
-Revises: 278c443fec0d
-Create Date: 2023-07-19 15:56:21.664743
+Revision ID: 445ce91e529d
+Revises: 11d40df04227
+Create Date: 2023-07-19 16:26:08.109706
 
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import table, column, Integer, String
+from sqlalchemy import column, table, Integer, String
 
 # revision identifiers, used by Alembic.
-revision = 'a807fac7dbb3'
-down_revision = '278c443fec0d'
+revision = '445ce91e529d'
+down_revision = '11d40df04227'
 branch_labels = None
 depends_on = None
+
 
 role = table('roles',
              column('id', Integer),

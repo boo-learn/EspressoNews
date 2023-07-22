@@ -1,8 +1,8 @@
-"""Fresh start
+"""Start
 
-Revision ID: 8d27dafd3e22
+Revision ID: 7b34b60603ea
 Revises: 
-Create Date: 2023-07-19 15:55:25.711275
+Create Date: 2023-07-19 16:25:49.722779
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8d27dafd3e22'
+revision = '7b34b60603ea'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -95,7 +95,7 @@ def upgrade() -> None:
     op.create_table('user_settings',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=True),
-    sa.Column('periodicity', sa.Enum('HOURLY', 'EVERY_THREE_HOURS', 'EVERY_SIX_HOURS', name='periodicityenum'), nullable=True),
+    sa.Column('periodicity', sa.Enum('HOURLY', 'EVERY_THREE_HOURS', 'EVERY_SIX_HOURS', 'FOR_TEST', name='periodicityenum'), nullable=True),
     sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('intonation_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['intonation_id'], ['intonations.id'], ),

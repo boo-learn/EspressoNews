@@ -1,10 +1,7 @@
-# Получаем список всех файлов с расширением .ini в папке accounts
+# Now we get all api_keys from a single txt file
 import logging
 import asyncio
-import glob
 import os
-
-import configparser
 
 from db_utils import save_gpt_account_to_db_sync
 from shared.models import GPTAccount
@@ -24,14 +21,7 @@ async def save_account(api_key):
     save_gpt_account_to_db_sync(account)
 
 
-async def load_and_test_account(config_file):
-    # Reading Configs
-    config = configparser.ConfigParser()
-    config.read(config_file)
-
-    # Setting configuration values
-    api_key = config['ChatGPT']['api_key']
-
+async def load_and_test_account(api_key):
     # Create the client and connect
     client = ChatGPT(api_key)
 
@@ -52,10 +42,13 @@ async def load_and_test_account(config_file):
         print(f"An error occurred: {e}")
 
 
-accounts_path = os.path.join(os.path.dirname(__file__), 'accounts')
-config_files = glob.glob(os.path.join(accounts_path, '*.ini'))
+api_keys_file = os.path.join(os.path.dirname(__file__), 'api_keys.txt')
 
-# Запускаем main функцию для каждого файла конфигурации
-for config_file in config_files:
+# Read the api_keys from the txt file
+with open(api_keys_file, 'r') as file:
+    api_keys = [line.strip() for line in file]
+
+# Run the main function for each api_key
+for api_key in api_keys:
     logger.info("Starting cycle")
-    asyncio.run(load_and_test_account(config_file))
+    asyncio.run(load_and_test_account(api_key))
