@@ -3,7 +3,7 @@ import json
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
-
+from celery.schedules import crontab
 from shared.database import async_session, sync_session
 from shared.models import TelegramAccount, Channel, Role, Intonation, UserSettings
 from shared.models import BeatSchedule
@@ -75,9 +75,24 @@ def load_schedule_from_db_sync():
             args = json.loads(schedule.args) if schedule.args else ()
             if args and not isinstance(args, tuple):
                 args = tuple(args)
+            # This will split the string into separate parts.
+            minute, hour, day_of_month, month_of_year, day_of_week = schedule.schedule.split()
+
+            # This will create a crontab object from the parts.
+            # Note: You need to replace '*' with '*/1' to indicate 'every' in crontab
+            minute = minute if minute != "*" else "*/1"
+            hour = hour if hour != "*" else "*/1"
+            day_of_month = day_of_month if day_of_month != "*" else "*/1"
+            month_of_year = month_of_year if month_of_year != "*" else "*/1"
+            day_of_week = day_of_week if day_of_week != "*" else "*/1"
+
+            cron_schedule = crontab(minute=minute, hour=hour, day_of_month=day_of_month, month_of_year=month_of_year,
+                                    day_of_week=day_of_week)
+            logger.info(f"Loading schedule from database {schedule.schedule}.")
+            logger.info(f"Cron shedule {cron_schedule}.")
             beat_schedule[schedule.task_name] = {
                 'task': schedule.task,
-                'schedule': float(schedule.schedule),
+                'schedule': cron_schedule,
                 'args': args,
                 'kwargs': schedule.kwargs if schedule.kwargs else {},
             }

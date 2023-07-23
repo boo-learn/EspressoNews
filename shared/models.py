@@ -11,7 +11,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from shared.database import Base
-from shared.selection_values_for_models import PeriodicityEnum
 
 
 class Role(Base):
@@ -63,7 +62,7 @@ class UserSettings(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(BigInteger, ForeignKey('users.user_id'))
 
-    periodicity = Column(Enum(PeriodicityEnum), default=PeriodicityEnum.FOR_TEST)
+    periodicity = Column(String, default='0 */6 * * *')
 
     role_id = Column(Integer, ForeignKey('roles.id'))
     intonation_id = Column(Integer, ForeignKey('intonations.id'))
@@ -217,7 +216,7 @@ class BeatSchedule(Base):
     id = Column(Integer, primary_key=True)
     task_name = Column(String, nullable=False)  # New field for the task name
     task = Column(String, nullable=False)  # Field for the task itself
-    schedule = Column(Integer, nullable=False)
+    schedule = Column(String, nullable=False)
     args = Column(JSON, nullable=True)
     kwargs = Column(JSON, nullable=True)
     last_run_at = Column(DateTime, nullable=True)

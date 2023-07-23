@@ -4,7 +4,6 @@ from typing import Optional, List
 from bot_app.databases.repositories import UserRepository
 from shared.db_utils import get_role, get_intonation
 from shared.models import User
-from shared.selection_values_for_models import PeriodicityEnum
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +14,9 @@ class UserCRUD:
         'Саркастично-шутливая': 'Comedy_sarcastic',
         'Диктор': 'Announcer',
         'Стандартная': 'Helpfull assistant.',
-        'Каждый час': PeriodicityEnum.HOURLY,
-        'Каждые 3 часа': PeriodicityEnum.EVERY_THREE_HOURS,
-        'Каждые 6 часов': PeriodicityEnum.EVERY_SIX_HOURS,
+        'Каждый час': '0 * * * *',
+        'Каждые 3 часа': '0 */3 * * *',
+        'Каждые 6 часов': '0 */6 * * *',
     }
 
     def __init__(self):

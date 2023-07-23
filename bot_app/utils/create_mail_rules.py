@@ -19,7 +19,7 @@ async def create_mail_rules():
         task_name = f'generate-digest-for-{str(user_id)}'
         task_schedule = {
             'task': 'tasks.generate_digest_for_user',
-            'schedule': option.value,
+            'schedule': option,
             'args': (user_id, ),
         }
 
@@ -43,7 +43,7 @@ async def create_mail_rule(user_id: int):
     task_name = f'generate-digest-for-{str(user_id)}'
     task_schedule = {
         'task': 'tasks.generate_digest_for_user',
-        'schedule': periodicity_option.value,
+        'schedule': periodicity_option,
         'args': (user_id, ),
     }
     logging.info(f"{task_schedule}")

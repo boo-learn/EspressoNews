@@ -1,8 +1,8 @@
 """Start
 
-Revision ID: 7b34b60603ea
+Revision ID: 11f48c518f0a
 Revises: 
-Create Date: 2023-07-19 16:25:49.722779
+Create Date: 2023-07-23 02:17:43.441794
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7b34b60603ea'
+revision = '11f48c518f0a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('task_name', sa.String(), nullable=False),
     sa.Column('task', sa.String(), nullable=False),
-    sa.Column('schedule', sa.Integer(), nullable=False),
+    sa.Column('schedule', sa.String(), nullable=False),
     sa.Column('args', sa.JSON(), nullable=True),
     sa.Column('kwargs', sa.JSON(), nullable=True),
     sa.Column('last_run_at', sa.DateTime(), nullable=True),
@@ -95,7 +95,7 @@ def upgrade() -> None:
     op.create_table('user_settings',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=True),
-    sa.Column('periodicity', sa.Enum('HOURLY', 'EVERY_THREE_HOURS', 'EVERY_SIX_HOURS', 'FOR_TEST', name='periodicityenum'), nullable=True),
+    sa.Column('periodicity', sa.String(), nullable=True),
     sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('intonation_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['intonation_id'], ['intonations.id'], ),

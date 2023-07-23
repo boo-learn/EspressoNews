@@ -37,7 +37,7 @@ celery_app.conf.update({
 new_schedule = {
     'every-half-hour-task-collect-news': {
         'task': 'tasks.collect_news',
-        'schedule': 1800,
+        'schedule': '*/30 * * * *',
         'args': (),
     },
 }
