@@ -25,6 +25,9 @@ console_handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(console_handler)
 
+MAX_RETRIES = 10
+RETRY_DELAY = 5
+
 
 class SingletonMeta(type):
     """
@@ -82,22 +85,32 @@ class Producer(metaclass=SingletonMeta):
         logger.info("Connected to the server")
 
     async def send_message(self, message_with_data: MessageData, queue: QueuesType, answer_callback=None):
-        try:
-            logger.info("Sending message")
-            logger.info(f"{self.connection}")
-            if not self.connection or self.connection.is_closed or not self.channel or self.channel.is_closed:
-                logger.info("Try connect")
-                await self.__connect()
-            logger.info("Start declare queue")
-            # await self.channel.declare_queue(queue.value)
-            logger.info("Connection is open")
-            message = aio_pika.Message(body=json.dumps(message_with_data, ensure_ascii=False).encode())
-            await self.channel.default_exchange.publish(message, routing_key=queue.value)
+        for _ in range(MAX_RETRIES):
+            try:
+                logger.info("Sending message")
+                logger.info(f"{self.connection}")
+                connection_is_closed = None if self.connection is None else self.connection.is_closed
+                channel_is_closed = None if self.channel is None else self.channel.is_closed
 
-            logger.info(f"Message sent: {message.body.decode()}")
-        except Exception as e:
-            logger.error(f"Failed to send message: {e}")
-            logger.error(traceback.format_exc())  # This will log the full traceback of the error
+                logger.info(
+                    f"Connection {self.connection} is closed {connection_is_closed} self channel {self.channel} is closed {channel_is_closed}")
+
+                if not self.connection or self.connection.is_closed or not self.channel or self.channel.is_closed:
+                    logger.info("Try connect")
+                    await self.__connect()
+                logger.info("Start declare queue")
+                # await self.channel.declare_queue(queue.value)
+                logger.info("Connection is open")
+                message = aio_pika.Message(body=json.dumps(message_with_data, ensure_ascii=False).encode())
+                await self.channel.default_exchange.publish(message, routing_key=queue.value)
+
+                logger.info(f"Message sent: {message.body.decode()}")
+                return
+            except Exception as e:
+                logger.error(f"Failed to send message: {e}")
+                logger.error(traceback.format_exc())  # This will log the full traceback of the error
+                await asyncio.sleep(RETRY_DELAY)
+        logger.error(f"Failed to send message after {MAX_RETRIES} attempts")
 
     def __del__(self):
         logger.info("Closing connection")
