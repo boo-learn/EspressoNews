@@ -83,11 +83,14 @@ async def collect_news_for_account(account):
             subscribed_channels = await get_subscribed_channels(client)
             logger.info(f'Get subscribed channels with Telethon {subscribed_channels}')
 
-            half_hour_ago = datetime.datetime.now(pytz.timezone('UTC')) - datetime.timedelta(minutes=31) # add 1 minute to avoid missing posts
+            half_hour_ago = datetime.datetime.now(pytz.timezone('UTC')) - datetime.timedelta(hours=50) # add 1 minute to avoid missing posts
             half_hour_ago = half_hour_ago.astimezone(pytz.timezone('Etc/GMT-3'))  # convert to UTC+3
             logger.info(f"Date ago {half_hour_ago}")
 
             news = []
+
+            subscribed_channel_ids = {channel.id for channel in
+                                      subscribed_channels}  # Create a set of subscribed channel IDs
 
             for channel in subscribed_channels:
                 logger.info(f"Subscribe channel {channel.username}, id {channel.id}")
@@ -95,14 +98,16 @@ async def collect_news_for_account(account):
                     if message.date < half_hour_ago:
                         break
                     logger.debug(f"News {message}")
-                    if message.peer_id.channel_id == channel.id:
+                    # Check if the message is from a subscribed channel
+                    if message.peer_id.channel_id in subscribed_channel_ids:
                         if message.text and len(message.text.split()) >= 45:
                             news.append(message)
                         else:
                             logger.info(
                                 f"Skipping message {message.id} from channel {message.peer_id.channel_id} due to insufficient word count.")
                     else:
-                        logger.info(f"Skipping message {message.id} from channel {message.peer_id.channel_id}")
+                        logger.info(
+                            f"Skipping message {message.id} from channel {message.peer_id.channel_id} as it is not a subscribed channel")
 
             logger.info(f"News from the last hour: {len(news)} messages")
 

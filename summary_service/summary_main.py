@@ -18,9 +18,9 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
         truncated_content = post.content[:10000]  # Truncate the content to 10,000 characters
 
         messages = [
-            {"role": "system", "content": f"You are {role_obj.role} and use intonation {intonation_obj.intonation}"},
+            {"role": "system", "content": f"Твоя роль {role_obj.role} и используй интонацию {intonation_obj.intonation}"},
             {"role": "user",
-             "content": f"Сделай этот текст максимально кратким и понятным: {truncated_content}"}]
+             "content": f"Сделай этот текст максимально кратким и понятным, отвечай на русском языке: {truncated_content}"}]
 
         response = await chatgpt.generate_response(messages=messages, user_id=post.post_id, model="gpt-3.5-turbo-16k")
         summary = response['choices'][0]['message']['content']

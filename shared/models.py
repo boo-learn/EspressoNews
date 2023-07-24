@@ -67,6 +67,8 @@ class UserSettings(Base):
     role_id = Column(Integer, ForeignKey('roles.id'))
     intonation_id = Column(Integer, ForeignKey('intonations.id'))
 
+    language = Column(String, default='ru')
+
     user = relationship("User", back_populates="settings")
     role = relationship("Role", back_populates="users")
     intonation = relationship("Intonation", back_populates="users")

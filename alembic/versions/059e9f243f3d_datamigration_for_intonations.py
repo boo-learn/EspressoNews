@@ -1,8 +1,8 @@
-"""Datamigration for intonations
+"""Datamigration_for_intonations
 
-Revision ID: 59926850bb87
-Revises: 82605021da12
-Create Date: 2023-07-23 02:18:35.008212
+Revision ID: 059e9f243f3d
+Revises: b9b6d00e928d
+Create Date: 2023-07-25 02:32:55.953824
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 from sqlalchemy import table, column, Integer, String
 
 # revision identifiers, used by Alembic.
-revision = '59926850bb87'
-down_revision = '82605021da12'
+revision = '059e9f243f3d'
+down_revision = 'b9b6d00e928d'
 branch_labels = None
 depends_on = None
 
