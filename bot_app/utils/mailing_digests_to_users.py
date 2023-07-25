@@ -30,11 +30,14 @@ async def send_digest(data: dict):
     logic_handler = DigestLogicHandler()
     digest_summary_list, total_count = await logic_handler.fetch_and_format_digest(data["digest_id"])
 
-    for digest_summary in digest_summary_list[:DIGESTS_LIMIT]:
-        await logic_handler.send_message_parts(
-            lambda text: bot.send_message(chat_id=data["user_id"], text=text),
-            digest_summary
-        )
+    # Combine all digest summaries into a nicely formatted string
+    digest_message = '\n\n'.join(digest_summary_list)
+
+    # Send the digest message in parts, if necessary
+    await logic_handler.send_message_parts(
+        lambda text: bot.send_message(chat_id=data["user_id"], text=text, disable_web_page_preview=True),
+        digest_message
+    )
 
     logger.info(f'Digest count {len(digest_summary_list)}, total count {DIGESTS_LIMIT}')
     if total_count > DIGESTS_LIMIT:

@@ -20,8 +20,21 @@ async def send_summaries_with_offset(call: types.CallbackQuery):
     limit = offset + DIGESTS_LIMIT
 
     logic_handler = DigestLogicHandler()
-    digest_summary, total_count = await logic_handler.fetch_and_format_digest(digest_id, offset, limit)
-    for digest in digest_summary[:DIGESTS_LIMIT]:
-        await logic_handler.send_message_parts(call.message.answer, digest)
-    if len(digest_summary) > DIGESTS_LIMIT:
-        await logic_handler.send_load_more(call.message.answer, total_count, digest_id, offset + DIGESTS_LIMIT)
+    digest_summary_list, total_count = await logic_handler.fetch_and_format_digest(digest_id, offset, limit)
+
+    # Combine all digest summaries into a nicely formatted string
+    digest_message = '\n\n'.join(digest_summary_list[:DIGESTS_LIMIT])
+
+    # Send the digest message in parts, if necessary
+    await logic_handler.send_message_parts(
+        lambda text: call.message.answer(text, disable_web_page_preview=True),
+        digest_message
+    )
+
+    if total_count > limit:
+        await logic_handler.send_load_more(
+            lambda text, reply_markup: call.message.answer(text, reply_markup=reply_markup),
+            total_count,
+            digest_id,
+            limit
+        )

@@ -100,7 +100,7 @@ async def collect_news_for_account(account):
                     logger.debug(f"News {message}")
                     # Check if the message is from a subscribed channel
                     if message.peer_id.channel_id in subscribed_channel_ids:
-                        if message.text and len(message.text.split()) >= 45:
+                        if message.text and len(message.text.split()) >= 10:
                             news.append(message)
                         else:
                             logger.info(
