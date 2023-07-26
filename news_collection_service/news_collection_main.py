@@ -59,14 +59,6 @@ async def collect_news():
 
     await asyncio.gather(*tasks)
 
-    message: MessageData = {
-        "type": 'summarize_news',
-        "data": None
-    }
-
-    producer = Producer(host=RABBIT_HOST, queue=QueuesType.summary_service)
-    await producer.send_message(message, QueuesType.summary_service)
-
 
 async def collect_news_for_account(account):
     max_retry_attempts = 10

@@ -37,19 +37,23 @@ async def prepare_digest(data: int):
     logger.info(f"Start digest prepare.")
     logger.info(f"{data}")
     user_id = data
-    producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
     digest = await create_digest(user_id)
 
     if digest:
+        producer = Producer(host=RABBIT_HOST, queue=QueuesType.summary_service)
+        logger.info(f"digest")
         message: MessageData = {
-            "type": "send_digest",
+            "type": "summarize_digest",  # send_digest
             "data": {
                 "user_id": digest.user_id,
                 "digest_id": digest.id,
             }
         }
         print(f"{message=}")
+        await producer.send_message(message_with_data=message, queue=QueuesType.summary_service)
     else:
+        producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
+        logger.info(f"no digest")
         message: MessageData = {
             "type": "no_digest",
             "data": {
@@ -57,7 +61,7 @@ async def prepare_digest(data: int):
             }
         }
         print(f"{message=}")
-    await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
+        await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
     logger.info(f"End digest prepare.")
 
 

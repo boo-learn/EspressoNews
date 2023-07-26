@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 from celery.schedules import crontab
 from shared.database import async_session, sync_session
-from shared.models import TelegramAccount, Channel, Role, Intonation, UserSettings
+from shared.models import TelegramAccount, Channel, Role, Intonation, UserSettings, Digest, Post
 from shared.models import BeatSchedule
 
 # Создаем логгер
@@ -186,7 +186,11 @@ async def get_intonation(intonation_name: str):
 async def get_user_settings(user_id: int):
     logger.info(f"Getting user settings for user ID {user_id} from database asynchronously.")
     async with async_session() as session:
-        result = await session.execute(select(UserSettings).filter(UserSettings.user_id == user_id))
+        result = await session.execute(
+            select(UserSettings)
+            .options(joinedload(UserSettings.role), joinedload(UserSettings.intonation))
+            .filter(UserSettings.user_id == user_id)
+        )
         user_settings = result.scalars().first()
         if user_settings:
             logger.info(f"Retrieved user settings for user ID {user_id} from database.")
@@ -194,3 +198,15 @@ async def get_user_settings(user_id: int):
         else:
             logger.info(f"No user settings found for user ID {user_id}.")
             return None
+
+
+async def get_digest_with_posts(digest_id: int):
+    logger.info(f"Getting digest with ID {digest_id} and its posts from database asynchronously.")
+    async with async_session() as db:
+        result = await db.execute(
+            select(Digest)
+            .options(joinedload(Digest.posts).joinedload(Post.channel))  # Eager load the 'channel' attribute
+            .filter(Digest.id == digest_id)
+        )
+        logger.info(f"Retrieved digest with ID {digest_id} and its posts from database.")
+        return result.scalars().first()
