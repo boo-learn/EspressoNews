@@ -12,7 +12,7 @@ def generate_keyboard(buttons: list[list[str]], resize_keyboard=True) -> ReplyKe
 def get_kb_settings():
     buttons = [
         ['Периодичность', 'Интонация'],
-        ['Роль', 'Главное меню']
+        ['Главное меню']  # 'Роль'
     ]
     return generate_keyboard(buttons)
 
