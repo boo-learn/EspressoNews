@@ -76,7 +76,7 @@ async def generate_summaries(data: dict):
             "digest_id": data["digest_id"],
         }
     }
-    await producer.send_message(message_with_data=message, queue=QueuesType.summary_service)
+    await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 
 
 async def update_post_and_generate_summary_async(chatgpt, post, role_obj, intonation_obj):
