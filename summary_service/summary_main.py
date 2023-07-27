@@ -5,10 +5,11 @@ import itertools
 from shared.config import RABBIT_HOST
 from shared.db_utils import get_user_settings, get_digest_with_posts
 from shared.models import Post, Role, Intonation
-from shared.rabbitmq import Subscriber, QueuesType
+from shared.rabbitmq import Subscriber, QueuesType, Producer, MessageData
 from summary_service.chat_gpt import ChatGPT
 from db_utils import get_posts_without_summary_async, update_post_summary_async, get_active_gpt_accounts_async, \
-    update_chatgpt_account_async, get_role_settings_options_for_gpt, get_intonation_settings_options_for_gpt
+    update_chatgpt_account_async, get_role_settings_options_for_gpt, get_intonation_settings_options_for_gpt, \
+    get_summary_for_post_async
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -66,12 +67,24 @@ async def generate_summaries(data: dict):
         tasks.append(update_post_and_generate_summary_async(chatgpt, post, role_obj, intonation_obj))
 
     await asyncio.gather(*tasks)
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
+    logger.info(f"send_digest")
+    message: MessageData = {
+        "type": "send_digest",  # send_digest
+        "data": {
+            "user_id": data["user_id"],
+            "digest_id": data["digest_id"],
+        }
+    }
+    await producer.send_message(message_with_data=message, queue=QueuesType.summary_service)
 
 
 async def update_post_and_generate_summary_async(chatgpt, post, role_obj, intonation_obj):
-    summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
-    if summary:
-        await update_post_summary_async(post.post_id, summary, role_obj.id, intonation_obj.id)
+    existing_summary = await get_summary_for_post_async(post.post_id, role_obj.id, intonation_obj.id)
+    if existing_summary is None:
+        summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
+        if summary:
+            await update_post_summary_async(post.post_id, summary, role_obj.id, intonation_obj.id)
 
 
 async def main():

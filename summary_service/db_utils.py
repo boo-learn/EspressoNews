@@ -84,3 +84,17 @@ async def get_intonation_settings_options_for_gpt():
             return [row for row in result.scalars().all()]
     except SQLAlchemyError as e:
         raise e
+
+
+async def get_summary_for_post_async(post_id: int, role_id: int, intonation_id: int):
+    async with async_session() as db:
+        result = await db.execute(
+            select(Summary).where(
+                and_(
+                    Summary.post_id == post_id,
+                    Summary.role_id == role_id,
+                    Summary.intonation_id == intonation_id
+                )
+            )
+        )
+        return result.scalars().first()  # Return the first matching summary, or None if no match is found
