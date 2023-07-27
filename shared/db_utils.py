@@ -21,6 +21,14 @@ async def get_account_from_db_async(account_id: int):
         return result.scalars().first()
 
 
+async def get_all_accounts_from_db_async():
+    logger.info("Getting all accounts from database asynchronously.")
+    async with async_session() as db:
+        result = await db.execute(select(TelegramAccount))
+        logger.info("Retrieved all accounts from database.")
+        return result.scalars().all()
+
+
 def get_account_from_db(account_id: int):
     logger.info(f"Getting account with ID {account_id} from database.")
     with sync_session() as db:

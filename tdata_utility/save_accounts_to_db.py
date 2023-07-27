@@ -4,6 +4,7 @@ import glob
 
 from telethon.sessions import StringSession
 from telethon.sync import TelegramClient
+from telethon.tl.functions.channels import LeaveChannelRequest
 
 from shared.models import TelegramAccount
 
@@ -14,8 +15,20 @@ from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
 
 
+async def unsubscribe_from_all_channels(client):
+    dialogs = await client.get_dialogs()
+    for dialog in dialogs:
+        if dialog.is_channel:
+            try:
+                await client(LeaveChannelRequest(dialog))
+                await asyncio.sleep(1)  # sleep for 1 second to avoid hitting rate limits
+            except Exception as e:
+                print(f"Failed to leave channel {dialog.name}: {str(e)}")
+
+
 async def save_account(client):
     me = await client.get_me()
+    await unsubscribe_from_all_channels(client)
     phone_number = me.phone
     username = me.username
 
@@ -58,7 +71,7 @@ async def main(config_file):
     # Ensure you're authorized
     if not await client.is_user_authorized():
         raise SessionPasswordNeededError
-    
+
     await save_account(client)
 
 
