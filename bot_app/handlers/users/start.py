@@ -9,6 +9,7 @@ from bot_app.databases.cruds import UserCRUD
 from bot_app.keyboards.inlines import ikb_start, get_posts_rubrics
 from bot_app.loader import dp
 from bot_app.utils import delete_previus_message_for_feedback
+from bot_app.utils.create_mail_rules import create_mail_rule
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ async def cmd_start(message: types.Message):
         message.from_user.first_name,
         message.from_user.last_name,
     )
+    await create_mail_rule(message.from_user.id)  # Add this line to call create_mail_rule
     logger.info('User checked and created if not existing')
     await message.answer(gen_start_mess(message.from_user.first_name))
     logger.debug('Start message sent')

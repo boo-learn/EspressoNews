@@ -42,7 +42,6 @@ class UserCRUD:
 
         if not user:
             user = await self.repository.create(**data)
-
         return user
 
     async def get_all_users(self) -> List[Optional[User]]:
