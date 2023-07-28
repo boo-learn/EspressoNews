@@ -92,7 +92,7 @@ async def check_connection(client):
         except Exception as e:
             logger.error(f'Error occurred during connection check: {e}. Retrying connection in 5 seconds.')
             await client.connect()
-        await asyncio.sleep(10)  # Check the connection every 10 seconds
+        await asyncio.sleep(60)  # Check the connection every 10 seconds
 
 
 async def main():

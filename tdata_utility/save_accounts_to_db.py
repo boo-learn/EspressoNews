@@ -24,6 +24,7 @@ async def unsubscribe_from_all_channels(client):
                 await asyncio.sleep(1)  # sleep for 1 second to avoid hitting rate limits
             except Exception as e:
                 print(f"Failed to leave channel {dialog.name}: {str(e)}")
+    pass
 
 
 async def save_account(client):
