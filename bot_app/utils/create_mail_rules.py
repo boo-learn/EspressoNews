@@ -15,12 +15,16 @@ async def create_mail_rules():
     logger.info(f"Got {len(user_ids)} users' settings options.")
     new_schedule = {}
     for user_id, option in zip(user_ids, users_list_periodicity_options):
-        logger.info(f"Schedule {option.value} for {user_id}")
+        try:
+            schedule_value = option.value
+        except AttributeError:  # если option - это str, и у него нет атрибута value
+            schedule_value = '0 */6 */1 */1 */1'
+        logger.info(f"Schedule {schedule_value} for {user_id}")
         task_name = f'generate-digest-for-{str(user_id)}'
         task_schedule = {
             'task': 'tasks.generate_digest_for_user',
-            'schedule': option,
-            'args': (user_id, ),
+            'schedule': schedule_value,
+            'args': (user_id,),
         }
 
         new_schedule[task_name] = task_schedule
