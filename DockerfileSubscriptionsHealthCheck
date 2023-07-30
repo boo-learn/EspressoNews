@@ -1,0 +1,14 @@
+# Use an official Python runtime as a parent image
+FROM hobrus/espresso_news_base:latest
+
+# Copy the news_collection_service folder into the container at /app
+COPY ./shared /app/shared
+COPY ./healthcheck_for_collect_news /app/healthcheck_for_collect_news
+
+EXPOSE 80
+
+# Define environment variable
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+
+# Run news_collection_main.py when the container launches
+CMD ["python", "healthcheck_for_collect_news/hc_collect_news_main.py"]

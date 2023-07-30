@@ -20,7 +20,7 @@ async def create_mail_rules():
             schedule_value = option
         except Exception as e:
             logger.error(f"Error while getting schedule value for user {user_id}: {e}")
-            schedule_value = '0 */6 */1 */1 */1'
+            schedule_value = '0 */1 */1 */1 */1'
         logger.info(f"Schedule {schedule_value} for {user_id}")
         task_name = f'generate-digest-for-{str(user_id)}'
         task_schedule = {

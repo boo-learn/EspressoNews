@@ -51,7 +51,7 @@ class ChannelCRUD:
         if not channel.subscriptions:
             logger.debug(f"Channel {channel} is empty, deleting")
             await self.repository.delete(channel)
-            await send_to_unsubscribe_channel("unsubscribe", (channel.channel_username, channel.account_id))
+            await send_to_unsubscribe_channel("unsubscribe", channel.channel_username, channel.account_id)
         else:
             logger.debug(f"Channel {channel} has subscriptions, not deleting")
 

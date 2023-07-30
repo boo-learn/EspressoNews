@@ -25,10 +25,12 @@ class DigestLogicHandler:
         return digest_summaries_list, total_count
 
     @staticmethod
-    async def send_message_parts(send_method, text, max_length=4096):
-        for i in range(0, len(text), max_length):
-            text_to_send = text[i:i + max_length]
-            await send_method(text=text_to_send)
+    async def send_message_parts(send_method, text, max_length=4096, reply_markup=None):
+        text_parts = [text[i:i + max_length] for i in range(0, len(text), max_length)]
+        for i, text_part in enumerate(text_parts):
+            is_last_message = i == len(text_parts) - 1
+            markup = reply_markup if is_last_message else None
+            await send_method(text=text_part, reply_markup=markup)
             await asyncio.sleep(1)
 
     @staticmethod

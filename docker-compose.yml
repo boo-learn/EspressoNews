@@ -184,5 +184,17 @@ services:
       db:
         condition: service_healthy
 
+  subscription_healthcheck:
+    build:
+      context: .
+      dockerfile: DockerfileSubscriptionsHealthCheck
+    env_file:
+      - .env.dev
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:

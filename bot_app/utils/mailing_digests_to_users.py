@@ -33,20 +33,25 @@ async def send_digest(data: dict):
     # Combine all digest summaries into a nicely formatted string
     digest_message = '\n\n'.join(digest_summary_list)
 
+    if total_count > DIGESTS_LIMIT:
+        # Add the load more message to the digest message
+        digest_message += '\n\n' + gen_digest_load_more()
+        reply_markup = ikb_load_more(data["digest_id"], DIGESTS_LIMIT)
+    else:
+        reply_markup = None
+
     # Send the digest message in parts, if necessary
     await logic_handler.send_message_parts(
-        lambda text: bot.send_message(chat_id=data["user_id"], text=text, disable_web_page_preview=True),
-        digest_message
+        send_method=lambda text, reply_markup=None: bot.send_message(
+            chat_id=data["user_id"],
+            text=text,
+            disable_web_page_preview=True,
+            reply_markup=reply_markup
+        ),
+        text=digest_message,
+        max_length=4096,  # or any desired max_length
+        reply_markup=reply_markup
     )
-
-    logger.info(f'Digest count {len(digest_summary_list)}, total count {DIGESTS_LIMIT}')
-    if total_count > DIGESTS_LIMIT:
-        await logic_handler.send_load_more(
-            lambda text, reply_markup: bot.send_message(chat_id=data["user_id"], text=text, reply_markup=reply_markup),
-            total_count,
-            data["digest_id"],
-            DIGESTS_LIMIT
-        )
 
 
 async def no_digest(data):

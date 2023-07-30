@@ -31,8 +31,8 @@ async def handle_subscription(message: str):
         await send_to_subscribe_channel("subscribe", channel_username)
 
 
-
 async def handle_unsubscription(message: str):
+    logging.info(f"Message: {message}")
     channel_username = message[0]
     account_id = message[1]
     logging.info(f"Unsubscribing from channel {channel_username} with account {account_id}")
