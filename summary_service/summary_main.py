@@ -9,7 +9,7 @@ from shared.rabbitmq import Subscriber, QueuesType, Producer, MessageData
 from summary_service.chat_gpt import ChatGPT
 from db_utils import get_posts_without_summary_async, update_post_summary_async, get_active_gpt_accounts_async, \
     update_chatgpt_account_async, get_role_settings_options_for_gpt, get_intonation_settings_options_for_gpt, \
-    get_summary_for_post_async
+    get_summary_for_post_async, get_role_by_id, get_intonation_by_id
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,13 +21,12 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
 
         messages = [
             {"role": "system",
-             "content": f"Твоя роль {role_obj.role} и используй интонацию {intonation_obj.intonation}"},
+             "content": f"Ты программа для сокращения новостей. Используй тон: {intonation_obj.intonation}"},
             {"role": "user",
-             "content": f"Сделай этот текст максимально кратким и понятным, отвечай на русском языке: {truncated_content}"}]
+             "content": f"Сделай текст максимально кратким и понятным, необходимо уложиться в 1-2 предложения.: {truncated_content}"}]
 
         response = await chatgpt.generate_response(messages=messages, user_id=post.post_id, model="gpt-3.5-turbo-16k")
         summary = response['choices'][0]['message']['content']
-        summary += f'<a href="https://t.me/{post.channel.channel_username}/{post.post_id}"> #Источник </a>'
 
         logger.info(f"Summary {summary}")
 
@@ -51,10 +50,10 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
 
 async def generate_summaries(data: dict):
     user_settings_obj = await get_user_settings(data["user_id"])
-    role_obj = user_settings_obj.role
-    intonation_obj = user_settings_obj.intonation
 
     digest_obj = await get_digest_with_posts(data["digest_id"])
+    role_obj = await get_role_by_id(digest_obj.role_id)
+    intonation_obj = await get_intonation_by_id(digest_obj.intonation_id)
     posts = digest_obj.posts
 
     chatgpt_accounts = await get_active_gpt_accounts_async()

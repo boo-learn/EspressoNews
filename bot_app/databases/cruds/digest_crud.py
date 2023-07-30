@@ -23,20 +23,18 @@ class DigestCRUD:
         if digest is None:
             return None
 
-        user_settings = await get_user_settings(digest.user_id)
-
-        if user_settings is None:
-            return None
-
-        user_role = user_settings.role_id
-        user_intonation = user_settings.intonation_id
+        user_role = digest.role_id
+        user_intonation = digest.intonation_id
 
         summaries = []
+        post_number = 1 + offset
         for post in digest.posts[offset:offset + limit]:
             for summary in post.summaries:
                 if summary.role_id == user_role and summary.intonation_id == user_intonation:
                     if summary.content:
-                        summaries.append(summary.content)
+                        summary_result = f"• {summary.content} <a href='https://t.me/{post.channel.channel_username}/{post.post_id}'> #{post_number} </a>"
+                        summaries.append(summary_result)
+            post_number += 1
 
         total_count = len(digest.posts)
         return summaries, total_count

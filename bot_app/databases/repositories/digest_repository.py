@@ -13,7 +13,9 @@ class DigestRepository:
                 stmt = (
                     select(Digest).options(
                         joinedload(Digest.posts).
-                        joinedload(Post.summaries)
+                        joinedload(Post.summaries),
+                        joinedload(Digest.posts).
+                        joinedload(Post.channel)
                     ).where(Digest.id == digest_id)
                 )
                 result = await session.execute(stmt)

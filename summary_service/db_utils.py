@@ -39,10 +39,6 @@ async def get_posts_without_summary_async(role_obj: Role = None, intonation_obj:
         return result.scalars().all()
 
 
-
-
-
-
 async def update_post_summary_async(post_id: int, summary: str, role_id: str, intonation_id: int):
     async with async_session() as db:
         new_summary = Summary(content=summary, role_id=role_id, intonation_id=intonation_id, post_id=post_id)
@@ -98,3 +94,23 @@ async def get_summary_for_post_async(post_id: int, role_id: int, intonation_id: 
             )
         )
         return result.scalars().first()  # Return the first matching summary, or None if no match is found
+
+
+async def get_role_by_id(role_id: int):
+    try:
+        async with async_session() as session:
+            result = await session.execute(select(Role).filter(Role.id == role_id))
+            return result.scalars().first()
+    except SQLAlchemyError as e:
+        await session.rollback()
+        raise e
+
+
+async def get_intonation_by_id(intonation_id: int):
+    try:
+        async with async_session() as session:
+            result = await session.execute(select(Intonation).filter(Intonation.id == intonation_id))
+            return result.scalars().first()
+    except SQLAlchemyError as e:
+        await session.rollback()
+        raise e

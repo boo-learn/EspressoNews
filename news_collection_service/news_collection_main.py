@@ -46,10 +46,10 @@ async def listen_to_account(account):
             logger.debug(f'Received new message on channel. Event id: {event.id}')
             if event.text:
                 # Add a check for the number of words in the message
-                words = event.text.split()
-                if len(words) < 9:
-                    logger.info(f'Skipping message {event.id} due to insufficient word count')
-                    return
+                # words = event.text.split()
+                # if len(words) < 9:
+                #     logger.info(f'Skipping message {event.id} due to insufficient word count')
+                #     return
                 # If the word count is sufficient, process the message
                 post = Post(
                     post_id=event.id,

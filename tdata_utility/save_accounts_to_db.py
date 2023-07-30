@@ -10,7 +10,6 @@ from shared.models import TelegramAccount
 
 from db_utils import save_account_to_db_sync
 import configparser
-import asyncio
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
 
@@ -64,16 +63,20 @@ async def main(config_file):
     username = config['Telegram']['username']
     session_string = config['Telegram']['session_string']
 
-    # Create the client and connect
-    client = TelegramClient(StringSession(session_string), api_id, api_hash)
-    await client.connect()
-    print(f"Client Created for {config_file}")
+    try:
+        # Create the client and connect
+        client = TelegramClient(StringSession(session_string), api_id, api_hash)
+        await client.connect()
+        print(f"Client Created for {config_file}")
 
-    # Ensure you're authorized
-    if not await client.is_user_authorized():
-        raise SessionPasswordNeededError
+        # Ensure you're authorized
+        if not await client.is_user_authorized():
+            raise SessionPasswordNeededError
 
-    await save_account(client)
+        await save_account(client)
+    except Exception as e:
+        print(f"Failed to process account for {config_file} due to error: {str(e)}")
+        return
 
 
 # Получаем список всех файлов с расширением .ini в папке accounts

@@ -1,0 +1,25 @@
+import logging
+
+from aiogram import types
+from aiogram.dispatcher.middlewares import BaseMiddleware
+from bot_app.databases.cruds import UserCRUD
+from bot_app.utils.create_mail_rules import create_mail_rule
+
+logger = logging.getLogger(__name__)
+
+
+class UserMiddleware(BaseMiddleware):
+
+    async def on_pre_process_message(self, message: types.Message, data: dict):
+        user_crud = UserCRUD()
+        user_exist = await user_crud.is_user_exist(message.from_user.id)
+        logger.info(f'Checking user {message.from_user.id}')
+        if not user_exist:
+            logger.info('User not exist, creating...')
+            await user_crud.check_user_and_create_if_none(
+                message.from_user.id,
+                message.from_user.username,
+                message.from_user.first_name,
+                message.from_user.last_name,
+            )
+            await create_mail_rule(message.from_user.id)

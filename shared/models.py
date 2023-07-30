@@ -122,6 +122,8 @@ class DigestAssociation(Base):
 class Digest(Base):
     __tablename__ = 'digests'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    role_id = Column(Integer)
+    intonation_id = Column(Integer)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     user: Mapped["User"] = relationship(back_populates="digests")
     posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)

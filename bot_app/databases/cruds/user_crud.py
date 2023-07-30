@@ -99,3 +99,7 @@ class UserCRUD:
             return getattr(user_settings, option_name)
 
         return None
+
+    async def is_user_exist(self, user_id):
+        user = await self.repository.get(user_id)
+        return user is not None

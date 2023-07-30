@@ -1,6 +1,10 @@
 import asyncio
 from aiogram import executor
+
+from bot_app.handlers.middleware.user_middleware import UserMiddleware
 from handlers import dp
+
+dp.middleware.setup(UserMiddleware())
 
 
 async def on_startup(dp):
