@@ -38,6 +38,6 @@ class SubscriptionCRUD:
             channel_crud = ChannelCRUD()
             await channel_crud.delete_channel(channel)
 
-            await send_to_unsubscribe_channel("unsubscribe", (channel.channel_username, channel.account_id))
+            await send_to_unsubscribe_channel("unsubscribe", channel.channel_username, channel.account_id)
 
         return True

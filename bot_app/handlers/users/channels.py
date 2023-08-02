@@ -49,7 +49,7 @@ async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext)
     await subscription_crud.check_channel_and_delete_if_empty(channel)
 
     logic_handler = ChannelLogicHandler()
-    await logic_handler.send_channels_list_to_user_after_remove(channel.channel_name, call.message, state)
+    await logic_handler.send_channels_list_to_user_after_remove(channel.channel_name, call.from_user.id, state)
     logger.info('Exiting unsubscribe_from_channel')
 
 
