@@ -87,6 +87,8 @@ services:
     depends_on:
       - rabbitmq
       - redis
+    restart: unless-stopped
+
 
   celery2:
     build:
@@ -97,6 +99,7 @@ services:
     depends_on:
       - rabbitmq
       - redis
+    restart: unless-stopped
 
   celery3:
     build:
@@ -107,6 +110,7 @@ services:
     depends_on:
       - rabbitmq
       - redis
+    restart: unless-stopped
 
   flower:
     build:

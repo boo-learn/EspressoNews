@@ -62,7 +62,7 @@ class UserSettings(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(BigInteger, ForeignKey('users.user_id'))
 
-    periodicity = Column(String, default='0 */1 * * *')
+    periodicity = Column(String, default='0 */1 */1 */1 */1')
 
     role_id = Column(Integer, ForeignKey('roles.id'))
     intonation_id = Column(Integer, ForeignKey('intonations.id'))

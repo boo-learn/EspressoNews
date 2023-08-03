@@ -73,28 +73,27 @@ async def prepare_digest(data: int):
 
 def exclude_duplicates(posts: list[Post]) -> list[Post]:
     # Get titles of the posts
-    # titles = [post.title for post in posts]
-    #
-    # # Initialize an empty list to hold the posts without duplicates
-    # posts_without_duplicates = []
-    #
-    # # For each post
-    # for i in range(len(posts)):
-    #     # Check if it's similar to any of the previously checked posts
-    #     for j in range(i):
-    #         # Calculate Levenshtein distance between the current post and the previous post
-    #         similarity = fuzz.ratio(titles[i], titles[j])
-    #
-    #         # If the titles are similar
-    #         if similarity > 60:
-    #             # Break the inner loop and skip to the next post
-    #             break
-    #     else:
-    #         # If the post is not similar to any previous post, add it to the list of posts without duplicates
-    #         posts_without_duplicates.append(posts[i])
-    #
-    # return posts_without_duplicates
-    pass
+    titles = [post.title for post in posts]
+
+    # Initialize an empty list to hold the posts without duplicates
+    posts_without_duplicates = []
+
+    # For each post
+    for i in range(len(posts)):
+        # Check if it's similar to any of the previously checked posts
+        for j in range(i):
+            # Calculate Levenshtein distance between the current post and the previous post
+            similarity = fuzz.ratio(titles[i], titles[j])
+
+            # If the titles are similar
+            if True: # similarity > 60
+                # Break the inner loop and skip to the next post
+                break
+        else:
+            # If the post is not similar to any previous post, add it to the list of posts without duplicates
+            posts_without_duplicates.append(posts[i])
+
+    return posts_without_duplicates
 
 
 async def main():
