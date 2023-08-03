@@ -36,6 +36,20 @@ class ChannelRepository:
         except SQLAlchemyError as e:
             raise e
 
+    async def get_by_id(self, channel_id: int) -> Optional[Channel]:
+        try:
+            channel_id = int(channel_id)
+            async with async_session() as session:
+                stmt = (
+                    select(Channel)
+                    .where(Channel.channel_id == channel_id)
+                    .options(selectinload(Channel.subscriptions))
+                )
+                result = await session.execute(stmt)
+                return result.scalars().first()
+        except SQLAlchemyError as e:
+            raise e
+
     async def delete(self, channel: Channel):
         try:
             async with async_session() as session:

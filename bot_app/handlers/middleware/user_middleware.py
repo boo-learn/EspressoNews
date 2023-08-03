@@ -22,4 +22,10 @@ class UserMiddleware(BaseMiddleware):
                 message.from_user.first_name,
                 message.from_user.last_name,
             )
-            await create_mail_rule(message.from_user.id)
+            user_crud = UserCRUD()
+            periodicity_option = await user_crud.get_settings_option_for_user(message.from_user.id, 'periodicity')
+            await create_mail_rule(message.from_user.id, periodicity_option)
+        elif not user_exist.is_active:
+            logger.info('User is not active, updating...')
+            await user_crud.enable_user(message.from_user.id)
+

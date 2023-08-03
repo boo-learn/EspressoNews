@@ -1,10 +1,11 @@
 import asyncio
 import logging
 
+import aiogram
 from aiogram.types import InlineKeyboardMarkup
 
 from bot_app.data.messages import gen_digest_not_exist_mess, gen_digest_load_more
-from bot_app.databases.cruds import DigestCRUD
+from bot_app.databases.cruds import DigestCRUD, UserCRUD
 from bot_app.keyboards.inlines import ikb_load_more
 from bot_app.loader import bot
 from bot_app.logic.digest_logic_handler import DigestLogicHandler
@@ -41,19 +42,32 @@ async def send_digest(data: dict):
         reply_markup = None
 
     # Send the digest message in parts, if necessary
-    await logic_handler.send_message_parts(
-        send_method=lambda text, reply_markup=None: bot.send_message(
-            chat_id=data["user_id"],
-            text=text,
-            disable_web_page_preview=True,
+    try:
+        await logic_handler.send_message_parts(
+            send_method=lambda text, reply_markup=None: bot.send_message(
+                chat_id=data["user_id"],
+                text=text,
+                disable_web_page_preview=True,
+                reply_markup=reply_markup
+            ),
+            text=digest_message,
+            max_length=4096,  # or any desired max_length
             reply_markup=reply_markup
-        ),
-        text=digest_message,
-        max_length=4096,  # or any desired max_length
-        reply_markup=reply_markup
-    )
+        )
+    except aiogram.exceptions.BotBlocked:
+        # Here the user blocked the bot, so we disable him/her.
+        await disable_user(data["user_id"])
 
 
 async def no_digest(data):
     logger.info(f'Digest data {data}')
-    await bot.send_message(chat_id=data["user_id"], text=gen_digest_not_exist_mess())
+    try:
+        await bot.send_message(chat_id=data["user_id"], text=gen_digest_not_exist_mess())
+    except aiogram.exceptions.BotBlocked:
+        # Here the user blocked the bot, so we disable him/her.
+        await disable_user(data["user_id"])
+
+
+async def disable_user(user_id: int):
+    user_crud = UserCRUD()
+    await user_crud.disable_user(user_id)

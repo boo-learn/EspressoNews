@@ -2,6 +2,7 @@ import logging
 from typing import Optional, List
 
 from bot_app.databases.repositories import UserRepository
+from bot_app.utils.create_mail_rules import create_mail_rule
 from shared.db_utils import get_role, get_intonation
 from shared.models import User
 
@@ -102,4 +103,24 @@ class UserCRUD:
 
     async def is_user_exist(self, user_id):
         user = await self.repository.get(user_id)
-        return user is not None
+        return user
+
+    async def disable_user(self, user_id):
+        user = await self.repository.get(user_id)
+        user = await self.repository.update(user, is_active=False)
+        user_settings = await self.repository.get_user_settings(user_id)
+        await self.repository.update_setting(user_settings, "periodicity", None)
+        task_name = f"generate-digest-for-{str(user_id)}"
+        await self.repository.delete_schedule(task_name)
+
+    async def enable_user(self, user_id):
+        user = await self.repository.get(user_id)
+        user = await self.repository.update(user, is_active=True)
+        user_settings = await self.repository.get_user_settings(user_id)
+        await self.repository.update_setting(user_settings, "periodicity", "*/1 * * * *")
+        user_crud = UserCRUD()
+        logger.info(f"Getting settings option for user {user_id}...")
+        periodicity_option = await user_crud.get_settings_option_for_user(user_id, 'periodicity')
+        await create_mail_rule(user_id, periodicity_option)
+
+

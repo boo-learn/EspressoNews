@@ -27,6 +27,9 @@ class ChannelCRUD:
     async def get_channel(self, channel_username):
         return await self.repository.get(channel_username)
 
+    async def get_channel_by_id(self, channel_id):
+        return await self.repository.get_by_id(channel_id)
+
     async def delete_channel(self, channel):
         return await self.repository.delete(channel)
 

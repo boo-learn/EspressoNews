@@ -80,7 +80,7 @@ def gen_adding_users_channels():
 
 # unsubscribe from the channel
 def gen_sure_unsubscribe_mess(channel_title):
-    message = f'Вы уверены, что хотите удалить канал {channel_title}  \n \n'
+    message = f'Вы уверены, что хотите удалить канал\n \n'
 
     return message
 

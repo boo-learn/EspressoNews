@@ -2,7 +2,7 @@ import logging
 from typing import Optional, List
 from shared.database import async_session
 from shared.db_utils import get_role, get_intonation
-from shared.models import User, UserSettings
+from shared.models import User, UserSettings, BeatSchedule
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.future import select
@@ -72,6 +72,7 @@ class UserRepository:
             async with async_session() as session:
                 for key, value in kwargs.items():
                     setattr(user, key, value)
+                session.add(user)
                 await session.commit()
                 return user
         except SQLAlchemyError as e:
@@ -122,3 +123,21 @@ class UserRepository:
                 return result.scalars().first()
         except SQLAlchemyError as e:
             raise e
+
+    @staticmethod
+    async def delete_schedule(task_name: str) -> bool:
+        try:
+            async with async_session() as session:
+                stmt = select(BeatSchedule).filter_by(task_name=task_name)
+                result = await session.execute(stmt)
+                schedule = result.scalars().first()
+                if schedule:
+                    await session.delete(schedule)
+                    await session.commit()
+                    return True
+                else:
+                    return False
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+

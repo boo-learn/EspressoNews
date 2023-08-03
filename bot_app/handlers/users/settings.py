@@ -50,7 +50,9 @@ async def change_intonation_option(message: types.Message):
 async def change_periodicity_option(message: types.Message):
     user_crud = UserCRUD()
     await user_crud.update_user_settings_option(message.from_user.id, 'periodicity', message.text)
-    await create_mail_rule(message.from_user.id)  # Add this line to call create_mail_rule
+    user_crud = UserCRUD()
+    periodicity_option = await user_crud.get_settings_option_for_user(message.from_user.id, 'periodicity')
+    await create_mail_rule(message.from_user.id, periodicity_option)  # Add this line to call create_mail_rule
     await message.answer('Изменения успешно сохранены!')
 
 

@@ -28,7 +28,7 @@ async def choose_channel_callback(call: types.CallbackQuery, state: FSMContext):
 async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext):
     logger.debug('Entering unsubscribe_from_channel')
     state_data = await state.get_data('choose_channel_for_delete')
-    channel_username = state_data['choose_channel_for_delete']
+    channel_id = state_data['choose_channel_for_delete']
 
     await delete_previus_message_for_feedback(call)
     await call.message.delete()
@@ -36,7 +36,8 @@ async def unsubscribe_from_channel(call: types.CallbackQuery, state: FSMContext)
     subscription_crud = SubscriptionCRUD()
     channel_crud = ChannelCRUD()
 
-    channel = await channel_crud.get_channel(channel_username)
+    logger.info(f'Channel username for delete {channel_id}')
+    channel = await channel_crud.get_channel_by_id(channel_id)
 
     logger.info(f'Channel object for delete {channel}')
 
