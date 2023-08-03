@@ -84,16 +84,24 @@ def load_schedule_from_db_sync():
             if args and not isinstance(args, tuple):
                 args = tuple(args)
             # This will split the string into separate parts.
-            minute, hour, day_of_month, month_of_year, day_of_week = schedule.schedule.split()
+            parts = schedule.schedule.split()
 
-            # This will create a crontab object from the parts.
-            # Note: You need to replace '*' with '*/1' to indicate 'every' in crontab
+            # If there's only one part, set minute to '0' and fill in the rest with '*/1'
+            if len(parts) == 1:
+                parts[0] = '0'
+                parts += ['*/1'] * 4
+
+            # Unpack the parts
+            minute, hour, day_of_month, month_of_year, day_of_week = parts
+
+            # Replace '*' with '*/1' to indicate 'every' in crontab
             minute = minute if minute != "*" else "*/1"
             hour = hour if hour != "*" else "*/1"
             day_of_month = day_of_month if day_of_month != "*" else "*/1"
             month_of_year = month_of_year if month_of_year != "*" else "*/1"
             day_of_week = day_of_week if day_of_week != "*" else "*/1"
 
+            # This will create a crontab object from the parts.
             cron_schedule = crontab(minute=minute, hour=hour, day_of_month=day_of_month, month_of_year=month_of_year,
                                     day_of_week=day_of_week)
             logger.info(f"Loading schedule from database {schedule.schedule}.")
@@ -106,6 +114,7 @@ def load_schedule_from_db_sync():
             }
     logger.info("Loaded schedule from database.")
     return beat_schedule
+
 
 
 async def update_or_create_schedule_in_db(task_name, task_info):
