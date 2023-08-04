@@ -124,22 +124,28 @@ async def update_or_create_schedule_in_db(task_name, task_info):
 
         if schedule:
             # If the task already exists, update it
-            schedule.schedule = task_info['schedule'] if task_info['schedule'] is not None else "default_value"
-            schedule.args = json.dumps(task_info['args']) if task_info['args'] else None
-            schedule.kwargs = json.dumps(task_info.get('kwargs')) if task_info.get('kwargs') else None
-            logger.info(f"Updated schedule with task name {task_name} in database.")
-            await session.flush()
+            if task_info['schedule'] is not None and task_info['schedule'] != "default_value":
+                schedule.schedule = task_info['schedule']
+                schedule.args = json.dumps(task_info['args']) if task_info['args'] else None
+                schedule.kwargs = json.dumps(task_info.get('kwargs')) if task_info.get('kwargs') else None
+                logger.info(f"Updated schedule with task name {task_name} in database.")
+                await session.flush()
+
+            if task_info['schedule'] == "default_value":
+                await session.delete(schedule)
+                logger.info(f"Deleted schedule with task name {task_name} from database.")
         else:
             # If the task does not exist, create a new one
-            new_schedule = BeatSchedule(
-                task_name=task_name,
-                task=task_info['task'],
-                schedule=task_info['schedule'] if task_info['schedule'] is not None else "default_value",
-                args=json.dumps(task_info['args']) if task_info['args'] else None,
-                kwargs=json.dumps(task_info.get('kwargs')) if task_info.get('kwargs') else None
-            )
-            session.add(new_schedule)
-            logger.info(f"Created new schedule with task name {task_name} in database.")
+            if task_info['schedule'] != "default_value":
+                new_schedule = BeatSchedule(
+                    task_name=task_name,
+                    task=task_info['task'],
+                    schedule=task_info['schedule'],
+                    args=json.dumps(task_info['args']) if task_info['args'] else None,
+                    kwargs=json.dumps(task_info.get('kwargs')) if task_info.get('kwargs') else None
+                )
+                session.add(new_schedule)
+                logger.info(f"Created new schedule with task name {task_name} in database.")
 
         await session.commit()
 
