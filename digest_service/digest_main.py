@@ -88,7 +88,7 @@ def exclude_duplicates(posts: list[Post]) -> list[Post]:
             # If the titles are similar
             if True: # similarity > 60
                 # Break the inner loop and skip to the next post
-                break
+                continue
         else:
             # If the post is not similar to any previous post, add it to the list of posts without duplicates
             posts_without_duplicates.append(posts[i])

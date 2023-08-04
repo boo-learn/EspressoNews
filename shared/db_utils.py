@@ -116,7 +116,6 @@ def load_schedule_from_db_sync():
     return beat_schedule
 
 
-
 async def update_or_create_schedule_in_db(task_name, task_info):
     logger.info(f"Updating or creating schedule with task name {task_name} in database asynchronously.")
     async with async_session() as session:
