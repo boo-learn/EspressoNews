@@ -4,6 +4,7 @@ import signal
 import time
 import logging
 from shared.db_utils import load_schedule_from_db_sync
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -65,16 +66,20 @@ def main():
     last_seen_schedule = None
 
     while True:
-        current_schedule = load_schedule_from_db_sync_with_retry()
-        logging.info(f"Last {last_seen_schedule}, Current {current_schedule}")
-        if last_seen_schedule != current_schedule:
-            logging.info("Schedule changed, restarting Celery worker...")
-            restart_celery()
-            last_seen_schedule = current_schedule
+        now = datetime.now()
+        if 30 <= now.minute < 50:  # Only proceed if the current minute is not between 50 and 58
+            current_schedule = load_schedule_from_db_sync_with_retry()
+            logging.info(f"Last {last_seen_schedule}, Current {current_schedule}")
+            if last_seen_schedule != current_schedule:
+                logging.info("Schedule changed, restarting Celery worker...")
+                restart_celery()
+                last_seen_schedule = current_schedule
+            else:
+                logging.info("No change in schedule detected")
         else:
-            logging.info("No change in schedule detected")
+            logging.info("Not checking for changes due to current time")
 
-        # Sleep for some time to avoid excessive DB queries
+        # Sleep for 90 seconds to avoid excessive DB queries
         time.sleep(60)
 
 
