@@ -83,8 +83,9 @@ async def main():
                 to_unsubscribe = client_channels_set - db_channels_set
                 logger.info(f"Determined channels to unsubscribe for account {i}: {to_unsubscribe}")
                 for channel in to_unsubscribe:
-                    logger.debug(f"Аккаунт {i} (Telethon) подписан на {channel}, но аккаунт в базе данных не подписан.")
-                    await send_to_unsubscribe_channel("unsubscribe", channel, current_account_id)
+                    if channel is not None:
+                        logger.debug(f"Аккаунт {i} (Telethon) подписан на {channel}, но аккаунт в базе данных не подписан.")
+                        await send_to_unsubscribe_channel("unsubscribe", channel, current_account_id)
 
                 logger.info(f"Finished processing account {i}")
 
