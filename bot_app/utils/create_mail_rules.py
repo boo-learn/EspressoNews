@@ -17,14 +17,15 @@ async def create_mail_rules(user_ids, users_list_periodicity_options):
             logger.error(f"Error while getting schedule value for user {user_id}: {e}")
             schedule_value = '0 */1 */1 */1 */1'
         logger.info(f"Schedule {schedule_value} for {user_id}")
-        task_name = f'generate-digest-for-{str(user_id)}'
-        task_schedule = {
-            'task': 'tasks.generate_digest_for_user',
-            'schedule': schedule_value,
-            'args': (user_id,),
-        }
+        if schedule_value is not None:
+            task_name = f'generate-digest-for-{str(user_id)}'
+            task_schedule = {
+                'task': 'tasks.generate_digest_for_user',
+                'schedule': schedule_value,
+                'args': (user_id,),
+            }
 
-        new_schedule[task_name] = task_schedule
+            new_schedule[task_name] = task_schedule
 
     logging.info(f"{new_schedule}")
     for task_name, task_info in new_schedule.items():
