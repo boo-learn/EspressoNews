@@ -17,9 +17,14 @@ logger = logging.getLogger(__name__)
 async def connect_and_execute(loaded_account, channel_username, action, action_name):
     loaded_client = TelegramClient(StringSession(loaded_account.session_string), loaded_account.api_id,
                                    loaded_account.api_hash)
-    await loaded_client.connect()
-    logger.info(f'{action_name} start ok!')
-    await action(loaded_client, channel_username)
+    try:
+        await loaded_client.connect()
+        logger.info(f'{action_name} start ok!')
+        await action(loaded_client, channel_username)
+    except Exception as e:
+        logger.error(f'Error in subscription {e}')
+    finally:
+        await loaded_client.disconnect()
 
 
 def task_executor(account_id, channel_username, action, action_name, task_name):
