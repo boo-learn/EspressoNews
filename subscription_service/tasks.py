@@ -41,12 +41,12 @@ def task_executor(account_id, channel_username, action, action_name, task_name):
         logger.error(f'Account {account_id} not found')
 
 
-@celery_app.task(name='tasks.subscribe_task', rate_limit='1/m', queue='subscription_queue')
+@celery_app.task(name='tasks.subscribe_task', rate_limit='10/m', queue='subscription_queue')
 def subscribe_task(account_id, channel_username):
     task_executor(account_id, channel_username, subscribe_to_channel, 'subscribe', 'subscribed')
 
 
-@celery_app.task(name='tasks.unsubscribe_task', rate_limit='1/m', queue='subscription_queue')
+@celery_app.task(name='tasks.unsubscribe_task', rate_limit='10/m', queue='subscription_queue')
 def unsubscribe_task(account_id, channel_username):
     task_executor(account_id, channel_username, unsubscribe_from_channel, 'unsubscribe', 'unsubscribed')
 
