@@ -74,9 +74,10 @@ async def main():
                 to_subscribe = db_channels_set - client_channels_set
                 logger.info(f"Determined channels to subscribe for account {i}: {to_subscribe}")
                 for channel in to_subscribe:
-                    logger.debug(f"Аккаунт {i} в базе данных подписан на {channel}, но аккаунт Telethon не подписан.")
-                    await remove_subscription(current_account_id, channel)
-                    await send_to_subscribe_channel("subscribe", channel)
+                    if channel is not None:
+                        logger.debug(f"Аккаунт {i} в базе данных подписан на {channel}, но аккаунт Telethon не подписан.")
+                        await remove_subscription(current_account_id, channel)
+                        await send_to_subscribe_channel("subscribe", channel)
 
                 # channels in client_channels but not in db_channels
                 to_unsubscribe = client_channels_set - db_channels_set
