@@ -69,7 +69,7 @@ def main():
         now = datetime.now()
         if 30 <= now.minute < 50:  # Only proceed if the current minute is not between 50 and 58
             current_schedule = load_schedule_from_db_sync_with_retry()
-            logging.info(f"Last {last_seen_schedule}, Current {current_schedule}")
+            logging.info(f"Start checking")
             if last_seen_schedule != current_schedule:
                 logging.info("Schedule changed, restarting Celery worker...")
                 restart_celery()
