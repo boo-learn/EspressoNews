@@ -108,6 +108,9 @@ async def update_post_and_generate_summary_async(index, post, role_obj, intonati
                     return True  # Успешно сгенерировано summary
             # Обновляем список аккаунтов, если не удалось сгенерировать summary
             chatgpt_accounts = await get_active_gpt_accounts_async()
+    else:
+        logger.info(f"Summary already exists for post {post.post_id}.")
+        return True
     logger.info('False')
     return False  # Не удалось сгенерировать summary
 
