@@ -95,16 +95,22 @@ async def update_post_and_generate_summary_async(index, post, role_obj, intonati
     existing_summary = await get_summary_for_post_async(post.post_id, role_obj.id, intonation_obj.id)
     if existing_summary is None:
         chatgpt_accounts = await get_active_gpt_accounts_async()
-        num_accounts = len(chatgpt_accounts)
-        # Попробуем каждый аккаунт, пока не удастся сгенерировать summary
-        for i in range(num_accounts):
-            chatgpt_account = chatgpt_accounts[(index + i) % num_accounts]  # Получаем аккаунт с учетом индекса
-            chatgpt = ChatGPT(chatgpt_account.api_key)
-            summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
-            if summary:
-                await update_post_summary_async(post.post_id, summary, role_obj.id, intonation_obj.id)
-                return True  # Успешно сгенерировано summary
+        while len(chatgpt_accounts) > 0:
+            num_accounts = len(chatgpt_accounts)
+            # Попробуем каждый аккаунт, пока не удастся сгенерировать summary
+            for i in range(num_accounts):
+                chatgpt_account = chatgpt_accounts[(index + i) % num_accounts]  # Получаем аккаунт с учетом индекса
+                chatgpt = ChatGPT(chatgpt_account.api_key)
+                summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
+                logger.info(f"Summary: {summary}")
+                if summary:
+                    await update_post_summary_async(post.post_id, summary, role_obj.id, intonation_obj.id)
+                    return True  # Успешно сгенерировано summary
+            # Обновляем список аккаунтов, если не удалось сгенерировать summary
+            chatgpt_accounts = await get_active_gpt_accounts_async()
+    logger.info('False')
     return False  # Не удалось сгенерировать summary
+
 
 
 async def main():
