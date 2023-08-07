@@ -42,8 +42,10 @@ async def listen_to_account(account):
     @client.on(events.NewMessage)
     async def my_event_handler(event: Message):
         logger.debug(f'Received new message {event.to_dict()}')
+        logger.debug(f'Message text: {event.text}')
         if event.is_channel:
             logger.debug(f'Received new message on channel. Event id: {event.id}')
+            logger.debug(f'Event channel id: {event.peer_id.channel_id}')
             if event.text:
                 # Add a check for the number of words in the message
                 # words = event.text.split()
