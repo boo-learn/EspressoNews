@@ -35,7 +35,8 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
         error_message = str(e)
         if "Error: 429" in error_message:
             message_match = re.search(r'rate_limit_exceeded', error_message)
-            if message_match:
+            message_match2 = re.search(r'insufficient_quota', error_message)
+            if message_match or message_match2:
                 logger.info("Start disabling acc.")
                 await update_chatgpt_account_async(chatgpt.api_key)
                 logger.info("End disabling acc.")
@@ -78,7 +79,7 @@ async def generate_summaries(data: dict):
     else:
         logger.info("Some posts failed to process."
                     " Not sending the message."
-                    " Userid: {data['user_id']}, Digestid: {data['digest_id']}")
+                    f" Userid: {data['user_id']}, Digestid: {data['digest_id']}")
         producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
         logger.info(f"no digest")
         message: MessageData = {
