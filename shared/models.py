@@ -110,7 +110,7 @@ digests_posts = Table(
     "digests_posts",
     Base.metadata,
     Column("digest_id", ForeignKey("digests.id"), primary_key=True),
-    Column("post_id", ForeignKey("posts.post_id"), primary_key=True),
+    Column("post_id", ForeignKey("posts.id"), primary_key=True),
 )
 
 
@@ -132,7 +132,7 @@ class Digest(Base):
     digest_recs: Mapped[list["DigestAssociation"]] = relationship("DigestAssociation", back_populates="digest",
                                                                   cascade="all, delete-orphan")
     digest_ids: Mapped[list[int]] = association_proxy(
-        "digest_recs", "post_id",
+        "digest_recs", "id",
         creator=lambda uid: DigestAssociation(post_id=uid))
 
     def __repr__(self):
@@ -142,7 +142,8 @@ class Digest(Base):
 class Post(Base):
     __tablename__ = 'posts'
 
-    post_id = Column(BigInteger, primary_key=True, unique=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    post_id = Column(BigInteger)
     channel_id = Column(BigInteger, ForeignKey('channels.channel_id'))
     rubric_id = Column(Integer, ForeignKey('posts_rubrics.rubric_id'), nullable=True)
 
@@ -165,7 +166,7 @@ class Summary(Base):
     content = Column(String)
     role_id = Column(Integer, ForeignKey('roles.id'))
     intonation_id = Column(Integer, ForeignKey('intonations.id'))
-    post_id = Column(Integer, ForeignKey("posts.post_id"))
+    post_id = Column(Integer, ForeignKey("posts.id"))
 
     post = relationship("Post", back_populates="summaries")
     role = relationship("Role", back_populates="summaries")
@@ -187,7 +188,7 @@ class File(Base):
     file_id = Column(Integer, primary_key=True)
     image = Column(LargeBinary, nullable=False)
     video = Column(LargeBinary, nullable=False)
-    post_id = Column(Integer, ForeignKey('posts.post_id'))
+    post_id = Column(Integer, ForeignKey('posts.id'))
     post = relationship('Post', back_populates='files')
 
 
