@@ -25,7 +25,9 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
             {"role": "user",
              "content": f"Ты программа для сокращения новостей. Используй тон: {intonation_obj.intonation}. Сделай текст максимально кратким и понятным, необходимо уложиться в 1-2 предложения.: {truncated_content}"}]
 
+        logger.info(f"For post {post.post_id} summary is generating from {truncated_content[:50]}")
         response = await chatgpt.generate_response(messages=messages, user_id=post.post_id, model="gpt-3.5-turbo-16k")
+        logger.info(f"For post {post.post_id} summary is {response['choices'][0]['message']['content']}")
         summary = response['choices'][0]['message']['content']
 
         logger.info(f"Summary {summary}")
