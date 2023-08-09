@@ -17,9 +17,9 @@ depends_on = None
 
 def upgrade() -> None:
     # Удаляем все записи в таблицах 'digests', 'files_library', и 'summaries'
+    op.execute('DELETE FROM digests_posts')
     op.execute('DELETE FROM posts')
     op.execute('DELETE FROM digests')
-    op.execute('DELETE FROM digests_posts')
     op.execute('DELETE FROM files_library')
     op.execute('DELETE FROM summaries')
 
