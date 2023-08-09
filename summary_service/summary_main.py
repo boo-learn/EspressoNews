@@ -25,9 +25,9 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
             {"role": "user",
              "content": f"Ты программа для сокращения новостей. Используй тон: {intonation_obj.intonation}. Сделай текст максимально кратким и понятным, необходимо уложиться в 1-2 предложения.: {truncated_content}"}]
 
-        logger.info(f"For post {post.post_id} summary is generating from {truncated_content[:50]}")
-        response = await chatgpt.generate_response(messages=messages, user_id=post.post_id, model="gpt-3.5-turbo-16k")
-        logger.info(f"For post {post.post_id} summary is {response['choices'][0]['message']['content'][:50]}")
+        logger.info(f"For post {post.id} summary is generating from {truncated_content[:50]}")
+        response = await chatgpt.generate_response(messages=messages, user_id=post.id, model="gpt-3.5-turbo-16k")
+        logger.info(f"For post {post.id} summary is {response['choices'][0]['message']['content'][:50]}")
         summary = response['choices'][0]['message']['content']
 
         logger.info(f"Summary {summary}")
@@ -53,7 +53,7 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
             await update_chatgpt_account_async(chatgpt.api_key)
         else:
             logger.info("An error occurred, but the message could not be extracted.")
-        logger.info(f"Error generating summary for post {post.post_id}: {e}")
+        logger.info(f"Error generating summary for post {post.id}: {e}")
         return None
 
 
@@ -94,7 +94,7 @@ async def generate_summaries(data: dict):
 
 
 async def update_post_and_generate_summary_async(index, post, role_obj, intonation_obj):
-    existing_summary = await get_summary_for_post_async(post.post_id, role_obj.id, intonation_obj.id)
+    existing_summary = await get_summary_for_post_async(post.id, role_obj.id, intonation_obj.id)
     if existing_summary is None:
         chatgpt_accounts = await get_active_gpt_accounts_async()
         while len(chatgpt_accounts) > 0:
@@ -106,12 +106,12 @@ async def update_post_and_generate_summary_async(index, post, role_obj, intonati
                 summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
                 logger.info(f"Summary: {summary}")
                 if summary:
-                    await update_post_summary_async(post.post_id, summary, role_obj.id, intonation_obj.id)
+                    await update_post_summary_async(post.id, summary, role_obj.id, intonation_obj.id)
                     return True  # Успешно сгенерировано summary
             # Обновляем список аккаунтов, если не удалось сгенерировать summary
             chatgpt_accounts = await get_active_gpt_accounts_async()
     else:
-        logger.info(f"Summary already exists for post {post.post_id}.")
+        logger.info(f"Summary already exists for post {post.id}.")
         return True
     logger.info('False')
     return False  # Не удалось сгенерировать summary
