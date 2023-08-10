@@ -5,6 +5,7 @@ from bot_app.databases.repositories import UserRepository
 from bot_app.utils.create_mail_rules import create_mail_rule
 from shared.db_utils import get_role, get_intonation
 from shared.models import User
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,7 @@ class UserCRUD:
 
     async def disable_user(self, user_id):
         user = await self.repository.get(user_id)
-        user = await self.repository.update(user, is_active=False)
+        user = await self.repository.update(user, is_active=False, disabled_at=datetime.now())
         user_settings = await self.repository.get_user_settings(user_id)
         await self.repository.update_setting(user_settings, "periodicity", None)
         task_name = f"generate-digest-for-{str(user_id)}"

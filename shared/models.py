@@ -49,6 +49,7 @@ class User(Base):
     is_staff = Column(Boolean, default=False)
 
     join_date = Column(DateTime, nullable=True, default=datetime.now)
+    disabled_at = Column(DateTime, nullable=True)
 
     subscriptions = relationship('Subscription', back_populates='user')
     settings = relationship("UserSettings", back_populates="user", uselist=False)
