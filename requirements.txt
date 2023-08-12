@@ -114,3 +114,5 @@ wcwidth==0.2.6
 websocket-client==1.6.1
 yarl==1.9.2
 fuzzywuzzy
+aioredis
+schedule

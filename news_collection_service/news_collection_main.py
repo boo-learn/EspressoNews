@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import json
 import logging
 
 import pytz
@@ -14,6 +15,20 @@ from shared.db_utils import (
     get_account_from_db_async, get_all_accounts_from_db_async
 )
 from shared.models import Post
+import redis.asyncio as redis
+
+
+async def create_redis_pool():
+    pool = redis.ConnectionPool(host='redis', port=6379, db=0)
+    r = redis.Redis(connection_pool=pool)
+    return r
+
+
+async def add_post_to_redis(redis_pool, post):
+    async with redis_pool.pipeline(transaction=True) as pipe:
+        await pipe.rpush('posts', post)
+        await pipe.execute()
+
 
 logger = logging.getLogger(__name__)
 # Set the level of this logger to DEBUG,
@@ -34,7 +49,7 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 
-async def listen_to_account(account):
+async def listen_to_account(account, redis_pool):
     logger.debug(f'Initiating Telegram client for account {account.account_id}')
     client = TelegramClient(StringSession(account.session_string), account.api_id, account.api_hash)
     client.parse_mode = None
@@ -53,18 +68,26 @@ async def listen_to_account(account):
                 #     logger.info(f'Skipping message {event.id} due to insufficient word count')
                 #     return
                 # If the word count is sufficient, process the message
-                post = Post(
-                    post_id=event.id,
-                    channel_id=event.peer_id.channel_id,
-                    rubric_id=None,
-                    title=event.text[:50] if event.text else "No title",
-                    content=event.text,
-                    post_date=event.date.astimezone(pytz.utc).replace(tzinfo=None) + datetime.timedelta(hours=3)
+                # post = Post(
+                #     post_id=event.id,
+                #     channel_id=event.peer_id.channel_id,
+                #     rubric_id=None,
+                #     title=event.text[:50] if event.text else "No title",
+                #     content=event.text,
+                #     post_date=event.date.astimezone(pytz.utc).replace(tzinfo=None) + datetime.timedelta(hours=3)
+                # )
+                post_json = json.dumps(
+                    {
+                        "post_id": event.id,
+                        "channel_id": event.peer_id.channel_id,
+                        "rubric_id": None,
+                        "title": event.text[:50] if event.text else "No title",
+                        "content": event.text,
+                        "post_date": event.date.astimezone(pytz.utc).replace(tzinfo=None).isoformat(),
+                    }
                 )
                 try:
-                    logger.debug(f'Attempting to add post {post.post_id} to database')
-                    await add_post_async(post)
-                    logger.info(f"Added post {post.post_id} from channel {post.channel_id}")
+                    await add_post_to_redis(redis_pool, post_json)
                 except IntegrityError as e:
                     logger.warning(f"Failed to add post due to IntegrityError: {e}")
                     return
@@ -101,9 +124,10 @@ async def main():
     logger.info(f'Collect news service run')
     logger.debug(f'Getting accounts for channels')
     await asyncio.sleep(30)
+    redis_pool = await create_redis_pool()
     accounts = await get_all_accounts_from_db_async()
     logger.debug(f'Received {len(accounts)} accounts for channels')
-    tasks = [listen_to_account(account) for account in accounts]
+    tasks = [listen_to_account(account, redis_pool) for account in accounts]
     logger.debug(f'Initiating listening tasks for {len(tasks)} accounts')
     await asyncio.gather(*tasks)
     logger.debug(f'Finished initiating listening tasks')

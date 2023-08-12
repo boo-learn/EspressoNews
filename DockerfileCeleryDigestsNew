@@ -1,0 +1,9 @@
+FROM hobrus/espresso_news_base:latest
+
+WORKDIR /app
+
+COPY ./shared /app/shared
+COPY ./new_digest_microservice /app
+
+# Run only the monitor script
+CMD ["python", "digest_main.py"]

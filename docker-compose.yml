@@ -188,6 +188,20 @@ services:
       db:
         condition: service_healthy
 
+  digest_service_new:
+    build:
+      context: .
+      dockerfile: DockerfileCeleryDigestsNew
+    env_file:
+      - .env.dev
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
   subscription_healthcheck:
     build:
       context: .

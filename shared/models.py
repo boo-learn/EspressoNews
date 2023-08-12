@@ -154,6 +154,7 @@ class Post(Base):
     summaries: Mapped[List["Summary"]] = relationship(back_populates="post")
 
     post_date = Column(DateTime, nullable=False, default=datetime.now)
+    processed_date = Column(DateTime, nullable=False, default=datetime.now)
 
     channel = relationship('Channel', back_populates='posts')
     rubric = relationship('Rubric', back_populates='posts')
