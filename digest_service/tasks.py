@@ -1,10 +1,12 @@
 import asyncio
 import logging
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
+from shared.database import async_session
 from shared.celery_app import celery_app
 from shared.database import async_session
-from shared.models import User
+from shared.models import User, Digest
 from shared.rabbitmq import Producer, QueuesType, MessageData
 from shared.config import RABBIT_HOST
 
@@ -21,18 +23,33 @@ def generate_digest_for_user(user_id):
 
 async def get_user_and_send_in_digest_service(user_id):
     logger.info("Task started")
-
-    logger.info("Getting users from database...")
-
-    logger.info("Setting up RabbitMQ producer...")
-    producer = Producer(host=RABBIT_HOST, queue=QueuesType.digest_service)
-
-    logger.info("Sending messages to RabbitMQ...")
-    message: MessageData = {
-        "type": 'prepare_digest',
-        "data": user_id,
-    }
-    await producer.send_message(message, QueuesType.digest_service)
-
-    logger.info("Messages sent to RabbitMQ")
-    logger.info("Task finished")
+    async with async_session() as session:
+        digest_result = await session.execute(
+            select(Digest).filter(Digest.user_id == user_id).options(
+                joinedload(Digest.digest_recs))
+        )
+        digest = digest_result.unique().scalar_one_or_none()
+        if digest is None or len(digest.digest_ids) == 0:
+            producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
+            logger.info(f"no digest")
+            message: MessageData = {
+                "type": "no_digest",
+                "data": {
+                    "user_id": user_id
+                }
+            }
+            print(f"{message=}")
+            await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
+        else:
+            producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
+            logger.info(f"send_digest")
+            message: MessageData = {
+                "type": "send_digest",  # send_digest
+                "data": {
+                    "user_id": user_id,
+                    "digest_id": digest.id,
+                }
+            }
+            digest.digest_ids.clear()
+            await session.commit()
+            await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)

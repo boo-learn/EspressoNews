@@ -6,7 +6,7 @@ COPY ./shared /app/shared
 COPY ./digest_service /app/digest_service
 
 # Copy the monitor script into the container
-COPY ./shared/monitor_script.py /app/monitor_script.py
+COPY digest_service/monitor_script.py /app/monitor_script.py
 
 # Run only the monitor script
 CMD ["python", "/app/monitor_script.py"]

@@ -53,7 +53,7 @@ class User(Base):
 
     subscriptions = relationship('Subscription', back_populates='user')
     settings = relationship("UserSettings", back_populates="user", uselist=False)
-    digests: Mapped[List["Digest"]] = relationship(back_populates="user")
+    digest: Mapped["Digest"] = relationship("Digest", back_populates="user", uselist=False)
     # access_channels = relationship("Channel", back_populates="user")
 
 
@@ -125,8 +125,9 @@ class Digest(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     role_id = Column(Integer)
     intonation_id = Column(Integer)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
-    user: Mapped["User"] = relationship(back_populates="digests")
+    is_active = Column(Boolean, default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=True)  # добавьте параметр unique=True
+    user: Mapped["User"] = relationship("User", back_populates="digests")
     posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)
     # generation_date = Column(DateTime, nullable=False, default=datetime.now)
     generation_date: Mapped[datetime] = mapped_column(insert_default=func.now())

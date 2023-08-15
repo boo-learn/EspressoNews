@@ -5,7 +5,7 @@ import os
 
 from db_utils import save_gpt_account_to_db_sync
 from shared.models import GPTAccount
-from summary_service.chat_gpt import ChatGPT
+from chat_gpt import ChatGPT
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

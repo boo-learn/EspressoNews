@@ -164,34 +164,10 @@ services:
       db:
         condition: service_healthy
 
-  summary_service:
+  digest_builder:
     build:
       context: .
-      dockerfile: DockerfileSummaryService
-    env_file:
-      - .env.dev
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      db:
-        condition: service_healthy
-
-  digest_service:
-    build:
-      context: .
-      dockerfile: DockerfileDigestService
-    env_file:
-      - .env.dev
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      db:
-        condition: service_healthy
-
-  digest_service_new:
-    build:
-      context: .
-      dockerfile: DockerfileCeleryDigestsNew
+      dockerfile: DockerfileDigestBuilder
     env_file:
       - .env.dev
     depends_on:

@@ -67,7 +67,7 @@ def main():
 
     while True:
         now = datetime.now()
-        if 30 <= now.minute < 50:  # Only proceed if the current minute is not between 50 and 58
+        if True:  # Only proceed if the current minute is not between 50 and 58
             current_schedule = load_schedule_from_db_sync_with_retry()
             logging.info(f"Start checking")
             if last_seen_schedule != current_schedule:
