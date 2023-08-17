@@ -49,5 +49,6 @@ class DigestCRUD:
             post_number += 1
 
         total_count = len(digest.posts)
+        digest = await self.repository.clear(digest)
         logger.info(f"Total posts count in digest: {total_count}")
         return summaries, total_count

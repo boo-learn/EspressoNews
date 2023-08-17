@@ -22,3 +22,44 @@ class DigestRepository:
                 return result.scalars().first()
         except SQLAlchemyError as e:
             raise e
+
+    async def create(self, user_id: int):
+        try:
+            async with async_session() as session:
+                digest = Digest(
+                    user_id=user_id,
+                    role_id=1,
+                    intonation_id=1,
+                    is_active=True
+                )
+                session.add(digest)
+                await session.commit()
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+
+    async def update(self, digest: Digest, **kwargs) -> Digest:
+        try:
+            async with async_session() as session:
+                for key, value in kwargs.items():
+                    setattr(digest, key, value)
+                session.add(digest)
+                await session.commit()
+                return digest
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+
+    async def clear(self, digest: Digest):
+        try:
+            async with async_session() as session:
+                digest_result = await session.execute(
+                    select(Digest).filter(Digest.id == digest.id).options(
+                        joinedload(Digest.digest_recs))
+                )
+                digest = digest_result.unique().scalar_one_or_none()
+                digest.digest_ids.clear()
+                await session.commit()
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e

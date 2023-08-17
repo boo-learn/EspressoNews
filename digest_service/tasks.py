@@ -50,6 +50,4 @@ async def get_user_and_send_in_digest_service(user_id):
                     "digest_id": digest.id,
                 }
             }
-            digest.digest_ids.clear()
-            await session.commit()
             await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)

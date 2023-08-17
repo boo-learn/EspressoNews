@@ -1,8 +1,8 @@
 """change one-to-one digests for users
 
-Revision ID: c9466a1846e6
+Revision ID: 69edb6535250
 Revises: aabfb37f37e3
-Create Date: 2023-08-15 15:16:18.440304
+Create Date: 2023-08-15 15:30:40.091088
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c9466a1846e6'
+revision = '69edb6535250'
 down_revision = 'aabfb37f37e3'
 branch_labels = None
 depends_on = None

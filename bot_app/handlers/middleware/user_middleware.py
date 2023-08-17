@@ -2,7 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
-from bot_app.databases.cruds import UserCRUD
+from bot_app.databases.cruds import UserCRUD, DigestCRUD
 from bot_app.utils.create_mail_rules import create_mail_rule
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,10 @@ class UserMiddleware(BaseMiddleware):
                 message.from_user.last_name,
             )
             user_crud = UserCRUD()
+            digest_crud = DigestCRUD()
+            await digest_crud.repository.create(
+                user_id=message.from_user.id
+            )
             periodicity_option = await user_crud.get_settings_option_for_user(message.from_user.id, 'periodicity')
             await create_mail_rule(message.from_user.id, periodicity_option)
         elif not user_exist.is_active:

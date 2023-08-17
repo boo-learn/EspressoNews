@@ -53,7 +53,7 @@ class User(Base):
 
     subscriptions = relationship('Subscription', back_populates='user')
     settings = relationship("UserSettings", back_populates="user", uselist=False)
-    digest: Mapped["Digest"] = relationship("Digest", back_populates="user", uselist=False)
+    digests: Mapped["Digest"] = relationship("Digest", back_populates="user", uselist=False)
     # access_channels = relationship("Channel", back_populates="user")
 
 

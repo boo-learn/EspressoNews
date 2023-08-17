@@ -67,18 +67,12 @@ async def run(r):
                     )
                     digest = digest_result.unique().scalar_one_or_none()
 
-                    if digest is None:
-                        logging.info(f"Создание нового дайджеста для пользователя {user.user_id}")
-                        digest = Digest(
-                            user_id=user.user_id,
-                            role_id=user.settings.role_id,
-                            intonation_id=user.settings.intonation_id,
-                            is_active=True
-                        )
-                        session.add(digest)
-                    else:
-                        logging.info(f"Обновление дайджеста для пользователя {user.user_id}")
-
+                    if digest.role_id != user.settings.role_id or digest.intonation_id != user.settings.intonation_id:
+                        logging.info(f"Роль или интонация пользователя {user.user_id} отличается от роли или интонации дайджеста")
+                        digest.role_id = user.settings.role_id
+                        digest.intonation_id = user.settings.intonation_id
+                        digest.digest_ids.clear()
+                        await session.commit()
                     logging.info(f"Пытаемся к дайджесту добавить {post.id}")
                     digest.digest_ids.append(post.id)
                     combination = (digest.role_id, digest.intonation_id)
