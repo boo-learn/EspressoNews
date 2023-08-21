@@ -7,6 +7,7 @@ import time
 import json
 import logging
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from summary import update_post_and_generate_summary_async
@@ -41,10 +42,15 @@ async def run(r):
 
     if len(posts) > 0:
         async with async_session() as session:
-            tasks = []
-            i = 0
-            session.add_all(posts)
-            await session.commit()
+            try:
+                tasks = []
+                i = 0
+                session.add_all(posts)
+                await session.commit()
+            except IntegrityError as e:
+                logging.error(f"Integrity error: {e}")
+                await session.rollback()
+                return  # это прервет дальнейшее выполнение функции после обработки ошибки
             logging.info("Посты добавлены в сессию")
 
             for post in posts:
@@ -62,9 +68,14 @@ async def run(r):
                     logging.info(f"Обработка пользователя {user.user_id}")
 
                     digest_result = await session.execute(
-                        select(Digest).filter(Digest.user_id == user.user_id).options(
-                            joinedload(Digest.digest_recs))
+                        select(Digest).filter(
+                            Digest.user_id == user.user_id,
+                            Digest.is_active == True
+                        ).options(
+                            joinedload(Digest.digest_recs)
+                        )
                     )
+
                     digest = digest_result.unique().scalar_one_or_none()
 
                     if digest.role_id != user.settings.role_id or digest.intonation_id != user.settings.intonation_id:

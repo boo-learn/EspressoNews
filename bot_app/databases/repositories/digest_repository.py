@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from shared.database import async_session
-from shared.models import Digest, Post
+from shared.models import Digest, Post, UserSettings
 
 
 class DigestRepository:
@@ -59,6 +59,29 @@ class DigestRepository:
                 )
                 digest = digest_result.unique().scalar_one_or_none()
                 digest.digest_ids.clear()
+                await session.commit()
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+
+    async def change_digest(self, digest: Digest, user_id: int):
+        try:
+            async with async_session() as session:
+                session.add(digest)
+                digest.is_active = False
+                result = await session.execute(
+                    select(UserSettings)
+                    .options(joinedload(UserSettings.role), joinedload(UserSettings.intonation))
+                    .filter(UserSettings.user_id == user_id)
+                )
+                user_settings = result.scalars().first()
+                new_digest = Digest(
+                    user_id=user_id,
+                    role_id=user_settings.role_id,
+                    intonation_id=user_settings.intonation_id,
+                    is_active=True
+                )
+                session.add(new_digest)
                 await session.commit()
         except SQLAlchemyError as e:
             await session.rollback()

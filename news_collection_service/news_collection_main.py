@@ -92,7 +92,10 @@ async def listen_to_account(account, redis_pool):
                     logger.warning(f"Failed to add post due to IntegrityError: {e}")
                     return
 
-    while True:
+    max_retries = 50
+    current_retry = 0
+
+    while current_retry < max_retries:
         try:
             await client.connect()
             logger.debug(f'Connected Telegram client for account {account.account_id}')
@@ -100,13 +103,16 @@ async def listen_to_account(account, redis_pool):
 
             # Start the connection checker
             asyncio.create_task(check_connection(client))
-
             await client.run_until_disconnected()
             logger.debug(f'Disconnected client for account {account.account_id}')
             break  # If we reach here, the disconnection was planned, so we exit the loop
         except Exception as e:
             logger.error(f'Error occurred: {e}. Retrying in 5 seconds.')
             await asyncio.sleep(5)  # Wait for 5 seconds before retrying
+            current_retry += 1
+
+    if current_retry >= max_retries:
+        logger.error('Maximum retries reached. Exiting.')
 
 
 async def check_connection(client):

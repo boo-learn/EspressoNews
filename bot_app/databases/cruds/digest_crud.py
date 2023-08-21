@@ -15,6 +15,7 @@ class DigestCRUD:
     async def get_digest_summaries_by_id_and_count(
             self,
             digest_id: int,
+            user_id: int,
             offset: int = 0,
             limit: int = DIGESTS_LIMIT
     ) -> Optional[Tuple[List[str], int]]:
@@ -49,6 +50,5 @@ class DigestCRUD:
             post_number += 1
 
         total_count = len(digest.posts)
-        digest = await self.repository.clear(digest)
         logger.info(f"Total posts count in digest: {total_count}")
         return summaries, total_count

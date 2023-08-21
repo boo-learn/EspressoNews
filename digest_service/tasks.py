@@ -25,9 +25,14 @@ async def get_user_and_send_in_digest_service(user_id):
     logger.info("Task started")
     async with async_session() as session:
         digest_result = await session.execute(
-            select(Digest).filter(Digest.user_id == user_id).options(
-                joinedload(Digest.digest_recs))
+            select(Digest).filter(
+                Digest.user_id == user_id,
+                Digest.is_active == True
+            ).options(
+                joinedload(Digest.digest_recs)
+            )
         )
+
         digest = digest_result.unique().scalar_one_or_none()
         if digest is None or len(digest.digest_ids) == 0:
             producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)

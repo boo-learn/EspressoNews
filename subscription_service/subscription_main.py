@@ -3,8 +3,7 @@ import logging
 
 from shared.config import RABBIT_HOST
 from shared.rabbitmq import Subscriber, QueuesType
-from subscription_service.db_utils import add_subscription, is_have_subscription, \
-    get_random_account_exclude_most_subscribed
+from subscription_service.db_utils import add_subscription, is_have_subscription, get_account_with_least_subscriptions
 from tasks import subscribe_task, unsubscribe_task, send_to_subscribe_channel
 
 # Configuring logging
@@ -20,7 +19,7 @@ async def handle_subscription(message: str):
         logging.info(f"Channel username: {channel_username}")
         is_subscribed = await is_have_subscription(channel_username)
         if not is_subscribed:
-            account = await get_random_account_exclude_most_subscribed()
+            account = await get_account_with_least_subscriptions()
             logging.info(f"Account with least subscriptions: {account.phone_number}")
             await add_subscription(account.account_id, channel_username)
             subscribe_task.apply_async(args=[account.account_id, channel_username])

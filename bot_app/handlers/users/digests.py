@@ -18,9 +18,10 @@ async def send_summaries_with_offset(call: types.CallbackQuery):
     digest_id = int(func_data[-1])
     offset = int(func_data[-3])
     limit = offset + DIGESTS_LIMIT
+    user_id = call.from_user.id
 
     logic_handler = DigestLogicHandler()
-    digest_summary_list, total_count = await logic_handler.fetch_and_format_digest(digest_id, offset, limit)
+    digest_summary_list, total_count = await logic_handler.fetch_and_format_digest(digest_id, user_id, offset, limit)
 
     # Combine all digest summaries into a nicely formatted string
     digest_message = '\n\n'.join(digest_summary_list[:DIGESTS_LIMIT])

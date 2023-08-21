@@ -29,7 +29,7 @@ async def send_digest(data: dict):
     logger.info(f'Digest data {data}')
 
     logic_handler = DigestLogicHandler()
-    digest_summary_list, total_count = await logic_handler.fetch_and_format_digest(data["digest_id"])
+    digest_summary_list, total_count = await logic_handler.fetch_and_format_digest(data["digest_id"], data['user_id'])
 
     # Combine all digest summaries into a nicely formatted string
     digest_message = '\n\n'.join(digest_summary_list)
@@ -54,6 +54,9 @@ async def send_digest(data: dict):
             max_length=4096,  # or any desired max_length
             reply_markup=reply_markup
         )
+        digest_crud = DigestCRUD()
+        digest = await digest_crud.repository.get(data["digest_id"])
+        await digest_crud.repository.change_digest(digest, data["user_id"])
     except aiogram.exceptions.BotBlocked:
         # Here the user blocked the bot, so we disable him/her.
         await disable_user(data["user_id"])

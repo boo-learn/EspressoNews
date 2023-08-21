@@ -11,10 +11,11 @@ logger = logging.getLogger(__name__)
 
 class DigestLogicHandler:
     @staticmethod
-    async def fetch_and_format_digest(digest_id: int, offset: int = 0, limit: int = DIGESTS_LIMIT):
+    async def fetch_and_format_digest(digest_id: int, user_id: int, offset: int = 0, limit: int = DIGESTS_LIMIT):
         digest_crud = DigestCRUD()
         digest_summaries_list, total_count = await digest_crud.get_digest_summaries_by_id_and_count(
             digest_id=digest_id,
+            user_id=user_id,
             offset=offset,
             limit=limit
         )
