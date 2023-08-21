@@ -116,3 +116,4 @@ yarl==1.9.2
 fuzzywuzzy
 aioredis
 schedule
+structlog==23.1.0

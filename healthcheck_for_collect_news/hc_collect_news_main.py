@@ -112,6 +112,7 @@ async def main():
 
 
 async def periodic_task():
+    await asyncio.sleep(60)
     while True:
         await main()  # Call your main function here
         await asyncio.sleep(1800)  # Pause for 10 minutes (600 seconds)
