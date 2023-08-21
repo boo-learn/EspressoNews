@@ -5,9 +5,20 @@ import pathlib
 
 
 logging.basicConfig(level=logging.NOTSET)
-json_formatter = structlog.stdlib.ProcessorFormatter(processor=structlog.processors.JSONRenderer())
-struct_formatter = structlog.stdlib.ProcessorFormatter(processor=structlog.dev.ConsoleRenderer(colors=False))
-logfmt_formatter = structlog.stdlib.ProcessorFormatter(processor=structlog.processors.LogfmtRenderer(key_order=['timestamp', 'level', 'event']))
+logging.getLogger('telethon').setLevel(logging.WARNING)
+logging.getLogger('asyncio').setLevel(logging.WARNING)
+
+json_formatter = structlog.stdlib.ProcessorFormatter(
+    processor=structlog.processors.JSONRenderer()
+)
+struct_formatter = structlog.stdlib.ProcessorFormatter(
+    processor=structlog.dev.ConsoleRenderer(colors=False)
+)
+logfmt_formatter = structlog.stdlib.ProcessorFormatter(
+    processor=structlog.processors.LogfmtRenderer(
+        key_order=['timestamp', 'level', 'event']
+    )
+)
 
 
 def get_logger(
