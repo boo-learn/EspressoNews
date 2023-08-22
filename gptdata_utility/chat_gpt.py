@@ -17,10 +17,7 @@ class ChatGPTError(Exception):
         else:
             error = body.get('error') or {}
             code = error.get('code', 'unknown_code')
-        repr_ = f'ChatGPTError: [status: {self.status_code}'
-        if code:
-            repr_ += f', code: {code}'
-        repr_ += ']'
+        repr_ = f'ChatGPTError: [status: {self.status_code}, code: {code}]'
         return repr_
 
     def __str__(self):
