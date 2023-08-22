@@ -1,6 +1,10 @@
 from shared.database import sync_session
+from shared.loggers import get_logger
 from shared.models import GPTAccount
 from sqlalchemy.orm import Session
+
+
+logger = get_logger('gptdata.db')
 
 
 def save_account_to_db(db: Session, account: GPTAccount):
@@ -11,7 +15,8 @@ def save_account_to_db(db: Session, account: GPTAccount):
         db.refresh(account)
         return account
     else:
-        print(f"Account with phone number {account.api_key} already exists in the database.")
+        # print(f"Account with phone number {account.api_key} already exists in the database.")
+        logger.info('Account already exists', api_key=account.api_key)
         return None
 
 

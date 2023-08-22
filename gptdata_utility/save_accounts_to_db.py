@@ -4,13 +4,15 @@ import asyncio
 import os
 
 from db_utils import save_gpt_account_to_db_sync
+from shared.loggers import get_logger
 from shared.models import GPTAccount
 from chat_gpt import ChatGPT
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.INFO,
+#                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+# logger = logging.getLogger(__name__)
+logger = get_logger('gptdata.main')
 
 
 async def save_account(api_key):
@@ -25,7 +27,7 @@ async def load_and_test_account(api_key):
     # Create the client and connect
     client = ChatGPT(api_key)
 
-    logger.info("init gpt")
+    logger.info("Initialize new ChatGPT account")
 
     try:
         response = await client.generate_response(
@@ -39,7 +41,7 @@ async def load_and_test_account(api_key):
         if response['choices'][0]['message']['content'] is not None:
             await save_account(api_key)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.error("Error initializing account", error=e)
 
 
 api_keys_file = os.path.join(os.path.dirname(__file__), 'api_keys.txt')

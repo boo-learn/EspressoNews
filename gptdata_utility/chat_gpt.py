@@ -1,5 +1,30 @@
 import httpx
 from httpx import Timeout
+import json
+
+
+class ChatGPTError(Exception):
+    def __init__(self, status_code: int, text: str):
+        super().__init__()
+        self.status_code = status_code
+        self.text = text
+
+    def __repr__(self):
+        try:
+            body = json.loads(self.text)
+        except json.JSONDecodeError:
+            code = None
+        else:
+            error = body.get('error') or {}
+            code = error.get('code', 'unknown_code')
+        repr_ = f'ChatGPTError: [status: {self.status_code}'
+        if code:
+            repr_ += f', code: {code}'
+        repr_ += ']'
+        return repr_
+
+    def __str__(self):
+        return f'ChatGPTError: [status: {self.status_code}, text: {self.text}]'
 
 
 class ChatGPT:
@@ -37,8 +62,9 @@ class ChatGPT:
             response = await client.post(self.api_url, headers=headers, json=data)
         return response
 
-    def _handle_response(self, response):
+    def _handle_response(self, response: httpx.Response):
         if response.status_code == 200:
             return response.json()
         else:
-            raise Exception(f"Error: {response.status_code}, {response.text}")
+            # raise ChatGPTError(f"Error: {response.status_code}, {response.text}")
+            raise ChatGPTError(status_code=response.status_code, text=response.text)
