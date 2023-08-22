@@ -6,27 +6,31 @@ import aio_pika
 import enum
 from collections.abc import Callable
 from typing import TypedDict, Any, Union, Callable
+from shared.loggers import get_logger
 
-logger = logging.getLogger(__name__)
-# Set the level of this logger to DEBUG,
-# so that it will log all messages of level DEBUG and above
-logger.setLevel(logging.DEBUG)
-
-# Create a console handler that logs all messages
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-
-# Create a formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Add the formatter to the handler
-console_handler.setFormatter(formatter)
-
-# Add the handler to the logger
-logger.addHandler(console_handler)
+# logger = logging.getLogger(__name__)
+# # Set the level of this logger to DEBUG,
+# # so that it will log all messages of level DEBUG and above
+# logger.setLevel(logging.DEBUG)
+#
+# # Create a console handler that logs all messages
+# console_handler = logging.StreamHandler()
+# console_handler.setLevel(logging.DEBUG)
+#
+# # Create a formatter
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+# # Add the formatter to the handler
+# console_handler.setFormatter(formatter)
+#
+# # Add the handler to the logger
+# logger.addHandler(console_handler)
 
 MAX_RETRIES = 10
 RETRY_DELAY = 5
+
+
+logger = get_logger('shared.rabbit')
 
 
 class SingletonMeta(type):
@@ -87,8 +91,8 @@ class Producer(metaclass=SingletonMeta):
     async def send_message(self, message_with_data: MessageData, queue: QueuesType, answer_callback=None):
         for _ in range(MAX_RETRIES):
             try:
-                logger.info("Sending message")
-                logger.info(f"{self.connection}")
+                logger.info("Sending message", connection=str(self.connection))
+                # logger.info(f"{self.connection}")
                 connection_is_closed = None if self.connection is None else self.connection.is_closed
                 channel_is_closed = None if self.channel is None else self.channel.is_closed
 
@@ -98,17 +102,17 @@ class Producer(metaclass=SingletonMeta):
                 if not self.connection or self.connection.is_closed or not self.channel or self.channel.is_closed:
                     logger.info("Try connect")
                     await self.__connect()
-                logger.info("Start declare queue")
+                # logger.info("Start declare queue")
                 # await self.channel.declare_queue(queue.value)
                 logger.info("Connection is open")
                 message = aio_pika.Message(body=json.dumps(message_with_data, ensure_ascii=False).encode())
                 await self.channel.default_exchange.publish(message, routing_key=queue.value)
 
-                logger.info(f"Message sent: {message.body.decode()}")
+                logger.info(f"Message sent", message=message.body.decode())
                 return
             except Exception as e:
-                logger.error(f"Failed to send message: {e}")
-                logger.error(traceback.format_exc())  # This will log the full traceback of the error
+                logger.exception(f"Failed to send message", error=e)
+                # logger.error(traceback.format_exc())  # This will log the full traceback of the error
                 await asyncio.sleep(RETRY_DELAY)
         logger.error(f"Failed to send message after {MAX_RETRIES} attempts")
 
@@ -118,8 +122,8 @@ class Producer(metaclass=SingletonMeta):
             try:
                 asyncio.run(self.connection.close())
             except Exception as e:
-                logger.error(f"Error closing connection: {e}")
-        logger.info("Connection closed")
+                logger.exception('Error closing connection', error=e)
+        logger.info('Connection closed')
 
 
 class Subscriber(metaclass=SingletonMeta):
@@ -135,7 +139,8 @@ class Subscriber(metaclass=SingletonMeta):
         self.handlers: dict[str, Callable] = {}
 
     async def __on_message(self, message: aio_pika.IncomingMessage):
-        print("!!!!!!!!!!!!!!!!!!!!!! Get message")
+        # print("!!!!!!!!!!!!!!!!!!!!!! Get message")
+        logger.info('Got new message')
         self.__delay_message_time += 1
         # print(f"Raw message = {message.body.decode()}")
         message_body = json.loads(message.body.decode())
@@ -167,7 +172,8 @@ class Subscriber(metaclass=SingletonMeta):
     async def __connect(self):
         if self.connection:
             return
-        print("Subscriber new connection")
+        # print("Subscriber new connection")
+        logger.info('Subscriber new connection')
         self.connection = await aio_pika.connect_robust(self.host_url)
         self.channel = await self.connection.channel()
         await self.channel.set_qos(prefetch_count=1)
@@ -194,7 +200,8 @@ class Subscriber(metaclass=SingletonMeta):
         while self.__delay_message_time > 0:
             await asyncio.sleep(0.5)
             self.__delay_message_time -= 0.5
-            print("time = ", self.__delay_message_time)
+            # print("time = ", self.__delay_message_time)
+            logger.info('Update delay time', time=self.__delay_message_time)
         await self.connection.close()
 
     # TODO: переписать деструктор на асинхронную работу
