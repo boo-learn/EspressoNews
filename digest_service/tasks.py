@@ -9,9 +9,12 @@ from shared.database import async_session
 from shared.models import User, Digest
 from shared.rabbitmq import Producer, QueuesType, MessageData
 from shared.config import RABBIT_HOST
+from shared.loggers import get_logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
+logger = get_logger('digest-mon.tasks')
 
 
 @celery_app.task(name='tasks.generate_digest_for_user', queue='digest_queue')

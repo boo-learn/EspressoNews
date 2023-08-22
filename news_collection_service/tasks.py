@@ -5,10 +5,12 @@ from celery import shared_task
 
 from shared.celery_app import celery_app
 from shared.rabbitmq import Producer, QueuesType, MessageData
+from shared.loggers import get_logger
 from shared.config import RABBIT_HOST
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
+logger = get_logger('collector.tasks')
 
 
 async def send_to_subscribe_channel(type: str, msg: str):

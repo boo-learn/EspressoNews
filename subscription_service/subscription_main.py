@@ -33,8 +33,7 @@ async def handle_unsubscription(message: str):
     # logging.info(f"Message: {message}")
     channel_username = message[0]
     account_id = message[1]
-    local_logger = logger.bind(channel=channel_username)
-    local_logger.info("Unsubscribing from channel", account=account_id)
+    logger.info("Unsubscribing from channel", channel=channel_username, account=account_id)
     unsubscribe_task.apply_async(args=[account_id, channel_username])
 
 

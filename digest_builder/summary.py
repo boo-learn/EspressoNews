@@ -4,15 +4,17 @@ import re
 
 from db_utils import update_post_summary_async, get_active_gpt_accounts_async, \
     update_chatgpt_account_async
-
+from shared.loggers import get_logger
 from shared.models import Post, Role, Intonation
-from chat_gpt import ChatGPT
+from chat_gpt import ChatGPT, ChatGPTError
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
+logger = get_logger('digest.summary')
 
 
 async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonation_obj: Intonation):
+    local_logger = logger.bind(post_id=post.id)
     try:
         truncated_content = post.content[:10000]  # Truncate the content to 10,000 characters
 
@@ -22,36 +24,44 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
             {"role": "user",
              "content": f"Ты программа для сокращения новостей. Используй тон: {intonation_obj.intonation}. Сделай текст максимально кратким и понятным, необходимо уложиться в 1-2 предложения.: {truncated_content}"}]
 
-        logger.info(f"For post {post.id} summary is generating from {truncated_content[:50]}")
+        local_logger.info("Generating summary", content=truncated_content[:50])
         response = await chatgpt.generate_response(messages=messages, user_id=post.id, model="gpt-3.5-turbo-16k")
-        logger.info(f"For post {post.id} summary is {response['choices'][0]['message']['content'][:50]}")
         summary = response['choices'][0]['message']['content']
-
-        logger.info(f"Summary {summary}")
+        local_logger.info('Summary generated', summary=summary[:50])
+        # logger.info(f"Summary {summary}")
 
         return summary
-    except Exception as e:
-        error_message = str(e)
-        if "Error: 429" in error_message:
-            message_match = re.search(r'rate_limit_exceeded', error_message)
-            message_match2 = re.search(r'insufficient_quota', error_message)
-            if message_match or message_match2:
-                logger.info("Start disabling acc.")
+    except ChatGPTError as e:
+        # error_message = str(e)
+        if e.status_code == 429:
+            if 'rate_limit_exceeded' in e.text:
+                msg = 'rate_limit_exceeded'
+            elif 'insufficient_quota' in e.text:
+                msg = 'insufficient_quota'
+            else:
+                msg = None
+            if msg:
+                logger.error("Failed summary generation", reason=msg)
+                logger.info("Start disabling account", api_key=chatgpt.api_key)
                 await update_chatgpt_account_async(chatgpt.api_key)
-                logger.info("End disabling acc.")
-        elif "Error: 401" in error_message:
-            message_match = re.search(r'invalid_api_key', error_message)
-            if message_match:
-                logger.info("Start disabling acc.")
+                logger.info("Account disabled", api_key=chatgpt.api_key)
+        elif e.status_code == 401:
+            if 'invalid_api_key' in e.text:
+                logger.error("Failed summary generation", reason='invalid_api_key')
+                logger.error("Start disabling account", api_key=chatgpt.api_key)
                 await update_chatgpt_account_async(chatgpt.api_key)
-                logger.info("End disabling acc.")
-        elif "Invalid model" in error_message:  # Add this condition
-            logger.info("Invalid model error occurred. Disabling account.")
+                logger.error("Account disabled", api_key=chatgpt.api_key)
+        elif "Invalid model" in e.text:  # Add this condition
+            logger.error("Failed summary generation", reason='invalid_model')
+            logger.error("Start disabling account", api_key=chatgpt.api_key)
             await update_chatgpt_account_async(chatgpt.api_key)
+            logger.error("Account disabled", api_key=chatgpt.api_key)
         else:
-            logger.info("An error occurred, but the message could not be extracted.")
-        logger.info(f"Error generating summary for post {post.id}: {e}")
+            logger.error("An error occurred, but the message could not be extracted.")
+        local_logger.error(f"Failed summary generation", error=e)
         return None
+    except Exception as e:
+        logger.error('Unexpected exception', error=e)
 
 
 async def update_post_and_generate_summary_async(session, index, post, role_obj, intonation_obj):
@@ -63,11 +73,11 @@ async def update_post_and_generate_summary_async(session, index, post, role_obj,
             chatgpt_account = chatgpt_accounts[(index + i) % num_accounts]  # Получаем аккаунт с учетом индекса
             chatgpt = ChatGPT(chatgpt_account.api_key)
             summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
-            logger.info(f"Summary: {summary}")
+            logger.info(f"Summary generated", summary=summary)
             if summary:
                 await update_post_summary_async(session, post.id, summary, role_obj.id, intonation_obj.id)
                 return True  # Успешно сгенерировано summary
         # Обновляем список аккаунтов, если не удалось сгенерировать summary
         chatgpt_accounts = await get_active_gpt_accounts_async(session)
-    logger.info('False')
+    logger.info('Failed to generate summary')
     return False  # Не удалось сгенерировать summary

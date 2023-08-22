@@ -15,8 +15,10 @@ from shared.db_utils import (
     get_account_from_db_async, get_all_accounts_from_db_async
 )
 from shared.models import Post
+from shared.loggers import get_logger
 import redis.asyncio as redis
 
+logger = get_logger('collector.main')
 
 async def create_redis_pool():
     pool = redis.ConnectionPool(host='redis', port=6379, db=0)
@@ -30,23 +32,23 @@ async def add_post_to_redis(redis_pool, post):
         await pipe.execute()
 
 
-logger = logging.getLogger(__name__)
-# Set the level of this logger to DEBUG,
-# so that it will log all messages of level DEBUG and above
-logger.setLevel(logging.DEBUG)
-
-# Create a console handler that logs all messages
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-
-# Create a formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Add the formatter to the handler
-console_handler.setFormatter(formatter)
-
-# Add the handler to the logger
-logger.addHandler(console_handler)
+# logger = logging.getLogger(__name__)
+# # Set the level of this logger to DEBUG,
+# # so that it will log all messages of level DEBUG and above
+# logger.setLevel(logging.DEBUG)
+#
+# # Create a console handler that logs all messages
+# console_handler = logging.StreamHandler()
+# console_handler.setLevel(logging.DEBUG)
+#
+# # Create a formatter
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+# # Add the formatter to the handler
+# console_handler.setFormatter(formatter)
+#
+# # Add the handler to the logger
+# logger.addHandler(console_handler)
 
 
 async def listen_to_account(account, redis_pool):
