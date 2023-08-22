@@ -52,24 +52,25 @@ async def run(r: redis.Redis):
                 session.add_all(posts)
                 await session.commit()
             except IntegrityError as e:
-                logger.error(f"Integrity error: {e}")
+                logger.error(f"Integrity error", error=e)
                 await session.rollback()
                 return  # это прервет дальнейшее выполнение функции после обработки ошибки
             logger.info("Посты добавлены в сессию")
 
             for post in posts:
                 unique_combinations = set()
-
-                logger.info(f"Обработка поста {post.title} из канала {post.channel_id}")
+                post_logger = logger.bind(title=post.title, channel=post.channel_id)
+                post_logger.info(f"Начинаем обработку поста")
                 result = await session.execute(
                     select(User).join(Subscription).filter(Subscription.channel_id == post.channel_id).options(
                         joinedload(User.settings))
                 )
                 users = result.scalars().all()
-                logger.info(f"Подписанны {len(users)} пользователей на канал {post.channel_id}")
+                post_logger.info(f"{len(users)} пользователей подписаны на канал")
 
                 for user in users:
-                    logger.info(f"Обработка пользователя {user.user_id}")
+                    user_logger = post_logger.bind(user_id=user.user_id)
+                    user_logger.info(f"Начинаем обработку пользователя")
 
                     digest_result = await session.execute(
                         select(Digest).filter(
@@ -83,20 +84,20 @@ async def run(r: redis.Redis):
                     digest = digest_result.unique().scalar_one_or_none()
 
                     if digest.role_id != user.settings.role_id or digest.intonation_id != user.settings.intonation_id:
-                        logger.info(f"Роль или интонация пользователя {user.user_id} отличается от роли или интонации дайджеста")
+                        user_logger.info(f"Роль/интонация пользователя отличается от роли/интонации дайджеста")
                         digest.role_id = user.settings.role_id
                         digest.intonation_id = user.settings.intonation_id
                         digest.digest_ids.clear()
                         await session.commit()
-                    logger.info(f"Пытаемся к дайджесту добавить {post.id}")
+                    user_logger.info(f"Добавляем пост к дайджесту")
                     digest.digest_ids.append(post.id)
                     combination = (digest.role_id, digest.intonation_id)
                     if combination in unique_combinations:
-                        logger.info(f"Комбинация {combination} уже обработана")
+                        user_logger.info(f"Комбинация уже обработана", combination=combination)
                         continue
 
                     unique_combinations.add(combination)
-                    logger.info(f"Уникальная комбинация роли и интонации: {combination}")
+                    user_logger.info(f"Добавили новую комбинацию", combination=combination)
 
                     role_result = await session.execute(select(Role).filter(Role.id == digest.role_id))
                     role_obj = role_result.scalars().first()
@@ -105,12 +106,12 @@ async def run(r: redis.Redis):
                     intonation_obj = intonation_result.scalars().first()
 
                     tasks.append(update_post_and_generate_summary_async(session, i, post, role_obj, intonation_obj))
-                    logger.info(f"Добавлена задача {i} для поста {post.title}")
+                    user_logger.info(f"Добавлена задача", task_num=i)
                     i += 1
 
-                logger.info(f"Завершена обработка поста: {post.title} из канала: {post.channel_id}")
+                post_logger.info(f"Завершена обработка поста")
 
-            logger.info("Выполнение всех задач параллельно")
+            logger.info(f"Начинаем выполнение {i} задач")
             results = await asyncio.gather(*tasks)
             logger.info(f"Задачи выполнены, получено {len(results)} результатов")
 
