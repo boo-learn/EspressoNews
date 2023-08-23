@@ -2,13 +2,11 @@ import subprocess
 import os
 import signal
 import time
-import logging
 from shared.db_utils import load_schedule_from_db_sync
 from shared.loggers import get_logger
 from datetime import datetime
 
-# # Configure logging
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Configure logging
 logger = get_logger('digest-mon.main')
 
 # Start the Celery worker and beat as separate processes
