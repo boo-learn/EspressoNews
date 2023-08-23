@@ -7,12 +7,23 @@ import pathlib
 logging.basicConfig(level=logging.NOTSET)
 logging.getLogger('telethon').setLevel(logging.WARNING)
 logging.getLogger('asyncio').setLevel(logging.WARNING)
+logging.getLogger('httpx').setLevel(logging.WARNING)
+logging.getLogger('httpcore').setLevel(logging.WARNING)
+logging.getLogger('celery').setLevel(logging.WARNING)
+logging.getLogger('aiormq').setLevel(logging.WARNING)
+logging.getLogger('aio_pika').setLevel(logging.WARNING)
+
+
+class ConsoleStringRenderer(structlog.dev.ConsoleRenderer):
+    def _repr(self, val) -> str:
+        return str(val)
+
 
 json_formatter = structlog.stdlib.ProcessorFormatter(
     processor=structlog.processors.JSONRenderer()
 )
 struct_formatter = structlog.stdlib.ProcessorFormatter(
-    processor=structlog.dev.ConsoleRenderer(colors=False)
+    processor=ConsoleStringRenderer(colors=False)
 )
 logfmt_formatter = structlog.stdlib.ProcessorFormatter(
     processor=structlog.processors.LogfmtRenderer(
