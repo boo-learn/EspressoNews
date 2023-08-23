@@ -66,7 +66,7 @@ async def main():
 
                 # Получаем список подписок
                 dialogs = await client.get_dialogs()
-                account_logger.info(f"Dialog list collected", dialogs=dialogs)
+                account_logger.info(f"Dialog list collected", dialogs=[d.name for d in dialogs])
                 client_channels = [d.entity.username for d in dialogs if d.is_channel]
                 account_logger.info("Channels name collected", channels=client_channels)
 
