@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 from shared.config import RABBIT_HOST
 from shared.loggers import get_logger
@@ -29,7 +28,6 @@ async def handle_subscription(message: str):
 
 
 async def handle_unsubscription(message: str):
-    # logging.info(f"Message: {message}")
     channel_username = message[0]
     account_id = message[1]
     logger.info("Unsubscribing from channel", channel=channel_username, account=account_id)
