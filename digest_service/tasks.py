@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
@@ -9,9 +8,10 @@ from shared.database import async_session
 from shared.models import User, Digest
 from shared.rabbitmq import Producer, QueuesType, MessageData
 from shared.config import RABBIT_HOST
+from shared.loggers import get_logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
+logger = get_logger('digest-mon.tasks')
 
 
 @celery_app.task(name='tasks.generate_digest_for_user', queue='digest_queue')
@@ -43,7 +43,6 @@ async def get_user_and_send_in_digest_service(user_id):
                     "user_id": user_id
                 }
             }
-            print(f"{message=}")
             await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
         else:
             producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)

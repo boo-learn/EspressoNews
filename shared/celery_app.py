@@ -4,8 +4,9 @@ import os
 from celery import Celery
 
 from shared.db_utils import load_schedule_from_db_sync, update_or_create_schedule_in_db_sync
+from shared.loggers import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger('shared.celery')
 
 broker_url = 'redis://redis:6379/0'
 backend_url = 'redis://redis:6379/0'
@@ -41,5 +42,5 @@ for task_name, task_info in new_schedule.items():
     update_or_create_schedule_in_db_sync(task_name, task_info)
 
 beat_schedule = load_schedule_from_db_sync()
-logging.info(beat_schedule)
+logger.info(beat_schedule)
 celery_app.conf.beat_schedule = beat_schedule
