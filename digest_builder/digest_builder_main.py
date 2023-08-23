@@ -59,7 +59,8 @@ async def run(r: redis.Redis):
 
             for post in posts:
                 unique_combinations = set()
-                post_logger = logger.bind(title=post.title, channel=post.channel_id)
+                title_one_line = post.title.split('\n')[0][:30]
+                post_logger = logger.bind(title=title_one_line, channel=post.channel_id)
                 post_logger.info(f"Начинаем обработку поста")
                 result = await session.execute(
                     select(User).join(Subscription).filter(Subscription.channel_id == post.channel_id).options(

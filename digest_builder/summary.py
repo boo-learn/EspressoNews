@@ -42,7 +42,7 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
                 msg = None
             if msg:
                 logger.error("Failed summary generation", reason=msg)
-                logger.info("Start disabling account", api_key=chatgpt.api_key)
+                logger.error("Start disabling account", api_key=chatgpt.api_key)
                 await update_chatgpt_account_async(chatgpt.api_key)
                 logger.info("Account disabled", api_key=chatgpt.api_key)
         elif e.status_code == 401:
@@ -50,12 +50,12 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
                 logger.error("Failed summary generation", reason='invalid_api_key')
                 logger.error("Start disabling account", api_key=chatgpt.api_key)
                 await update_chatgpt_account_async(chatgpt.api_key)
-                logger.error("Account disabled", api_key=chatgpt.api_key)
+                logger.info("Account disabled", api_key=chatgpt.api_key)
         elif "Invalid model" in e.text:  # Add this condition
             logger.error("Failed summary generation", reason='invalid_model')
             logger.error("Start disabling account", api_key=chatgpt.api_key)
             await update_chatgpt_account_async(chatgpt.api_key)
-            logger.error("Account disabled", api_key=chatgpt.api_key)
+            logger.info("Account disabled", api_key=chatgpt.api_key)
         else:
             logger.error("An error occurred, but the message could not be extracted.")
         local_logger.error(f"Failed summary generation", error=e)
@@ -73,7 +73,7 @@ async def update_post_and_generate_summary_async(session, index, post, role_obj,
             chatgpt_account = chatgpt_accounts[(index + i) % num_accounts]  # Получаем аккаунт с учетом индекса
             chatgpt = ChatGPT(chatgpt_account.api_key)
             summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
-            logger.info(f"Summary generated", summary=summary)
+            # logger.info(f"Summary generated", summary=summary)
             if summary:
                 await update_post_summary_async(session, post.id, summary, role_obj.id, intonation_obj.id)
                 return True  # Успешно сгенерировано summary
