@@ -1,5 +1,4 @@
 # Now we get all api_keys from a single txt file
-import logging
 import asyncio
 import os
 
@@ -8,10 +7,6 @@ from shared.loggers import get_logger
 from shared.models import GPTAccount
 from chat_gpt import ChatGPT
 
-# logging.basicConfig(level=logging.INFO,
-#                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#
-# logger = logging.getLogger(__name__)
 logger = get_logger('gptdata.main')
 
 

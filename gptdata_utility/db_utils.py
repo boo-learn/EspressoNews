@@ -15,7 +15,6 @@ def save_account_to_db(db: Session, account: GPTAccount):
         db.refresh(account)
         return account
     else:
-        # print(f"Account with phone number {account.api_key} already exists in the database.")
         logger.info('Account already exists', api_key=account.api_key)
         return None
 
