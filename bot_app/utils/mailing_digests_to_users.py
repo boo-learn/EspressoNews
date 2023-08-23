@@ -9,11 +9,11 @@ from bot_app.databases.cruds import DigestCRUD, UserCRUD
 from bot_app.keyboards.inlines import ikb_load_more
 from bot_app.loader import bot
 from bot_app.logic.digest_logic_handler import DigestLogicHandler
-from shared.config import RABBIT_HOST, DIGESTS_LIMIT
+from shared.config import RABBIT_HOST, DIGESTS_LIMIT, RETRY_LIMIT
+from shared.loggers import get_logger
 from shared.rabbitmq import Subscriber, QueuesType
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger('bot.mailing')
 
 
 async def mailing_digests_to_users():
@@ -54,12 +54,14 @@ async def send_digest(data: dict):
             max_length=4096,  # or any desired max_length
             reply_markup=reply_markup
         )
-        digest_crud = DigestCRUD()
-        digest = await digest_crud.repository.get(data["digest_id"])
-        await digest_crud.repository.change_digest(digest, data["user_id"])
     except aiogram.exceptions.BotBlocked:
         # Here the user blocked the bot, so we disable him/her.
         await disable_user(data["user_id"])
+    else:
+        digest_crud = DigestCRUD()
+        digest = await digest_crud.repository.get(data["digest_id"])
+        await digest_crud.repository.change_digest(digest, data["user_id"])
+
 
 
 async def no_digest(data):
