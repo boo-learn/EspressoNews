@@ -26,7 +26,6 @@ async def handle_subscription(message: str):
             local_logger.warn("Channel already subscribed")
     except Exception as e:
         local_logger.exception("Error subscription to channel", error=e)
-        await send_to_subscribe_channel("subscribe", channel_username)
 
 
 async def handle_unsubscription(message: str):
