@@ -1,5 +1,3 @@
-import logging
-
 from telethon import TelegramClient
 import asyncio
 
@@ -10,19 +8,6 @@ from healthcheck_for_collect_news.db_utils import get_telethon_accounts_list, \
 from healthcheck_for_collect_news.tasks import send_to_subscribe_channel, send_to_unsubscribe_channel
 from shared.loggers import get_logger
 
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
-
-# Create a console handler
-# console_handler = logging.StreamHandler()
-# console_handler.setLevel(logging.DEBUG)  # Set the logging level
-
-# Create a formatter and set it for the handler
-# formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-# console_handler.setFormatter(formatter)
-
-# Add the handler to the logger
-# logger.addHandler(console_handler)
 logger = get_logger('collect-check.main')
 
 
@@ -47,14 +32,12 @@ async def main():
                 },
                 "channels": [channel.channel_username for channel in account.channels]
             }
-        # logger.info(f'Accounts subscriptions: {account_subscriptions}')
 
         current_account_id = None
 
         for i, account_info in account_subscriptions.items():
             account_logger = logger.bind(account_id=i)
             try:
-                # logger.info(f"Account info: {account_info}")
                 account = account_info["account"]
                 current_account_id = i
                 account_logger.info("Start processing")
@@ -115,6 +98,7 @@ async def main():
 
 
 async def periodic_task():
+    await asyncio.sleep(60)
     while True:
         await main()  # Call your main function here
         await asyncio.sleep(1800)  # Pause for 10 minutes (600 seconds)
