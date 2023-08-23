@@ -8,20 +8,19 @@ class ChatGPTError(Exception):
         super().__init__()
         self.status_code = status_code
         self.text = text
-
-    def __repr__(self):
         try:
             body = json.loads(self.text)
         except json.JSONDecodeError:
-            code = None
+            self.code = None
         else:
             error = body.get('error') or {}
-            code = error.get('code', 'unknown_code')
-        repr_ = f'ChatGPTError: [status: {self.status_code}, code: {code}]'
-        return repr_
+            self.code = error.get('code', 'unknown_code')
+
+    def __repr__(self):
+        return f'ChatGPTError: [status: {self.status_code}, code: {self.code}, text: {self.text}]'
 
     def __str__(self):
-        return f'ChatGPTError: [status: {self.status_code}, text: {self.text}]'
+        return f'ChatGPTError: [status: {self.status_code}, code: {self.code}]'
 
 
 class ChatGPT:
