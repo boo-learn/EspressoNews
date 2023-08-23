@@ -8,8 +8,6 @@ from shared.loggers import get_logger
 from shared.models import Post, Role, Intonation
 from chat_gpt import ChatGPT, ChatGPTError
 
-# logging.basicConfig(level=logging.INFO)
-# logger = logging.getLogger(__name__)
 logger = get_logger('digest.summary')
 
 
@@ -28,11 +26,9 @@ async def generate_summary(chatgpt: ChatGPT, post: Post, role_obj: Role, intonat
         response = await chatgpt.generate_response(messages=messages, user_id=post.id, model="gpt-3.5-turbo-16k")
         summary = response['choices'][0]['message']['content']
         local_logger.info('Summary generated', summary=summary[:50])
-        # logger.info(f"Summary {summary}")
 
         return summary
     except ChatGPTError as e:
-        # error_message = str(e)
         if e.status_code == 429:
             if 'rate_limit_exceeded' in e.text:
                 msg = 'rate_limit_exceeded'
@@ -73,7 +69,6 @@ async def update_post_and_generate_summary_async(session, index, post, role_obj,
             chatgpt_account = chatgpt_accounts[(index + i) % num_accounts]  # Получаем аккаунт с учетом индекса
             chatgpt = ChatGPT(chatgpt_account.api_key)
             summary = await generate_summary(chatgpt, post, role_obj, intonation_obj)
-            # logger.info(f"Summary generated", summary=summary)
             if summary:
                 await update_post_summary_async(session, post.id, summary, role_obj.id, intonation_obj.id)
                 return True  # Успешно сгенерировано summary

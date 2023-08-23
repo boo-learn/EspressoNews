@@ -62,5 +62,4 @@ class ChatGPT:
         if response.status_code == 200:
             return response.json()
         else:
-            # raise Exception(f"Error: {response.status_code}, {response.text}")
             raise ChatGPTError(status_code=response.status_code, text=response.text)

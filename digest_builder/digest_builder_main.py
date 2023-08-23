@@ -2,10 +2,7 @@ import asyncio
 import datetime
 
 import redis
-import schedule
-import time
 import json
-import logging
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
@@ -124,9 +121,6 @@ async def main():
     # Создание пула соединений
     pool = redis.ConnectionPool(host='redis', port=6379, db=0)
     r = redis.Redis(connection_pool=pool)
-
-    # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-    #                     datefmt='%Y-%m-%d %H:%M:%S')
 
     while True:
         await run(r)
