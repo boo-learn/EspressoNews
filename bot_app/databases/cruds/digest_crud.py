@@ -47,7 +47,7 @@ class DigestCRUD:
             if post_number - 1 < offset:
                 continue
             if post_number > offset + limit:
-                break
+                continue
 
             post_logger.info(f'Processing #{post_number} post')
             for summary in post.summaries:
