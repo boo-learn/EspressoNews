@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+
+    - name: Add server to known hosts
+      run: ssh-keyscan ${{ secrets.SERVER_ADDRESS }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to server
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
+        SERVER_USERNAME: ${{ secrets.DEVELOP_SERVER_USERNAME }}
+        SERVER_ADDRESS: ${{ secrets.DEVELOP_SERVER_ADDRESS }}
+        PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+      run: |
+        ssh $SERVER_USERNAME@$SERVER_ADDRESS "
+          if [ ! -d $PROJECT_PATH ]; then
+            git clone https://$GITHUB_TOKEN:x-oauth-basic@github.com/Ainna-NET/ai_open_news.git $PROJECT_PATH;
+          fi
+          cd $PROJECT_PATH;
+          git checkout develop;
+          git pull;
+          docker-compose down;
+          docker-compose up --build -d"
