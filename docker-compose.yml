@@ -77,6 +77,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+      - rdb_data:/etc
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -219,3 +220,4 @@ volumes:
   celery_data:
   celery2_data:
   celery3_data:
+  rdb_data:
