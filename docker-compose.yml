@@ -72,23 +72,25 @@ services:
 
   redis:
     image: "redis:6.2"
-    command: ["redis-server", "--appendonly", "yes", "--dir", "/data"]
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-      - rdb_data:/etc
     depends_on:
       rabbitmq:
         condition: service_healthy
+    command: >
+      /bin/sh -c "
+      chmod 777 -R /data;
+      chmod 777 -R /etc;
+      redis-server /usr/local/etc/redis/redis.conf
+      "
 
 
   celery:
     build:
       context: .
       dockerfile: DockerfileCelerySubscription
-    volumes:
-      - celery_data:/app
     env_file:
       - .env.dev
     depends_on:
@@ -101,8 +103,6 @@ services:
     build:
       context: .
       dockerfile: DockerfileCeleryNewsCollection
-    volumes:
-      - celery2_data:/app
     env_file:
       - .env.dev
     depends_on:
@@ -114,8 +114,6 @@ services:
     build:
       context: .
       dockerfile: DockerfileCeleryDigests
-    volumes:
-      - celery3_data:/app
     env_file:
       - .env.dev
     depends_on:
@@ -217,7 +215,3 @@ volumes:
   postgres_data:
   grafana_data:
   redis_data:
-  celery_data:
-  celery2_data:
-  celery3_data:
-  rdb_data:
