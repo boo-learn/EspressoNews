@@ -13,8 +13,8 @@ backend_url = 'redis://redis:6379/0'
 
 celery_app = Celery('tasks', broker=broker_url, backend=backend_url)
 
-# current_directory = os.getcwd()
-schedule_filepath = os.path.join('/data', 'schedule.db')
+current_directory = os.getcwd()
+schedule_filepath = os.path.join(current_directory, 'schedule.db')
 
 celery_app.conf.update({
     'broker_connection_retry_on_startup': True,
