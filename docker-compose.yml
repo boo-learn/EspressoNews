@@ -83,7 +83,7 @@ services:
       /bin/sh -c "
       chmod 777 -R /data;
       chmod 777 -R /etc;
-      redis-server /usr/local/etc/redis/redis.conf
+      redis-server
       "
 
 
