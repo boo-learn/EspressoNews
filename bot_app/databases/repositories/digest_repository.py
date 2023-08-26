@@ -7,6 +7,19 @@ from shared.models import Digest, Post, UserSettings
 
 
 class DigestRepository:
+    async def check_by_user_id(self, user_id: int) -> bool:
+        try:
+            async with async_session() as session:
+                stmt = (
+                    select(Digest).where(Digest.user_id == user_id)
+                )
+                result = await session.execute(stmt)
+                if result.scalars().first():
+                    return True
+                return False
+        except SQLAlchemyError as e:
+            raise e
+
     async def get(self, digest_id: int) -> Optional[Digest]:
         try:
             async with async_session() as session:
