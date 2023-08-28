@@ -90,6 +90,7 @@ vscode/
 /project_structure.txt
 /project_tree.ps1
 /project_structure_filtered.txt
+/demo
 
 # Code coverage
 .coverage
