@@ -1,8 +1,9 @@
-from typing import Generator
+from loguru import logger
 
 from fastapi import (
     Depends,
-    HTTPException
+    HTTPException,
+    status
 )
 from fastapi.security import OAuth2PasswordBearer
 
@@ -20,10 +21,11 @@ from collections.abc import AsyncGenerator
 from pydantic import ValidationError
 from jose import jwt
 
-# create session factory to generate new database sessions
 from shared.database import DATABASE_URI
 
-from admin_service import models, schemas
+from admin_service import models, schemas, repository
+from admin_service.core.config import settings
+from admin_service.core import const
 
 
 # def create_session() -> Generator[Session]:
@@ -58,24 +60,24 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"/login/access-token"
+    tokenUrl=f"/auth/login/access-token"
 )
 
-# def get_current_user(
-#         db: Session = Depends(create_session),
-#         token: str = Depends(reusable_oauth2)
-# ) -> models.AdminUser:
-#     try:
-#         payload = jwt.decode(
-#             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
-#         )
-#         token_data = schemas.TokenPayload(**payload)
-#     except (jwt.JWTError, ValidationError):
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN,
-#             detail="Could not validate credentials",
-#         )
-#     user = crud.user.get(db, id=token_data.sub)
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return user
+
+async def get_current_user(
+        session: AsyncSession = Depends(get_db_session), token: str = Depends(reusable_oauth2)
+) -> models.AdminUser:
+    try:
+        payload = jwt.decode(
+            token, settings.token_key, algorithms=[const.TOKEN_ALGORITHM]
+        )
+        token_data = schemas.TokenCreateSchema(**payload)
+    except (jwt.JWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    user = await repository.admin_users.get_by_id(session, id=token_data.user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user

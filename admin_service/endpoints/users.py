@@ -1,3 +1,5 @@
+from loguru import logger
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -9,7 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # from admin_service.core.session import create_session
-from admin_service.core.depends import get_db_session
+from admin_service.core import depends
 from admin_service.core.const import (
     USERS_TAGS,
 )
@@ -21,7 +23,7 @@ router = APIRouter(prefix="", tags=USERS_TAGS)
 
 @router.get("/users", response_model=list[schemas.UserSchema])
 async def get_users(
-        session: AsyncSession = Depends(get_db_session),
+        session: AsyncSession = Depends(depends.get_db_session),
         skip: int = 0,
         limit: int = 100,
 ):
@@ -31,7 +33,7 @@ async def get_users(
 @router.get("/users/{id}", response_model=schemas.UserSchema)
 async def get_user_by_id(
         id: int,
-        session: AsyncSession = Depends(get_db_session),
+        session: AsyncSession = Depends(depends.get_db_session),
 ):
     user = await repository.admin_users.get_by_id(session, id=id)
     if user is None:
@@ -44,8 +46,8 @@ async def get_user_by_id(
 
 @router.post("/users", response_model=schemas.UserSchema, status_code=201)
 async def create_user(
-        user_data: schemas.CreateUserSchema,
-        session: AsyncSession = Depends(get_db_session)
+        user_data: schemas.UserCreateSchema,
+        session: AsyncSession = Depends(depends.get_db_session)
 ):
     user = await repository.admin_users.get_by_email(session, email=user_data.email)
     if user:

@@ -6,7 +6,7 @@ class BaseUserSchema(BaseModel):
     email: EmailStr
 
 
-class CreateUserSchema(BaseUserSchema):
+class UserCreateSchema(BaseUserSchema):
     password: str
 
 

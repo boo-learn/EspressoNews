@@ -45,8 +45,7 @@ class AdminUser(Base):
         """Encode user information and expiration time."""
 
         payload = {
-            "name": self.name,
-            "sub": self.email,
+            "user_id": self.id,
             "expires_at": self._expiration_time(),
         }
 

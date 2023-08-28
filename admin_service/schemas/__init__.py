@@ -1,2 +1,2 @@
-from .auth import TokenSchema
-from .admin_users import UserSchema, CreateUserSchema
+from .auth import TokenSchema, TokenCreateSchema
+from .admin_users import UserSchema, UserCreateSchema

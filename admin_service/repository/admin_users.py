@@ -29,7 +29,7 @@ async def get_multi(
 
 
 async def create(
-        session: AsyncSession, *, obj_data: schemas.CreateUserSchema
+        session: AsyncSession, *, obj_data: schemas.UserCreateSchema
 ) -> models.AdminUser:
     # obj_in_data = jsonable_encoder(obj_data)
     db_obj = models.AdminUser(**obj_data.model_dump())

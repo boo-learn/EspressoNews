@@ -1,3 +1,5 @@
+from loguru import logger
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -5,26 +7,27 @@ from fastapi import (
 )
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from admin_service.core.const import (
     AUTH_TAGS,
     AUTH_URL,
     TOKEN_TYPE
 )
-from admin_service.core.depends import get_db_session
+from admin_service.core import depends
 from admin_service import schemas, models, repository
 
 router = APIRouter(prefix="" + AUTH_URL, tags=AUTH_TAGS)
 
 
 @router.post("/login/access-token", response_model=schemas.TokenSchema)
-def login_access_token(
-        session: Session = Depends(get_db_session),
+async def login_access_token(
+        session: AsyncSession = Depends(depends.get_db_session),
         form_data: OAuth2PasswordRequestForm = Depends()
 ):
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    user = crud.admin_user.authenticate(
+    user = await repository.auth.authenticate(
         session, email=form_data.username, password=form_data.password
     )
     if not user:
@@ -37,9 +40,13 @@ def login_access_token(
         "token_type": TOKEN_TYPE,
     }
 
-# @router.post("/login/test-token", response_model=schemas.User)
-# def test_token(current_user: models.AdminUser = Depends(deps.get_current_user)) -> Any:
-#     """
-#     Test access token
-#     """
-#     return current_user
+
+@router.post("/login/test-token", response_model=schemas.UserSchema)
+async def test_token(
+        current_user: models.AdminUser = Depends(depends.get_current_user)
+):
+    """
+    Test access token
+    """
+
+    return current_user
