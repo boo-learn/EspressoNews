@@ -6,8 +6,8 @@ from admin_service.core.const import (
 )
 from admin_service.endpoints import (
     auth,
-    users
-    # movies,
+    users,
+    tg_accounts
 )
 from admin_service.version import __version__
 
@@ -21,3 +21,4 @@ app = FastAPI(
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(tg_accounts.router)
