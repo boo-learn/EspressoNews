@@ -25,3 +25,7 @@ USERS_URL: Final = "/users"
 # TGAccounts constants
 TGACCOUNTS_TAGS: Final[List[str | Enum] | None] = ["TGAccounts"]
 TGACCOUNTS_URL: Final = "/tg-accounts"
+
+# GPTAccounts constants
+GPTACCOUNTS_TAGS: Final[List[str | Enum] | None] = ["GPTAccounts"]
+GPTACCOUNTS_URL: Final = "/gpt-accounts"

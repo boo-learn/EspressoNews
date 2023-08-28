@@ -7,10 +7,10 @@ from admin_service.core.const import (
 from admin_service.endpoints import (
     auth,
     users,
-    tg_accounts
+    tg_accounts,
+    gpt_accounts
 )
 from admin_service.version import __version__
-
 
 app = FastAPI(
     title=OPEN_API_TITLE,
@@ -22,3 +22,4 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(tg_accounts.router)
+app.include_router(gpt_accounts.router)
