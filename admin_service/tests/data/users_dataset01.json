@@ -1,0 +1,28 @@
+{
+  "admin_users": [
+    {
+      "id": 1,
+      "email": "test1@mail.ru",
+      "name": "test-user1",
+      "password": "test"
+    },
+    {
+      "id": 2,
+      "email": "test2@mail.ru",
+      "name": "test-user2",
+      "password": "test"
+    },
+    {
+      "id": 3,
+      "email": "test3@mail.ru",
+      "name": "test-user3",
+      "password": "test"
+    },
+    {
+      "id": 4,
+      "email": "test4@mail.ru",
+      "name": "test-user4",
+      "password": "test"
+    }
+  ]
+}
