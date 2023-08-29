@@ -17,6 +17,9 @@ from pydantic_settings import (
 class Settings(BaseSettings):
     # database: DatabaseConfig = DatabaseConfig()
     token_key: str = ""
+    FIRST_SUPERUSER_NAME: str = "admin"
+    FIRST_SUPERUSER_EMAIL: str = "admin@mail.ru"
+    FIRST_SUPERUSER_PASSWORD: str = "adminPasswrd"
 
     class Config:
         env_file = ".env.dev"

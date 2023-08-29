@@ -1,8 +1,9 @@
+import os
 import asyncio
 import pytest
 from pathlib import Path
 import time
-import logging
+from loguru import logger
 import socket
 from uuid import uuid4
 from docker import APIClient
@@ -11,11 +12,11 @@ from fastapi.testclient import TestClient
 from typing import Generator
 from admin_service.main import app
 
-pytest_plugins = ['db_fixtures']
+pytest_plugins = ['db_fixtures', 'auth_fixtures']
 
-logging.basicConfig()
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+# logging.basicConfig()
+# logger = logging.getLogger()
+# logger.setLevel(logging.DEBUG)
 
 
 @pytest.fixture(scope='session')
@@ -36,7 +37,7 @@ def unused_port():
     Find unused port
     """
 
-    def wrapper():
+    def wrapper() -> str:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.bind(('localhost', 0))
             return sock.getsockname()[1]
@@ -149,7 +150,8 @@ def event_loop(request):
     loop.close()
 
 
-@pytest.fixture(scope="session")
-def client() -> Generator:
+@pytest.fixture(scope="function")
+#  -> Generator
+def client(session):
     with TestClient(app) as test_client:
         yield test_client

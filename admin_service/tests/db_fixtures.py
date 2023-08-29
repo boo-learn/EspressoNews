@@ -1,5 +1,6 @@
 from loguru import logger
 import pytest
+from typing import Generator
 from sqlalchemy import create_engine, select, func, insert, Table, inspect
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -7,20 +8,21 @@ from shared.models import Base, User
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.pool import NullPool
 import json
+from shared.database import sync_DATABASE_URI
+from shared.database import Base as BaseModel
 
 
 @pytest.fixture(scope='session')
 def engine(db_server):
-    port = db_server["db_port"]
-    engine: Engine = create_engine(f'postgresql://postgres:postgres@localhost:{port}/TestDB', future=True,
-                                   poolclass=NullPool)
-    logger.info(f'!!!postgresql://postgres:postgres@localhost:{port}/TestDB')
+    # port = db_server["db_port"]
+    engine: Engine = create_engine(sync_DATABASE_URI, future=True, poolclass=NullPool)
+    # logger.info(f"{sync_DATABASE_URI=}")
     yield engine
 
 
 @pytest.fixture(scope='function')
+#  -> Generator[Session]
 def session(engine: Engine):
-
     session_maker = sessionmaker(bind=engine)
     with session_maker() as session:
         Base.metadata.drop_all(bind=engine)
@@ -31,8 +33,22 @@ def session(engine: Engine):
 
 
 @pytest.fixture(scope="function")
+def create_objects(session):
+    def _create_objects(object_type: type[BaseModel], objects_data: list[dict]) -> list[BaseModel]:
+        objects = []
+        for object_data in objects_data:
+            obj = object_type(**object_data)
+            objects.append(obj)
+            session.add(obj)
+        session.commit()
+        return objects
+
+    return _create_objects
+
+
+@pytest.fixture(scope="function")
 def create_object(session):
-    def _create_object(object_type, object_data):
+    def _create_object(object_type: type[BaseModel], object_data: dict) -> BaseModel:
         obj = object_type(**object_data)
         session.add(obj)
         session.commit()

@@ -10,7 +10,7 @@ from fastapi import (
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# from admin_service.core.session import create_session
+from admin_service import models
 from admin_service.core import depends
 from admin_service.core.const import (
     USERS_TAGS,
@@ -47,7 +47,8 @@ async def get_user_by_id(
 @router.post("/users", response_model=schemas.UserSchema, status_code=201)
 async def create_user(
         user_data: schemas.UserCreateSchema,
-        session: AsyncSession = Depends(depends.get_db_session)
+        session: AsyncSession = Depends(depends.get_db_session),
+        current_user: models.AdminUser = Depends(depends.get_current_user)
 ):
     user = await repository.admin_users.get_by_email(session, email=user_data.email)
     if user:
