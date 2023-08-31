@@ -18,6 +18,8 @@ RUN pip install -U pip && \
 # Copy the news_collection_service folder into the container at /app
 COPY ./shared /app/shared
 COPY ./admin_service /app/admin_service
+COPY ./alembic /app/alembic
+COPY ./alembic.ini /app
 
 EXPOSE 80
 
