@@ -24,5 +24,12 @@ EXPOSE 80
 # Define environment variable
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
+WORKDIR /app
+
+RUN chmod a+x admin_service/scripts/*
+#RUN admin_service/scripts/create_new_user.sh
+
 # Run news_collection_main.py when the container launches
-CMD ["uvicorn", "admin_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
+#CMD ["python", "admin_service/cli.py", "create-user", "--name", "admin", "--email", "admin@mail.ru", "--password admin"]
+CMD admin_service/scripts/start_service.sh
+#CMD ["uvicorn", "admin_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
