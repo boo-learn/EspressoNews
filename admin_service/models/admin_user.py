@@ -22,8 +22,7 @@ class AdminUser(Base):
     __tablename__ = "admin_users"
     # __table_args__ = {"schema": "myapi"}
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    # TODO: email --> unique
-    email: Mapped[str]
+    email: Mapped[str] = mapped_column(unique=True)
     name: Mapped[str]
     hashed_password: Mapped[str]
 

@@ -1,11 +1,5 @@
 import click
 
-from admin_service.backend.session import create_session
-from admin_service.schemas.auth import CreateUserSchema
-from admin_service.services.auth import AuthService
-from admin_service.version import __version__
-
-
 @click.group(invoke_without_command=True)
 @click.option("--version", is_flag=True, help="Show package version")
 def main(version: bool) -> None:
