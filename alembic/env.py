@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+from admin_service.models.admin_user import AdminUser
 from shared.models import Base
 from shared.database import sync_DATABASE_URI
 

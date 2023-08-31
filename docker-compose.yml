@@ -211,6 +211,20 @@ services:
     depends_on:
       - db
 
+  admin_service:
+    build:
+      context: .
+      dockerfile: DockerfileAdminService
+    env_file:
+      - .env.dev
+#    volumes:
+#      - ./:/admin_service
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   grafana_data:
