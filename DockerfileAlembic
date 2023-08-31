@@ -6,7 +6,7 @@ COPY ./shared /app/shared
 COPY ./alembic /app/alembic
 COPY ./alembic.ini /app
 COPY ./db_healthcheck.py /app
-COPY ./admin_service/models /app/admin_service/models
+COPY ./admin_service/models/base.py /app/admin_service/models/base.py
 
 # Make port 80 available to the world outside this container
 EXPOSE 80

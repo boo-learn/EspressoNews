@@ -2,17 +2,17 @@ import pytest
 
 from fastapi.testclient import TestClient
 from admin_service.core.config import settings
-from admin_service import models
+from admin_service.models.admin_user import AdminUser
 
 
 @pytest.fixture()
-def superuser(create_object) -> models.AdminUser:
+def superuser(create_object) -> AdminUser:
     user_data = {
         "name": settings.FIRST_SUPERUSER_NAME,
         "email": settings.FIRST_SUPERUSER_EMAIL,
         "password": settings.FIRST_SUPERUSER_PASSWORD,
     }
-    return create_object(models.AdminUser, user_data)
+    return create_object(AdminUser, user_data)
 
 
 @pytest.fixture()
