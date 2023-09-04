@@ -1,16 +1,41 @@
 from datetime import datetime
 from typing import List
-from typing import Optional
 
 from sqlalchemy import Boolean, ForeignKey, Enum, Text, LargeBinary, \
     BigInteger, Table
-from sqlalchemy import Column, Integer, String, JSON, DateTime, Float
+from sqlalchemy import Column, Integer, String, JSON, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from shared.database import Base
+
+
+class Language(Base):
+    __tablename__ = 'languages'
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True
+    )
+    name: Mapped[str] = mapped_column(
+        String(50),
+        default='English'
+    )
+    code: Mapped[str] = mapped_column(
+        String(50),
+        default='en'
+    )
+
+    users = relationship(
+        "UserSettings",
+        back_populates="language"
+    )
+    summaries = relationship(
+        "Summary",
+        back_populates="language"
+    )
 
 
 class Role(Base):
@@ -67,12 +92,12 @@ class UserSettings(Base):
 
     role_id = Column(Integer, ForeignKey('roles.id'))
     intonation_id = Column(Integer, ForeignKey('intonations.id'))
-
-    language = Column(String, default='ru')
+    language_id = Column(Integer, ForeignKey('languages.id'))
 
     user = relationship("User", back_populates="settings")
     role = relationship("Role", back_populates="users")
     intonation = relationship("Intonation", back_populates="users")
+    language = relationship("Language", back_populates="users")
 
 
 class Subscription(Base):
@@ -125,8 +150,9 @@ class Digest(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     role_id = Column(Integer)
     intonation_id = Column(Integer)
+    language_id = Column(Integer)
     is_active = Column(Boolean, default=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=True)  # добавьте параметр unique=True
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=True)
     user: Mapped["User"] = relationship("User", back_populates="digests")
     posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)
     # generation_date = Column(DateTime, nullable=False, default=datetime.now)
@@ -169,11 +195,13 @@ class Summary(Base):
     content = Column(String)
     role_id = Column(Integer, ForeignKey('roles.id'))
     intonation_id = Column(Integer, ForeignKey('intonations.id'))
+    language_id = Column(Integer, ForeignKey('languages.id'))
     post_id = Column(Integer, ForeignKey("posts.id"))
 
     post = relationship("Post", back_populates="summaries")
     role = relationship("Role", back_populates="summaries")
     intonation = relationship("Intonation", back_populates="summaries")
+    language = relationship("Language", back_populates="summaries")
 
 
 class Rubric(Base):

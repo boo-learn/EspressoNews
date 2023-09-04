@@ -1,12 +1,11 @@
-import logging
 import json
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 from celery.schedules import crontab
 from shared.database import async_session, sync_session
 from shared.loggers import get_logger
-from shared.models import TelegramAccount, Channel, Role, Intonation, UserSettings, Digest, Post
+from shared.models import TelegramAccount, Channel, Role, Intonation, UserSettings, Digest, Post, Language
 from shared.models import BeatSchedule
 
 # Создаем логгер
@@ -194,13 +193,21 @@ async def get_role(role_name: str):
         raise e
 
 
-from sqlalchemy.orm import joinedload
-
-
 async def get_intonation(intonation_name: str):
     try:
         async with async_session() as session:
             result = await session.execute(select(Intonation).filter(Intonation.intonation == intonation_name))
+            return result.scalars().first()
+    except SQLAlchemyError as e:
+        logger.error('Caught error, rollback', error=e)
+        await session.rollback()
+        raise e
+
+
+async def get_language(language_name: str):
+    try:
+        async with async_session() as session:
+            result = await session.execute(select(Language).filter(Language.name == language_name))
             return result.scalars().first()
     except SQLAlchemyError as e:
         logger.error('Caught error, rollback', error=e)
