@@ -30,7 +30,6 @@ class Intonation(Base):
     id = Column(Integer, primary_key=True)
     intonation = Column(String(50), nullable=False)
     button_name = Column(String(50), nullable=False)
-    test_field = Column(String(50), nullable=True)
 
     users = relationship("UserSettings", back_populates="intonation")
     summaries = relationship("Summary", back_populates="intonation")
