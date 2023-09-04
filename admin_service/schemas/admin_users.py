@@ -12,3 +12,7 @@ class UserCreateSchema(BaseUserSchema):
 
 class UserSchema(BaseUserSchema):
     id: int
+
+
+class UserUpdateSchema(BaseUserSchema):
+    pass

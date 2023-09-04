@@ -15,7 +15,7 @@ from admin_service.core.const import (
     TGACCOUNTS_TAGS
 )
 
-from admin_service import repository, schemas
+from admin_service import crud, schemas
 from admin_service.models.admin_user import AdminUser
 
 router = APIRouter(prefix="" + TGACCOUNTS_URL, tags=TGACCOUNTS_TAGS)
@@ -27,7 +27,7 @@ async def get_tg_accounts(
         skip: int = 0,
         limit: int = 100,
 ):
-    db_object = await repository.tg_accounts.get_multi(session, skip=skip, limit=limit)
+    db_object = await crud.tg_account.get_multi(session, skip=skip, limit=limit)
     if db_object is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -41,7 +41,7 @@ async def get_tg_account_by_name(
         id: int,
         session: AsyncSession = Depends(depends.get_db_session),
 ):
-    db_object = await repository.tg_accounts.get_by_id(session, id=id)
+    db_object = await crud.tg_account.get(session, id=id)
     if db_object is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -56,7 +56,7 @@ async def create_tg_account(
         session: AsyncSession = Depends(depends.get_db_session),
         current_user: AdminUser = Depends(depends.get_current_user)
 ):
-    db_object = await repository.tg_accounts.create(session, obj_data=tg_account_data)
+    db_object = await crud.tg_account.create(session, obj_data=tg_account_data)
     return db_object
 
 
@@ -67,10 +67,10 @@ async def update_tg_account(
         session: AsyncSession = Depends(depends.get_db_session),
         current_user: AdminUser = Depends(depends.get_current_user)
 ):
-    db_object = await repository.tg_accounts.get_by_id(session, id=id)
+    db_object = await crud.tg_account.get(session, id=id)
     if not db_object:
         raise HTTPException(status_code=404, detail=f"Telegram Account with id={id} does not exist")
-    db_object = await repository.tg_accounts.update(session, db_obj=db_object, obj_data=tg_account_data)
+    db_object = await crud.tg_account.update(session, db_obj=db_object, obj_data=tg_account_data)
     return db_object
 
 
@@ -80,7 +80,7 @@ async def delete_tg_account(
         session: AsyncSession = Depends(depends.get_db_session),
         current_user: AdminUser = Depends(depends.get_current_user)
 ):
-    db_object = await repository.tg_accounts.get_by_id(session, id=id)
+    db_object = await crud.tg_account.get(session, id=id)
     if not db_object:
         raise HTTPException(status_code=404, detail=f"Telegram Account with id={id} does not exist")
-    await repository.tg_accounts.remove(session, db_obj=db_object)
+    await crud.tg_account.remove(session, db_obj=db_object)
