@@ -17,13 +17,12 @@ class MenuHandlers(HandlersTools):
         self.register_handlers()
 
     def register_handlers(self):
-        self.registrar.multilingual_handler_registration(
+        self.registrar.simply_handler_registration(
             dp.register_message_handler,
             self.cmd_menu,
-            'cmd_menu',
+            'menu',
             'command'
         )
-        dp.register_message_handler(self.cmd_menu, Command('menu'))
         self.registrar.multilingual_handler_registration(
             dp.register_message_handler,
             self.menu_button_my_channels,

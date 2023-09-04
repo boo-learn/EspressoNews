@@ -11,10 +11,10 @@ class HelpHandlers(HandlersTools):
         self.register_handlers()
 
     def register_handlers(self):
-        self.registrar.multilingual_handler_registration(
+        self.registrar.simply_handler_registration(
             dp.register_message_handler,
             self.cmd_help,
-            'cmd_help',
+            'help',
             'command'
         )
         self.registrar.simply_handler_registration(

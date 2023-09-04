@@ -46,7 +46,6 @@ class RegistrarMiddleware(BaseMiddleware):
         user_lang_code = user.settings.language.code
 
         self.update_handlers_message_manager(message, user_lang_code)
-        await self.registration_translate_default_commands(user_lang_code)
 
     def update_handlers_message_manager(
             self,
@@ -85,25 +84,3 @@ class RegistrarMiddleware(BaseMiddleware):
             await self.mailing_manager.create_rule(message.from_user.id, periodicity_option)
 
         return user
-
-    @staticmethod
-    async def registration_translate_default_commands(language: str) -> None:
-        """
-        Registers default bot commands with the bot.
-
-        :param language: User language for user's messages.
-        """
-        cmd_keys = [
-            'desc_cmd_menu',
-            'desc_cmd_help'
-        ]
-
-        message_manager = MessageManager()
-        message_manager.set_language(language)
-
-        await dp.bot.set_my_commands([
-            types.BotCommand(
-                '/' + key.split('desc_cmd_')[-1],
-                message_manager.get_message(key)
-            ) for key in cmd_keys
-        ])

@@ -14,10 +14,10 @@ class StartHandlers(HandlersTools):
         self.register_handlers()
 
     def register_handlers(self):
-        self.registrar.multilingual_handler_registration(
+        self.registrar.simply_handler_registration(
             dp.register_message_handler,
             self.start_command,
-            'cmd_start',
+            'start',
             'command'
         )
         self.registrar.simply_handler_registration(
@@ -34,7 +34,7 @@ class StartHandlers(HandlersTools):
         )
 
     async def start_command(self, message: types.Message):
-        await self.message_manager.send_message(message, 'start', first_name=message.from_user.first_name)
+        await self.message_manager.send_message('start', first_name=message.from_user.first_name)
 
     async def action_after_start_btn(self, call: CallbackQuery):
         message_obj = call.message
