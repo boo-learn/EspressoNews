@@ -84,7 +84,7 @@ msgstr "लगातार सवाल"
 msgid "channel_list"
 msgstr "चैनल सूची:"
 
-msgid "not_subscribed_channels."
+msgid "not_subscribed_channels"
 msgstr "अब तक, आपने किसी भी चैनल की सदस्यता नहीं ली है ।"
 
 msgid 'change_option_periodicity'
@@ -96,6 +96,8 @@ msgstr "इंटोनेशन"
 msgid 'change_option_role'
 msgstr "भूमिका"
 
+msgid 'change_option_language'
+msgstr "भाषा: हिन्दी"
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions
 # ---------------------------------------------------------------------------------------------------------------------

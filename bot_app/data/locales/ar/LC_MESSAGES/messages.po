@@ -84,7 +84,7 @@ msgstr "أسئلة متكررة"
 msgid "channel_list"
 msgstr "قائمة القنوات:"
 
-msgid "not_subscribed_channels."
+msgid "not_subscribed_channels"
 msgstr "حتى الآن ، أنت غير مشترك في أي قنوات."
 
 msgid 'change_option_periodicity'
@@ -96,6 +96,8 @@ msgstr "التجويد"
 msgid 'change_option_role'
 msgstr "الدور"
 
+msgid 'change_option_language'
+msgstr "اللغة"
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions
 # ---------------------------------------------------------------------------------------------------------------------

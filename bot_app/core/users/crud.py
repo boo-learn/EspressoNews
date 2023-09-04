@@ -56,34 +56,27 @@ class UserCRUD:
             option: str,
             value
     ) -> bool:
-        user = await self.repository.get(user_id)
+        if option == 'language':
+            language = await get_language(value)
+            return await self.repository.update_setting(user_id, option, language)
 
-        if user:
-            settings = user.settings
-            if hasattr(settings, option):
-                if option == 'language':
-                    language = await get_language(value)
-                    return await self.repository.update_setting(settings, option, language)
+        updated_settings_value_mappings = {
+            message_manager.get_message(key): value for key, value in UserCRUD.settings_value_mappings.items()
+        }
 
-                updated_settings_value_mappings = {
-                    message_manager.get_message(key): value for key, value in UserCRUD.settings_value_mappings.items()
-                }
+        mapped_value = updated_settings_value_mappings[value]
 
-                mapped_value = updated_settings_value_mappings[value]
-
-                if option == 'role':
-                    role = await get_role(mapped_value)
-                    logging.info(f"Updating role setting with value: {role}")
-                    return await self.repository.update_setting(settings, option, role)
-                elif option == 'intonation':
-                    intonation = await get_intonation(mapped_value)
-                    logging.info(f"Updating intonation setting with value: {intonation}")
-                    return await self.repository.update_setting(settings, option, intonation)
-                else:
-                    logging.info(f"Updating setting {option} with value: {mapped_value}")
-                    return await self.repository.update_setting(settings, option, mapped_value)
-
-        return False
+        if option == 'role':
+            role = await get_role(mapped_value)
+            logging.info(f"Updating role setting with value: {role}")
+            return await self.repository.update_setting(user_id, option, role)
+        elif option == 'intonation':
+            intonation = await get_intonation(mapped_value)
+            logging.info(f"Updating intonation setting with value: {intonation}")
+            return await self.repository.update_setting(user_id, option, intonation)
+        else:
+            logging.info(f"Updating setting {option} with value: {mapped_value}")
+            return await self.repository.update_setting(user_id, option, mapped_value)
 
     async def get_settings_option_for_all_users(self, option_name: str):
         users_settings = await self.repository.get_all_users_settings()
@@ -113,16 +106,13 @@ class UserCRUD:
     async def disable_user(self, user_id):
         user = await self.repository.get(user_id)
         await self.repository.update(user, is_active=False, disabled_at=datetime.now())
-        user_settings = await self.repository.get_user_settings(user_id)
-        await self.repository.update_setting(user_settings, "periodicity", None)
+        await self.repository.update_setting(user_id, "periodicity", None)
         task_name = f"generate-digest-for-{str(user_id)}"
         await self.repository.delete_schedule(task_name)
 
     async def enable_user(self, user):
         await self.repository.update(user, is_active=True)
-        await self.repository.update_setting(user.settings, "periodicity", "*/1 * * * *")
+        await self.repository.update_setting(user.id, "periodicity", "*/1 * * * *")
 
     def get_language(self, param):
         pass
-
-

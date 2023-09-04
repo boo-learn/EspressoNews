@@ -83,7 +83,7 @@ msgstr "常见问题"
 msgid "channel_list"
 msgstr "频道列表:"
 
-msgid "not_subscribed_channels."
+msgid "not_subscribed_channels"
 msgstr "到目前为止，您还没有订阅任何频道。"
 
 msgid 'change_option_periodicity'
@@ -94,6 +94,9 @@ msgstr "语调,语调"
 
 msgid 'change_option_role'
 msgstr "角色"
+
+msgid 'change_option_language'
+msgstr "语言"
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions

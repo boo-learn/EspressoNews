@@ -88,7 +88,7 @@ msgstr "Frequent questions"
 msgid "channel_list"
 msgstr "Channel List:"
 
-msgid "not_subscribed_channels."
+msgid "not_subscribed_channels"
 msgstr "So far, you are not subscribed to any channels."
 
 msgid 'change_option_periodicity'
@@ -99,6 +99,9 @@ msgstr "Intonation"
 
 msgid 'change_option_role'
 msgstr "Role"
+
+msgid 'change_option_language'
+msgstr "Language"
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions

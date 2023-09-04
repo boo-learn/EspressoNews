@@ -88,7 +88,7 @@ msgstr "ঘন ঘন প্রশ্ন"
 msgid "channel_list"
 msgstr "চ্যানেল তালিকা:"
 
-msgid "not_subscribed_channels."
+msgid "not_subscribed_channels"
 msgstr "এখন পর্যন্ত, আপনি কোন চ্যানেলে সাবস্ক্রাইব করা হয় না."
 
 msgid 'change_option_periodicity'
@@ -100,6 +100,8 @@ msgstr "স্বরবর্ণ"
 msgid 'change_option_role'
 msgstr "ভূমিকা"
 
+msgid 'change_option_language'
+msgstr "ভাষা"
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions
 # ---------------------------------------------------------------------------------------------------------------------

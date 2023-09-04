@@ -112,18 +112,23 @@ class UserRepository:
             raise e
 
     @staticmethod
-    async def update_setting(settings: UserSettings, field: str, value) -> bool:
-        try:
-            async with async_session() as session:
-                session.add(settings)
-                setattr(settings, field, value)
-                logging.info(f"Settings: {settings}, field {field}, mapped_value {value}")
+    async def update_setting(user_id: int, option: str, value) -> bool:
+        async with async_session() as session:
+            try:
+                stmt = (select(User).options(joinedload(User.settings)).where(User.user_id == user_id))
+                result = await session.execute(stmt)
+                user = result.scalars().first()
+
+                if not user:
+                    return False
+
+                settings = user.settings
+                setattr(settings, option, value)
                 await session.commit()
                 return True
-        except SQLAlchemyError as e:
-            logging.info(f"Rollback")
-            await session.rollback()
-            raise e
+            except SQLAlchemyError as e:
+                await session.rollback()
+                raise e
 
     @staticmethod
     async def get_user_settings(user_id: int) -> Optional[UserSettings]:
