@@ -54,7 +54,7 @@ class ChannelsHandlers(HandlersTools):
         state_data = await state.get_data('choose_channel_for_delete')
         channel_id = state_data['choose_channel_for_delete']
 
-        await self.message_manager.delete_previous_message()
+        await self.message_manager.delete_before_message()
         await call.message.delete()
 
         logger.info(f'Channel username for delete {channel_id}')
@@ -79,7 +79,7 @@ class ChannelsHandlers(HandlersTools):
         logger.debug('Entering do_not_unsubscribe_from_channel')
         user_id = call.from_user.id
 
-        await self.message_manager.delete_previous_message()
+        await self.message_manager.delete_before_message()
         await call.message.delete()
 
         await state.finish()

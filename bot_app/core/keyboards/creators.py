@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from abc import ABC, abstractmethod
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 
 class KeyboardCreator(ABC):
@@ -36,7 +36,7 @@ class InlineKeyboardCreator(KeyboardCreator):
     def create_keyboard(
             self,
             keyboard_manager,
-            buttons: List[List[Tuple[str, str, str | None]]],
+            buttons: List[List[Tuple[str, str] | Tuple[str, str, str]]],
             resize_keyboard: bool = True
     ) -> InlineKeyboardMarkup:
         """
@@ -50,14 +50,16 @@ class InlineKeyboardCreator(KeyboardCreator):
         keyboard = InlineKeyboardMarkup(resize_keyboard=resize_keyboard)
 
         for row in buttons:
-            row_buttons = [
-                InlineKeyboardButton(
-                    text=text,
-                    callback_data=callback_data,
-                    url=url
-                ) for text, callback_data, url in row
-            ]
+            row_buttons = []
+            for button in row:
+                if len(button) == 3:
+                    text, callback_data, url = button
+                    row_buttons.append(InlineKeyboardButton(text=text, callback_data=callback_data, url=url))
+                else:
+                    text, callback_data = button
+                    row_buttons.append(InlineKeyboardButton(text=text, callback_data=callback_data))
             keyboard.row(*row_buttons)
+
         return keyboard
 
 

@@ -39,7 +39,7 @@ class StartHandlers(HandlersTools):
     async def action_after_start_btn(self, call: CallbackQuery):
         message_obj = call.message
 
-        await self.message_manager.delete_previous_message()
+        await self.message_manager.delete_before_message()
         await message_obj.delete()
         await self.message_manager.send_message('manual')
 
@@ -51,6 +51,6 @@ class StartHandlers(HandlersTools):
 
     async def return_action(self, call: CallbackQuery):
         message_obj = call.message
-        await self.message_manager.delete_previous_message()
+        await self.message_manager.delete_before_message()
         await message_obj.delete()
         await self.message_manager.send_message('return')

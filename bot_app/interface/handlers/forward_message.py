@@ -69,7 +69,7 @@ class ForwardHandlers(HandlersTools):
 
             await self.message_manager.send_message(
                 'success_subscribe',
-                dynamic_keyboards_parameters=channel_username,
+                dynamic_keyboard_parameters=channel_username,
                 channel_title=message.forward_from_chat.full_name
             )
 
@@ -81,7 +81,7 @@ class ForwardHandlers(HandlersTools):
 
         logger.debug(f'Channel username: {channel_username}')
 
-        await self.message_manager.delete_previous_message()
+        await self.message_manager.delete_before_message()
         logger.debug('Deleted previous message for feedback')
 
         await call.message.delete()

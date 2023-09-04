@@ -112,7 +112,7 @@ class UserCRUD:
 
     async def enable_user(self, user):
         await self.repository.update(user, is_active=True)
-        await self.repository.update_setting(user.id, "periodicity", "*/1 * * * *")
+        await self.repository.update_setting(user.user_id, "periodicity", "*/1 * * * *")
 
     def get_language(self, param):
         pass

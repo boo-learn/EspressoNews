@@ -116,6 +116,8 @@ class ReplySender(MessageSender):
         :param off_preview: Optional flag to disable web page preview.
         :param message_kwargs: Additional keyword arguments for message content formatting.
         """
+        message_manager.ensure_message_obj_exists()
+
         message = message_manager.get_message(message_key, **message_kwargs)
         await message_manager.message_obj.reply(
             message,
