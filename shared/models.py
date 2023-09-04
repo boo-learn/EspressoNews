@@ -30,6 +30,7 @@ class Intonation(Base):
     id = Column(Integer, primary_key=True)
     intonation = Column(String(50), nullable=False)
     button_name = Column(String(50), nullable=False)
+    test_field = Column(String(50), nullable=True)
 
     users = relationship("UserSettings", back_populates="intonation")
     summaries = relationship("Summary", back_populates="intonation")
@@ -126,7 +127,7 @@ class Digest(Base):
     role_id = Column(Integer)
     intonation_id = Column(Integer)
     is_active = Column(Boolean, default=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=True)  # добавьте параметр unique=True
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     user: Mapped["User"] = relationship("User", back_populates="digests")
     posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)
     # generation_date = Column(DateTime, nullable=False, default=datetime.now)
