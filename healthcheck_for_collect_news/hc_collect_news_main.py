@@ -1,5 +1,3 @@
-import logging
-
 from telethon import TelegramClient
 import asyncio
 
@@ -8,20 +6,9 @@ from telethon.sessions import StringSession
 from healthcheck_for_collect_news.db_utils import get_telethon_accounts_list, \
     delete_banned_account_and_reconnect_channels, remove_subscription
 from healthcheck_for_collect_news.tasks import send_to_subscribe_channel, send_to_unsubscribe_channel
+from shared.loggers import get_logger
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-# Create a console handler
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)  # Set the logging level
-
-# Create a formatter and set it for the handler
-formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-console_handler.setFormatter(formatter)
-
-# Add the handler to the logger
-logger.addHandler(console_handler)
+logger = get_logger('collect-check.main')
 
 
 async def main():
@@ -45,49 +32,48 @@ async def main():
                 },
                 "channels": [channel.channel_username for channel in account.channels]
             }
-        logger.info(f'Accounts subscriptions: {account_subscriptions}')
 
         current_account_id = None
 
         for i, account_info in account_subscriptions.items():
+            account_logger = logger.bind(account_id=i)
             try:
-                logger.info(f"Account info: {account_info}")
                 account = account_info["account"]
                 current_account_id = i
-                logger.info(f"Processing account {i}")
+                account_logger.info("Start processing")
 
                 db_channels = account_info["channels"]
                 client = TelegramClient(StringSession(account["session_string"]), account["api_id"], account["api_hash"])
                 await client.connect()
-                logger.info(f"Successfully connected to Telegram client for account {i}")
+                account_logger.info("Connected")
 
                 # Получаем список подписок
                 dialogs = await client.get_dialogs()
-                logger.info(f"Successfully retrieved dialog list for account {i}")
+                account_logger.info(f"Dialog list collected", dialogs=[d.name for d in dialogs])
                 client_channels = [d.entity.username for d in dialogs if d.is_channel]
-                logger.info(f"Client channels: {client_channels}")
+                account_logger.info("Channels name collected", channels=client_channels)
 
                 db_channels_set = set(db_channels)
                 client_channels_set = set(client_channels)
 
                 # channels in db_channels but not in client_channels
                 to_subscribe = db_channels_set - client_channels_set
-                logger.info(f"Determined channels to subscribe for account {i}: {to_subscribe}")
+                account_logger.info(f"Channels to subscribe collected", channels=to_subscribe)
                 for channel in to_subscribe:
                     if channel is not None:
-                        logger.debug(f"Аккаунт {i} в базе данных подписан на {channel}, но аккаунт Telethon не подписан.")
+                        account_logger.debug(f"Аккаунт {i} в базе данных подписан на {channel}, но аккаунт Telethon не подписан.")
                         await remove_subscription(current_account_id, channel)
                         await send_to_subscribe_channel("subscribe", channel)
 
                 # channels in client_channels but not in db_channels
                 to_unsubscribe = client_channels_set - db_channels_set
-                logger.info(f"Determined channels to unsubscribe for account {i}: {to_unsubscribe}")
+                account_logger.info(f"Channels to unsubscribe collected", channels=to_unsubscribe)
                 for channel in to_unsubscribe:
                     if channel is not None:
-                        logger.debug(f"Аккаунт {i} (Telethon) подписан на {channel}, но аккаунт в базе данных не подписан.")
+                        account_logger.debug(f"Аккаунт {i} (Telethon) подписан на {channel}, но аккаунт в базе данных не подписан.")
                         await send_to_unsubscribe_channel("unsubscribe", channel, current_account_id)
 
-                logger.info(f"Finished processing account {i}")
+                account_logger.info(f"Finished processing account")
 
             except Exception as e:
                 logger.error(f'Healthcheak for collect news service inner error: {e}')

@@ -26,7 +26,8 @@ from admin_service.core.const import (
     TOKEN_EXPIRE_MINUTES,
     TOKEN_TYPE,
 )
-from admin_service import models, schemas, repository
+from admin_service import schemas, repository
+from admin_service.models.admin_user import AdminUser
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -35,7 +36,7 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl=AUTH_URL, auto_error=False)
 
 async def authenticate(
         session: AsyncSession, *, email: str, password: str
-) -> models.AdminUser | None:
+) -> AdminUser | None:
     user = await repository.admin_users.get_by_email(session, email=email)
     if not user:
         return None

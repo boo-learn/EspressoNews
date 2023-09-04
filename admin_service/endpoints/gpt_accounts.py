@@ -15,7 +15,8 @@ from admin_service.core.const import (
     GPTACCOUNTS_TAGS
 )
 
-from admin_service import models, repository, schemas
+from admin_service import repository, schemas
+from admin_service.models.admin_user import AdminUser
 
 router = APIRouter(prefix="" + GPTACCOUNTS_URL, tags=GPTACCOUNTS_TAGS)
 
@@ -53,7 +54,7 @@ async def get_gpt_account_by_ig(
 async def create_gpt_account(
         gpt_account_data: schemas.GPTAccountCreateSchema,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: models.AdminUser = Depends(depends.get_current_user)
+        current_user: AdminUser = Depends(depends.get_current_user)
 ):
     db_object = await repository.gpt_accounts.create(session, obj_data=gpt_account_data)
     return db_object
@@ -64,7 +65,7 @@ async def update_gpt_account(
         id: int,
         gpt_account_data: schemas.GPTAccountUpdateSchema,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: models.AdminUser = Depends(depends.get_current_user)
+        current_user: AdminUser = Depends(depends.get_current_user)
 ):
     db_object = await repository.gpt_accounts.get_by_id(session, id=id)
     if not db_object:
@@ -77,7 +78,7 @@ async def update_gpt_account(
 async def delete_gpt_account(
         id: int,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: models.AdminUser = Depends(depends.get_current_user)
+        current_user: AdminUser = Depends(depends.get_current_user)
 ):
     db_object = await repository.gpt_accounts.get_by_id(session, id=id)
     if not db_object:

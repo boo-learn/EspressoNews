@@ -1,12 +1,14 @@
 import asyncio
 import logging
+import aiogram
 
 from bot_app.data.messages import gen_digest_load_more
 from bot_app.databases.cruds import DigestCRUD
 from bot_app.keyboards.inlines import ikb_load_more
-from shared.config import DIGESTS_LIMIT
+from shared.config import DIGESTS_LIMIT, RETRY_LIMIT
+from shared.loggers import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger('bot.digest.logic')
 
 
 class DigestLogicHandler:
@@ -31,7 +33,16 @@ class DigestLogicHandler:
         for i, text_part in enumerate(text_parts):
             is_last_message = i == len(text_parts) - 1
             markup = reply_markup if is_last_message else None
-            await send_method(text=text_part, reply_markup=markup)
+            for _ in range(RETRY_LIMIT):
+                try:
+                    await send_method(text=text_part, reply_markup=markup)
+                except aiogram.exceptions.RetryAfter as error:
+                    logger.warning('Limit reached', error=error)
+                    await asyncio.sleep(error.timeout)
+                else:
+                    break
+            else:
+                logger.error(f'Failed to send digest after {RETRY_LIMIT} retries')
             await asyncio.sleep(1)
 
     @staticmethod

@@ -3,7 +3,8 @@ from loguru import logger
 
 from sqlalchemy import create_engine, select, func, insert, Table, inspect
 from fastapi.testclient import TestClient
-from admin_service import models, schemas
+from admin_service import schemas
+from admin_service.models.admin_user import AdminUser
 
 
 # @pytest.mark.skip()
@@ -16,7 +17,7 @@ def test_get_users(load_data_from_json, client: TestClient):
     assert "id" in users[1]
     assert users[1]["email"] == "test2@mail.ru"
     assert users[1]["name"] == "test-user2"
-    # assert models.AdminUser.verify_password("test", users[1]["hashed_password"])
+    # assert AdminUser.verify_password("test", users[1]["hashed_password"])
 
 
 def test_get_user_by_id(load_data_from_json, client: TestClient):

@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 import json
-import logging
 
 import pytz
 from sqlalchemy.exc import IntegrityError
@@ -15,7 +14,10 @@ from shared.db_utils import (
     get_account_from_db_async, get_all_accounts_from_db_async
 )
 from shared.models import Post
+from shared.loggers import get_logger
 import redis.asyncio as redis
+
+logger = get_logger('collector.main')
 
 
 async def create_redis_pool():
@@ -30,37 +32,17 @@ async def add_post_to_redis(redis_pool, post):
         await pipe.execute()
 
 
-logger = logging.getLogger(__name__)
-# Set the level of this logger to DEBUG,
-# so that it will log all messages of level DEBUG and above
-logger.setLevel(logging.DEBUG)
-
-# Create a console handler that logs all messages
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-
-# Create a formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Add the formatter to the handler
-console_handler.setFormatter(formatter)
-
-# Add the handler to the logger
-logger.addHandler(console_handler)
-
-
 async def listen_to_account(account, redis_pool):
-    logger.debug(f'Initiating Telegram client for account {account.account_id}')
+    account_logger = logger.bind(account=account.account_id)
+    account_logger.debug('Initiating Telegram client')
     client = TelegramClient(StringSession(account.session_string), account.api_id, account.api_hash)
     client.parse_mode = None
 
     @client.on(events.NewMessage)
     async def my_event_handler(event: Message):
-        logger.debug(f'Received new message {event.to_dict()}')
-        logger.debug(f'Message text: {event.text}')
+        account_logger.debug('Received new message', text=event.text)
         if event.is_channel:
-            logger.debug(f'Received new message on channel. Event id: {event.id}')
-            logger.debug(f'Event channel id: {event.peer_id.channel_id}')
+            account_logger.debug('Received new channel message', event_id=event.id, channel_id=event.peer_id.channel_id)
             if event.text:
                 # Add a check for the number of words in the message
                 # words = event.text.split()
@@ -89,7 +71,7 @@ async def listen_to_account(account, redis_pool):
                 try:
                     await add_post_to_redis(redis_pool, post_json)
                 except IntegrityError as e:
-                    logger.warning(f"Failed to add post due to IntegrityError: {e}")
+                    account_logger.error(f"Failed to add post", error=e)
                     return
 
     max_retries = 50
@@ -98,16 +80,16 @@ async def listen_to_account(account, redis_pool):
     while current_retry < max_retries:
         try:
             await client.connect()
-            logger.debug(f'Connected Telegram client for account {account.account_id}')
-            logger.info(f'Start listening for account {account.account_id}')
+            account_logger.debug(f'Connected Telegram client')
+            account_logger.info(f'Start listening')
 
             # Start the connection checker
             asyncio.create_task(check_connection(client))
             await client.run_until_disconnected()
-            logger.debug(f'Disconnected client for account {account.account_id}')
+            account_logger.debug(f'Disconnected client')
             break  # If we reach here, the disconnection was planned, so we exit the loop
         except Exception as e:
-            logger.error(f'Error occurred: {e}. Retrying in 5 seconds.')
+            account_logger.error('Error occurred, retrying in 5 seconds', error=e)
             await asyncio.sleep(5)  # Wait for 5 seconds before retrying
             current_retry += 1
 
@@ -121,7 +103,7 @@ async def check_connection(client):
             me = await client.get_me()
             logger.info(f'Current user: {me.username}')
         except Exception as e:
-            logger.error(f'Error occurred during connection check: {e}. Retrying connection in 5 seconds.')
+            logger.error(f'Error occurred during connection check, retrying in 5 seconds', error=e)
             await client.connect()
         await asyncio.sleep(60)  # Check the connection every 10 seconds
 

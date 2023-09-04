@@ -1,48 +1,45 @@
 import asyncio
-import logging
 
 from shared.config import RABBIT_HOST
+from shared.loggers import get_logger
 from shared.rabbitmq import Subscriber, QueuesType
 from subscription_service.db_utils import add_subscription, is_have_subscription, get_account_with_least_subscriptions
 from tasks import subscribe_task, unsubscribe_task, send_to_subscribe_channel
 
 # Configuring logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-logger = logging.getLogger(__name__)
+logger = get_logger('subscription.main')
 
 
 async def handle_subscription(message: str):
     channel_username = message
+    local_logger = logger.bind(channel=channel_username)
     try:
-        logging.info(f"Channel username: {channel_username}")
+        local_logger.info('Subscribing to channel')
         is_subscribed = await is_have_subscription(channel_username)
         if not is_subscribed:
             account = await get_account_with_least_subscriptions()
-            logging.info(f"Account with least subscriptions: {account.phone_number}")
+            local_logger.info('Account chosen', phone_number=account.phone_number)
             await add_subscription(account.account_id, channel_username)
             subscribe_task.apply_async(args=[account.account_id, channel_username])
         else:
-            logging.info(f"Channel {channel_username} already subscribed")
+            local_logger.warn("Channel already subscribed")
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        local_logger.exception("Error subscription to channel", error=e)
 
 
 async def handle_unsubscription(message: str):
-    logging.info(f"Message: {message}")
     channel_username = message[0]
     account_id = message[1]
-    logging.info(f"Unsubscribing from channel {channel_username} with account {account_id}")
+    logger.info("Unsubscribing from channel", channel=channel_username, account=account_id)
     unsubscribe_task.apply_async(args=[account_id, channel_username])
 
 
 async def main():
-    logger.info("Starting main function...")
+    logger.info("Starting main function")
     subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.subscription_service)
     subscriber.subscribe("subscribe", handle_subscription)
     subscriber.subscribe("unsubscribe", handle_unsubscription)
-    logger.info("Main function has been started...")
+    logger.info("Main function has been started")
     await subscriber.run()
 
 
@@ -52,5 +49,5 @@ if __name__ == "__main__":
         loop.create_task(main())
         loop.run_forever()
     finally:
-        logger.info("Closing the event loop...")
+        logger.info("Closing the event loop")
         loop.close()

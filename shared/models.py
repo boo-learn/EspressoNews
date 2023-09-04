@@ -35,6 +35,23 @@ class Intonation(Base):
     summaries = relationship("Summary", back_populates="intonation")
 
 
+users_categories = Table(
+    "users_categories",
+    Base.metadata,
+    Column("user_id", ForeignKey("users.user_id")),
+    Column("category_id", ForeignKey("categories.id")),
+)
+
+
+class Category(Base):
+    __tablename__ = 'categories'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str]
+    users: Mapped[List["User"]] = relationship(
+        secondary=users_categories, back_populates="categories"
+    )
+
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -54,6 +71,9 @@ class User(Base):
     subscriptions = relationship('Subscription', back_populates='user')
     settings = relationship("UserSettings", back_populates="user", uselist=False)
     digests: Mapped["Digest"] = relationship("Digest", back_populates="user", uselist=False)
+    categories: Mapped[List["Category"]] = relationship(
+        secondary=users_categories, back_populates="users"
+    )
     # access_channels = relationship("Channel", back_populates="user")
 
 
@@ -126,7 +146,7 @@ class Digest(Base):
     role_id = Column(Integer)
     intonation_id = Column(Integer)
     is_active = Column(Boolean, default=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=True)  # добавьте параметр unique=True
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     user: Mapped["User"] = relationship("User", back_populates="digests")
     posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)
     # generation_date = Column(DateTime, nullable=False, default=datetime.now)

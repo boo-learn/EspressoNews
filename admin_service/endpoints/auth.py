@@ -14,7 +14,8 @@ from admin_service.core.const import (
     TOKEN_TYPE
 )
 from admin_service.core import depends
-from admin_service import schemas, models, repository
+from admin_service import schemas, repository
+from admin_service.models.admin_user import AdminUser
 
 router = APIRouter(prefix="" + AUTH_URL, tags=AUTH_TAGS)
 
@@ -43,7 +44,7 @@ async def login_access_token(
 
 @router.post("/login/test-token", response_model=schemas.UserSchema)
 async def test_token(
-        current_user: models.AdminUser = Depends(depends.get_current_user)
+        current_user: AdminUser = Depends(depends.get_current_user)
 ):
     """
     Test access token

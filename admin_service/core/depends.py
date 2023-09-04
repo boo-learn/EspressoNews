@@ -23,7 +23,8 @@ from jose import jwt
 
 from shared.database import DATABASE_URI
 
-from admin_service import models, schemas, repository
+from admin_service import schemas, repository
+from admin_service.models.admin_user import AdminUser
 from admin_service.core.config import settings
 from admin_service.core import const
 
@@ -66,7 +67,7 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 async def get_current_user(
         session: AsyncSession = Depends(get_db_session), token: str = Depends(reusable_oauth2)
-) -> models.AdminUser:
+) -> AdminUser:
     try:
         payload = jwt.decode(
             token, settings.token_key, algorithms=[const.TOKEN_ALGORITHM]

@@ -12,7 +12,7 @@ from shared.config import POSTGRES_USER, POSTGRES_PASSWORD, DB_HOST, POSTGRES_DB
 
 # Замените следующие значения настройками вашей базы данных
 DATABASE_URI = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}'
-# print(f"{DATABASE_URI=}")
+print(f"{DATABASE_URI=}")
 # Асинхронный движок и сессия
 engine = create_async_engine(DATABASE_URI)
 async_session = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)

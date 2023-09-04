@@ -1,6 +1,10 @@
 from shared.database import sync_session
 from shared.models import TelegramAccount
+from shared.loggers import get_logger
 from sqlalchemy.orm import Session
+
+
+logger = get_logger('tdata.db')
 
 
 def save_account_to_db(db: Session, account: TelegramAccount):
@@ -11,7 +15,7 @@ def save_account_to_db(db: Session, account: TelegramAccount):
         db.refresh(account)
         return account
     else:
-        print(f"Account with phone number {account.phone_number} already exists in the database.")
+        logger.warn('Account already exists', phone=account.phone_number)
         return None
 
 

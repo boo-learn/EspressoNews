@@ -12,6 +12,10 @@ from db_utils import save_account_to_db_sync
 import configparser
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
+from shared.loggers import get_logger
+
+
+logger = get_logger('tdata.main')
 
 
 async def unsubscribe_from_all_channels(client):
@@ -39,7 +43,6 @@ async def save_account(client):
         session_string=StringSession.save(client.session),
     )
     save_account_to_db_sync(account)
-    print(account.account_id)
 
     # Close and delete the session
     await client.disconnect()
@@ -60,14 +63,14 @@ async def main(config_file):
     api_hash = str(api_hash)
     api_id = int(api_id)
 
-    username = config['Telegram']['username']
+    # username = config['Telegram']['username']
     session_string = config['Telegram']['session_string']
 
     try:
         # Create the client and connect
         client = TelegramClient(StringSession(session_string), api_id, api_hash)
         await client.connect()
-        print(f"Client Created for {config_file}")
+        logger.info('Client created', config_file=config_file)
 
         # Ensure you're authorized
         if not await client.is_user_authorized():
@@ -75,7 +78,7 @@ async def main(config_file):
 
         await save_account(client)
     except Exception as e:
-        print(f"Failed to process account for {config_file} due to error: {str(e)}")
+        logger.exception('Account process failed', config_file=config_file, error=e)
         return
 
 

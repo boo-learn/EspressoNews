@@ -1,7 +1,4 @@
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-)
+from .base import AdminUserBase
 
 from datetime import (
     datetime,
@@ -13,19 +10,11 @@ from jose import jwt
 
 from admin_service.core.config import settings
 from admin_service.core import const
-from shared.database import Base
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class AdminUser(Base):
-    __tablename__ = "admin_users"
-    # __table_args__ = {"schema": "myapi"}
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    email: Mapped[str] = mapped_column(unique=True)
-    name: Mapped[str]
-    hashed_password: Mapped[str]
-
+class AdminUser(AdminUserBase):
     def __init__(self, **kwargs):
         hashed_password = AdminUser.get_password_hash(kwargs["password"])
         del kwargs["password"]

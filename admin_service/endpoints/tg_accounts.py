@@ -15,7 +15,8 @@ from admin_service.core.const import (
     TGACCOUNTS_TAGS
 )
 
-from admin_service import models, repository, schemas
+from admin_service import repository, schemas
+from admin_service.models.admin_user import AdminUser
 
 router = APIRouter(prefix="" + TGACCOUNTS_URL, tags=TGACCOUNTS_TAGS)
 
@@ -53,7 +54,7 @@ async def get_tg_account_by_name(
 async def create_tg_account(
         tg_account_data: schemas.TgAccountCreateSchema,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: models.AdminUser = Depends(depends.get_current_user)
+        current_user: AdminUser = Depends(depends.get_current_user)
 ):
     db_object = await repository.tg_accounts.create(session, obj_data=tg_account_data)
     return db_object
@@ -64,7 +65,7 @@ async def update_tg_account(
         id: int,
         tg_account_data: schemas.TgAccountUpdateSchema,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: models.AdminUser = Depends(depends.get_current_user)
+        current_user: AdminUser = Depends(depends.get_current_user)
 ):
     db_object = await repository.tg_accounts.get_by_id(session, id=id)
     if not db_object:
@@ -77,7 +78,7 @@ async def update_tg_account(
 async def delete_tg_account(
         id: int,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: models.AdminUser = Depends(depends.get_current_user)
+        current_user: AdminUser = Depends(depends.get_current_user)
 ):
     db_object = await repository.tg_accounts.get_by_id(session, id=id)
     if not db_object:

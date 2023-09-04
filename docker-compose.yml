@@ -74,9 +74,18 @@ services:
     image: "redis:6.2"
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     depends_on:
       rabbitmq:
         condition: service_healthy
+    command: >
+      /bin/sh -c "
+      chmod 777 -R /data;
+      chmod 777 -R /etc;
+      redis-server
+      "
+
 
   celery:
     build:
@@ -213,9 +222,9 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
 volumes:
   postgres_data:
   grafana_data:
+  redis_data:
