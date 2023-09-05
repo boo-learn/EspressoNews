@@ -49,6 +49,13 @@ class UserCRUD:
     async def get_all_users(self) -> List[Optional[User]]:
         return await self.repository.get_all()
 
+    async def update_user_intonation(self, user_id: int, intonation: str):
+        await self.repository.update_setting(
+            user_id,
+            option='intonation',
+            value=await get_intonation(intonation),
+        )
+
     async def update_user_settings_option(
             self,
             message_manager,

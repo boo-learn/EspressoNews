@@ -87,10 +87,10 @@ class SettingsHandlers(HandlersTools):
 
     async def success_change_intonation_option(self, message: types.Message):
         await self.user_crud.update_user_settings_option(
-            self.message_manager,
-            message.from_user.id,
-            'intonation',
-            message.text
+            message_manager=self.message_manager,
+            user_id=message.from_user.id,
+            option='intonation',
+            value=message.text
         )
         await self.message_manager.send_message('settings_save_success')
 
