@@ -114,5 +114,10 @@ class UserCRUD:
         await self.repository.update(user, is_active=True)
         await self.repository.update_setting(user.user_id, "periodicity", "*/1 * * * *")
 
+    async def update_user_name(self, user_id: int, first_name: str):
+        user = await self.repository.get(user_id)
+        user = await self.repository.update(user, first_name=first_name)
+        return user
+
     def get_language(self, param):
         pass

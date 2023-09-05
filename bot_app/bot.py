@@ -24,8 +24,8 @@ from bot_app.loader import dp
 from bot_app.digests.enter_controllers import DigestMailingManager
 from bot_app.core.middlewares.i18n_middleware import i18n
 from bot_app.core.middlewares.registrar_middleware import RegistrarMiddleware
-from shared.config import RABBIT_HOST
-from shared.rabbitmq import Subscriber, QueuesType
+# from shared.config import RABBIT_HOST
+# from shared.rabbitmq import Subscriber, QueuesType
 
 logger = logging.getLogger(__name__)
 
@@ -41,9 +41,9 @@ class BotApp:
 
         await asyncio.gather(
             self.keyboard_registration(),
-            self.create_mail_rules(),
-            self.instant_mailing_digests_to_users(),
-            self.gradual_mailing_digests_to_users(),
+            # self.create_mail_rules(),
+            # self.instant_mailing_digests_to_users(),
+            # self.gradual_mailing_digests_to_users(),
             self.registration_default_commands(),
             self.on_startup_notify(),
         )
@@ -99,12 +99,12 @@ class BotApp:
     async def instant_mailing_digests_to_users(self):
         pass
 
-    async def gradual_mailing_digests_to_users(self):
-        logger.info(f'Start digest mailing')
-        subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.bot_service)
-        subscriber.subscribe("send_digest", self.digest_router.send)
-        subscriber.subscribe("no_digest", self.digest_router.not_exist)
-        await subscriber.run()
+    # async def gradual_mailing_digests_to_users(self):
+    #     logger.info(f'Start digest mailing')
+    #     subscriber = Subscriber(host=RABBIT_HOST, queue=QueuesType.bot_service)
+    #     subscriber.subscribe("send_digest", self.digest_router.send)
+    #     subscriber.subscribe("no_digest", self.digest_router.not_exist)
+    #     await subscriber.run()
 
     def run(self):
         executor.start_polling(self.dp, on_startup=self.on_startup)

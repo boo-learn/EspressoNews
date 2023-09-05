@@ -8,9 +8,35 @@ class StartKeyboards(KeyboardsTools):
         self.init_keyboards()
 
     def init_keyboards(self):
-        self.register('after_start_btn', KeyboardType.INLINE, [
-            [('Животные', 'Животные')],
-            [('Война', 'Война')],
-            [('Ужасы', 'Ужасы')],
-        ])
-
+        self.register(
+            'after_start_btn', KeyboardType.INLINE, [
+                [('Животные', 'Животные')],
+                [('Война', 'Война')],
+                [('Ужасы', 'Ужасы')],
+            ]
+        )
+        self.register(
+            'start',
+            KeyboardType.REPLY,
+            [
+                [
+                    ('Настроить сейчас ✅',),
+                    ('Настроить позже ➡️',),
+                ],
+            ]
+        )
+        self.register(
+            'ask_for_name',
+            KeyboardType.INLINE,
+            [[('Оставить имя', 'keep_name_cb')]]
+        )
+        self.register(
+            'ask_for_intonation',
+            KeyboardType.INLINE,
+            [
+                [
+                    ('list_official', 'list_official'),
+                    ('list_sarcastic-joking', 'list_sarcastic-joking'),
+                ],
+            ]
+        )
