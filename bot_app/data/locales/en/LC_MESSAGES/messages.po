@@ -1,0 +1,287 @@
+# English translations for EspressoNews.
+# Copyright (C) 2023 EspressoNews
+# This file is distributed under the same license as the EspressoNews.
+# Roman Ignatov <ignatov.roman.a@mail.ru>, 2023.
+#
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Bot interface messages
+# ---------------------------------------------------------------------------------------------------------------------
+
+msgid "manual"
+msgstr "I'll quickly notify you so that you won't have any questions for me. \n \n"
+       "We have a fantastic feature. You can forward me any message from an open channel, and I'll add "
+       "it to your subscriptions."
+
+msgid "start"
+msgstr "Hello, <b>{first_name}</b>!\n\n"
+        "Welcome to the era of personalized news! Our bot is your personal guide in the world of information. "
+        "🚀\n\n"
+        "Tired of the information noise? We've done everything so that you can focus only on what truly "
+        "matters. Our daily news digests are not just news; they are your personalized collection tailored to "
+        "your preferences. 👓\n\n"
+        "And now, get ready for the magic! ✨ You can customize your news feed by adding any open Telegram "
+        "channels. Just forward a message from a channel to us, and we\"ll process it with the magic of "
+        "personalization.\n\n"
+        "So, are you ready to start? Let's dive into the world of information headfirst! 🌊\n\n"
+
+msgid "after_start_btn"
+msgstr "<b>{first_name}</b>, look, now you'll need to choose the categories that interest you. \n\n"
+
+msgid "help"
+msgstr "Hello, <b>{first_name}</b>! \n\n Do you need help? \n \n"
+
+msgid "answer_to_question_1"
+msgstr "Answer to question 1"
+
+msgid "answer_to_question_2"
+msgstr "Answer to question 2"
+
+msgid "answer_to_question_3"
+msgstr "Answer to question 3"
+
+msgid "answer_to_question_4"
+msgstr "Answer to question 4"
+
+msgid "answer_to_question_5"
+msgstr "Answer to question 5"
+
+msgid "menu"
+msgstr "Open Sesame!!!"
+
+msgid "error"
+msgstr "Oops! No such command =)"
+
+msgid "adding_users_channels"
+msgstr "Now, you'll have to think a bit. \n \n What category of channels are you interested in?"
+
+msgid "sure_unsubscribe"
+msgstr "Are you sure you want to unsubscribe from the channel {channel_title}?\n \n"
+
+msgid "subscribe_failed"
+msgstr "Unfortunately, you cannot subscribe to a private channel!"
+
+msgid "success_subscribe"
+msgstr "You have subscribed to the channel {channel_title}"
+
+msgid "return"
+msgstr "To go to the menu, click here -> /menu"
+
+msgid "digest_not_exist"
+msgstr "Unfortunately, there has been no new information on your channels."
+
+msgid "digest_load_more"
+msgstr "To go to the next page, click \"Next\"."
+
+msgid "thank_you"
+msgstr "Thank you in advance, as our developers will be a little happier in just a minute."
+
+msgid "settings"
+msgstr "List of settings"
+
+msgid "settings_save_success"
+msgstr "Changes have been saved successfully!"
+
+msgid "frequent_questions"
+msgstr "Frequent questions"
+
+msgid "channel_list"
+msgstr "Channel List:"
+
+msgid "not_subscribed_channels"
+msgstr "So far, you are not subscribed to any channels."
+
+msgid 'change_option_periodicity'
+msgstr "Frequency"
+
+msgid 'change_option_intonation'
+msgstr "Intonation"
+
+msgid 'change_option_role'
+msgstr "Role"
+
+msgid 'change_option_language'
+msgstr "Language"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Drop-down list with command suggestions
+# ---------------------------------------------------------------------------------------------------------------------
+
+msgid "desc_cmd_menu"
+msgstr "Menu"
+
+msgid "desc_cmd_help"
+msgstr "Need help?"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Handlers comands
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "cmd_menu"
+msgstr "menu"
+
+msgid "cmd_start"
+msgstr "start"
+
+msgid "cmd_help"
+msgstr "help"
+
+msgid "regexp_my_channels"
+msgstr "My Channels"
+
+msgid "regexp_settings"
+msgstr "Settings"
+
+msgid "regexp_donat"
+msgstr "Donat"
+
+msgid "regexp_help"
+msgstr "Help"
+
+msgid "regexp_main_menu"
+msgstr "Main Menu"
+
+msgid "regexp_periodicity"
+msgstr "Frequency"
+
+msgid "regexp_intonation"
+msgstr "Intonation"
+
+msgid "regexp_role"
+msgstr "Role"
+
+msgid "regexp_language"
+msgstr "Language"
+
+msgid "list_official"
+msgstr "Official"
+
+msgid "list_sarcastic-joking"
+msgstr "Sarcastic-joking"
+
+msgid "list_every_hour"
+msgstr "Every hour"
+
+msgid "list_every_3_hours"
+msgstr "Every 3 hours"
+
+msgid "list_every_6_hours"
+msgstr "Every 6 hours"
+
+msgid "list_announcer"
+msgstr "Announcer"
+
+msgid "list_standard"
+msgstr "Standard"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Keyboards
+# ---------------------------------------------------------------------------------------------------------------------
+
+#  Menu
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Меню"
+msgstr "Menu"
+
+msgid "Донат"
+msgstr "Donat"
+
+msgid "Настройки"
+msgstr "Settings"
+
+msgid "Мои каналы"
+msgstr "My Channels"
+
+#  Settings
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Язык"
+msgstr "Language"
+
+msgid "Интонация"
+msgstr "Intonation"
+
+msgid "Периодичность"
+msgstr "Frequency"
+
+#  change_option_periodicity
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Каждый час"
+msgstr "Every hour"
+
+msgid "Каждые 3 часа"
+msgstr "Every 3 hours"
+
+msgid "Каждые 6 часов"
+msgstr "Every 6 hours"
+
+#  change_option_intonation
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Официальная"
+msgstr "Official"
+
+msgid "Саркастично-шутливая"
+msgstr "Sarcastic-joking"
+
+#  change_option_role
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Диктор"
+msgstr "Announcer"
+
+msgid "Стандартная"
+msgstr "Standard"
+
+#  thank_you
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Отблагодарить"
+msgstr "Thank you"
+
+#  frequent_questions
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Вопрос 1"
+msgstr "Question 1"
+
+msgid "Вопрос 2"
+msgstr "Question 2"
+
+msgid "Вопрос 3"
+msgstr "Question 3"
+
+msgid "Вопрос 4"
+msgstr "Question 4"
+
+msgid "Вопрос 5"
+msgstr "Question 5"
+
+#  success_subscribe
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Отписаться"
+msgstr "Unsubscribe"
+
+#  sure_unsubscribe
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Да"
+msgstr "Yes"
+
+msgid "Нет"
+msgstr "No"
+
+#  Return to main menu btn
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Главное меню"
+msgstr "Main Menu"
+
+msgid ""
+msgstr ""
+"Project-Id-Version: EspressoNews 1.0\n"
+"Report-Msgid-Bugs-To: ignatov.roman.a@mail.ru\n"
+"POT-Creation-Date: 2023-08-09 19:23+0300\n"
+"PO-Revision-Date: 2023-08-09 19:23+0300\n"
+"Last-Translator: Roman <ignatov.roman.a@mail.ru>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+

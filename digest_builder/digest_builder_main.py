@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 
 import redis
 import json
@@ -8,10 +7,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from summary import update_post_and_generate_summary_async
-from shared.db_utils import get_user_settings
-from sqlalchemy import select, and_
+from sqlalchemy import select
 
-from shared.models import Post, User, Subscription, Digest, Role, Intonation, Summary
+from shared.models import Post, User, Subscription, Digest, Role, Intonation, Language
 from shared.database import async_session
 from shared.loggers import get_logger
 from dateutil.parser import parse
@@ -39,7 +37,6 @@ def fetch_and_clear_posts_atomic(r: redis.Redis):
 
 async def run(r: redis.Redis):
     posts = fetch_and_clear_posts_atomic(r)
-    logger.info(f"Получено {len(posts)} постов")
 
     if len(posts) > 0:
         async with async_session() as session:
@@ -81,15 +78,18 @@ async def run(r: redis.Redis):
 
                     digest = digest_result.unique().scalar_one_or_none()
 
-                    if digest.role_id != user.settings.role_id or digest.intonation_id != user.settings.intonation_id:
-                        user_logger.info(f"Роль/интонация пользователя отличается от роли/интонации дайджеста")
+                    if digest.role_id != user.settings.role_id or digest.intonation_id != user.settings.intonation_id or digest.language_id != user.settings.language_id:
+                        user_logger.info(
+                            f"Роль/интонация/язык пользователя отличается от роли/интонации/языка дайджеста"
+                        )
                         digest.role_id = user.settings.role_id
                         digest.intonation_id = user.settings.intonation_id
+                        digest.language_id = user.settings.language_id
                         digest.digest_ids.clear()
                         await session.commit()
                     user_logger.info(f"Добавляем пост к дайджесту")
                     digest.digest_ids.append(post.id)
-                    combination = (digest.role_id, digest.intonation_id)
+                    combination = (digest.role_id, digest.intonation_id, digest.language_id)
                     if combination in unique_combinations:
                         user_logger.info(f"Комбинация уже обработана", combination=combination)
                         continue
@@ -102,8 +102,20 @@ async def run(r: redis.Redis):
                     intonation_result = await session.execute(
                         select(Intonation).filter(Intonation.id == digest.intonation_id))
                     intonation_obj = intonation_result.scalars().first()
+                    language_result = await session.execute(
+                        select(Language).filter(Language.id == digest.language_id)
+                    )
+                    language_obj = language_result.scalars().first()
 
-                    tasks.append(update_post_and_generate_summary_async(session, i, post, role_obj, intonation_obj))
+                    tasks.append(update_post_and_generate_summary_async(
+                        session,
+                        i,
+                        post,
+                        role_obj,
+                        intonation_obj,
+                        language_obj
+                    ))
+
                     user_logger.info(f"Добавлена задача", task_num=i)
                     i += 1
 

@@ -1,0 +1,285 @@
+# Portuguese translations for EspressoNews.
+# Copyright (C) 2023 EspressoNews
+# This file is distributed under the same license as the EspressoNews.
+# Roman Ignatov <ignatov.roman.a@mail.ru>, 2023.
+#
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Bot interface messages
+# ---------------------------------------------------------------------------------------------------------------------
+
+msgid "manual"
+msgstr "Enviarei rapidamente uma mensagem para evitar perguntas adicionais. \n \n"
+       "Temos um recurso incrível. Você pode encaminhar-me qualquer mensagem de um canal público, "
+       "e eu a adicionarei às suas assinaturas."
+
+msgid "start"
+msgstr "Olá, <b>{first_name}</b>!\n\n"
+       "Bem-vindo à era das notícias personalizadas! Nosso bot é seu guia pessoal no mundo da informação. 🚀\n\n"
+       "Cansado do barulho de informações? Nós fizemos tudo para que você possa se concentrar apenas no que "
+       "realmente importa. Nossos resumos diários de notícias não são apenas notícias; são sua coleção "
+       "personalizada adaptada às suas preferências. 👓\n\n"
+       "E agora, prepare-se para a mágica! ✨ Você pode personalizar seu feed de notícias adicionando qualquer "
+       "canal aberto do Telegram. Basta encaminhar uma mensagem de um canal para nós, e a processaremos com a "
+       "magia da personalização.\n\n"
+       "Então, está pronto para começar? Vamos mergulhar de cabeça no mundo da informação! 🌊\n\n"
+
+msgid "after_start_btn"
+msgstr "<b>{first_name}</b>, veja, agora você precisará escolher as categorias que lhe interessam. \n\n"
+
+msgid "help"
+msgstr "Olá, <b>{first_name}</b>! \n\n Você precisa de ajuda? \n \n"
+
+msgid "answer_to_question_1"
+msgstr "Resposta à pergunta 1 em inglês"
+
+msgid "answer_to_question_2"
+msgstr "Resposta à pergunta 2 em inglês"
+
+msgid "answer_to_question_3"
+msgstr "Resposta à pergunta 3 em inglês"
+
+msgid "answer_to_question_4"
+msgstr "Resposta à pergunta 4 em inglês"
+
+msgid "answer_to_question_5"
+msgstr "Resposta à pergunta 5 em inglês"
+
+msgid "menu"
+msgstr "Abre-te Sésamo!"
+
+msgid "error"
+msgstr "Ops! Nenhum comando assim =)"
+
+msgid "adding_users_channels"
+msgstr "Agora, você terá que pensar um pouco. \n \n Em qual categoria de canais você está interessado?"
+
+msgid "sure_unsubscribe"
+msgstr "Você tem certeza de que deseja cancelar a inscrição no canal {channel_title}?\n \n"
+
+msgid "subscribe_failed"
+msgstr "Infelizmente, você não pode se inscrever em um canal privado!"
+
+msgid "success_subscribe"
+msgstr "Você se inscreveu no canal {channel_title}"
+
+msgid "return"
+msgstr "Para ir ao menu, clique aqui -> /menu"
+
+msgid "digest_not_exist"
+msgstr "Infelizmente, não houve informações novas nos seus canais."
+
+msgid "digest_load_more"
+msgstr "Para ir para a próxima página, clique em \"Próximo\"."
+
+msgid "thank_you"
+msgstr "Obrigado antecipadamente, pois nossos desenvolvedores ficarão um pouco mais felizes em apenas um minuto."
+
+msgid "settings"
+msgstr "Lista de configuração"
+
+msgid "settings_save_success"
+msgstr "As alterações foram salvas com sucesso!"
+
+msgid "frequent_questions"
+msgstr "Perguntas frequentes:"
+
+msgid "channel_list"
+msgstr "Lista de canais:"
+
+msgid "not_subscribed_channels"
+msgstr "Ainda não se inscreveu em nenhum canal."
+
+msgid 'change_option_periodicity'
+msgstr "Periodicidade"
+
+msgid 'change_option_intonation'
+msgstr "Entonação"
+
+msgid 'change_option_role'
+msgstr "Papel"
+
+msgid 'change_option_language'
+msgstr "Idioma"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Drop-down list with command suggestions
+# ---------------------------------------------------------------------------------------------------------------------
+
+msgid "desc_cmd_menu"
+msgstr "Menu"
+
+msgid "desc_cmd_help"
+msgstr "Precisa de Ajuda?"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Handlers comands
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "cmd_menu"
+msgstr "menu"
+
+msgid "cmd_start"
+msgstr "começar"
+
+msgid "cmd_help"
+msgstr "assistência"
+
+msgid "regexp_my_channels"
+msgstr "Meus canais"
+
+msgid "regexp_settings"
+msgstr "Sintonização"
+
+msgid "regexp_donat"
+msgstr "Donat"
+
+msgid "regexp_help"
+msgstr "Assistência"
+
+msgid "regexp_main_menu"
+msgstr "Menu principal"
+
+msgid "regexp_periodicity"
+msgstr "Periodicidade"
+
+msgid "regexp_intonation"
+msgstr "Entonação"
+
+msgid "regexp_role"
+msgstr "Papel"
+
+msgid "regexp_language"
+msgstr "Idioma"
+
+msgid "list_official"
+msgstr "Oficial"
+
+msgid "list_sarcastic-joking"
+msgstr "Sarcástico-brincalhão"
+
+msgid "list_every_hour"
+msgstr "A cada hora"
+
+msgid "list_every_3_hours"
+msgstr "A cada 3 horas"
+
+msgid "list_every_6_hours"
+msgstr "A cada 6 horas"
+
+msgid "list_announcer"
+msgstr "Locutor"
+
+msgid "list_standard"
+msgstr "Padronizado"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Keyboards
+# ---------------------------------------------------------------------------------------------------------------------
+
+#  Menu
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Меню"
+msgstr "Menu"
+
+msgid "Донат"
+msgstr "Donat"
+
+msgid "Настройки"
+msgstr "Sintonização"
+
+msgid "Мои каналы"
+msgstr "Meus canais"
+
+#  Settings
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Язык"
+msgstr "Idioma"
+
+msgid "Интонация"
+msgstr "Entonação"
+
+msgid "Периодичность"
+msgstr "Periodicidade"
+
+#  change_option_periodicity
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Каждый час"
+msgstr "A cada hora"
+
+msgid "Каждые 3 часа"
+msgstr "A cada 3 horas"
+
+msgid "Каждые 6 часов"
+msgstr "A cada 6 horas"
+
+#  change_option_intonation
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Официальная"
+msgstr "Oficial"
+
+msgid "Саркастично-шутливая"
+msgstr "Sarcástico-brincalhão"
+
+#  change_option_role
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Диктор"
+msgstr "Locutor"
+
+msgid "Стандартная"
+msgstr "Padronizado"
+
+#  thank_you
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Отблагодарить"
+msgstr "Agradecer"
+
+#  frequent_questions
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Вопрос 1"
+msgstr "Questão 1"
+
+msgid "Вопрос 2"
+msgstr "Questão 2"
+
+msgid "Вопрос 3"
+msgstr "Questão 3"
+
+msgid "Вопрос 4"
+msgstr "Questão 4"
+
+msgid "Вопрос 5"
+msgstr "Questão 5"
+
+#  success_subscribe
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Отписаться"
+msgstr "Cancelar subscrição"
+
+#  sure_unsubscribe
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Да"
+msgstr "sim"
+
+msgid "Нет"
+msgstr "Não"
+
+#  Return to main menu btn
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Главное меню"
+msgstr "Menu principal"
+
+msgid ""
+msgstr ""
+"Project-Id-Version: EspressoNews 1.0\n"
+"Report-Msgid-Bugs-To: ignatov.roman.a@mail.ru\n"
+"POT-Creation-Date: 2023-08-09 21:40+0300\n"
+"PO-Revision-Date: 2023-08-09 21:40+0300\n"
+"Last-Translator: Roman <ignatov.roman.a@mail.ru>\n"
+"Language: pt\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+

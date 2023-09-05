@@ -31,8 +31,10 @@ services:
       dockerfile: DockerfileAlembic
     env_file:
       - .env.dev
+    volumes:
+      - ./alembic/versions:/app/alembic/versions
     ports:
-      - "5000:5000"  # Add the desired port mapping here
+      - "5000:5000"
     depends_on:
       db:
         condition: service_healthy

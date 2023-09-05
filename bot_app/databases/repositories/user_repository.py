@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, List
 from shared.database import async_session
-from shared.db_utils import get_role, get_intonation
+from shared.db_utils import get_role, get_intonation, get_language
 from shared.models import User, UserSettings, BeatSchedule
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
@@ -21,6 +21,7 @@ class UserRepository:
                 user.settings = user_settings
                 user_settings.role = await get_role('Helpfull assistant.')
                 user_settings.intonation = await get_intonation('Official')
+                user_settings.language = await get_language('English')
 
                 session.add(user)
                 session.add(user_settings)
@@ -38,8 +39,11 @@ class UserRepository:
                 stmt = (select(User)
                         .options(joinedload(User.settings))
                         .options(
-                    joinedload(User.settings).joinedload(UserSettings.intonation))  # Use joinedload for intonation
-                        .options(joinedload(User.settings).joinedload(UserSettings.role))  # Use joinedload for role
+                            joinedload(User.settings).joinedload(UserSettings.intonation))
+                        .options(
+                            joinedload(User.settings).joinedload(UserSettings.role))
+                        .options(
+                            joinedload(User.settings).joinedload(UserSettings.language))
                         .where(User.user_id == user_id))
                 result = await session.execute(stmt)
                 return result.scalars().first()
@@ -94,33 +98,54 @@ class UserRepository:
     async def get_all_users_settings():
         try:
             async with async_session() as session:
-                result = await session.execute(select(UserSettings))
+                result = await session.execute(
+                    select(UserSettings)
+                    .options(
+                        joinedload(UserSettings.language),
+                        joinedload(UserSettings.role),
+                        joinedload(UserSettings.intonation)
+                    )
+                )
                 return result.scalars().all()
         except SQLAlchemyError as e:
             await session.rollback()
             raise e
 
     @staticmethod
-    async def update_setting(settings: UserSettings, field: str, value) -> bool:
-        try:
-            async with async_session() as session:
-                session.add(settings)
-                setattr(settings, field, value)
-                logging.info(f"Settings: {settings}, field {field}, mapped_value {value}")
+    async def update_setting(user_id: int, option: str, value) -> bool:
+        async with async_session() as session:
+            try:
+                stmt = (select(User).options(joinedload(User.settings)).where(User.user_id == user_id))
+                result = await session.execute(stmt)
+                user = result.scalars().first()
+
+                if not user:
+                    return False
+
+                settings = user.settings
+                setattr(settings, option, value)
                 await session.commit()
                 return True
-        except SQLAlchemyError as e:
-            logging.info(f"Rollback")
-            await session.rollback()
-            raise e
+            except SQLAlchemyError as e:
+                await session.rollback()
+                raise e
 
     @staticmethod
     async def get_user_settings(user_id: int) -> Optional[UserSettings]:
         try:
             async with async_session() as session:
-                stmt = select(UserSettings).where(UserSettings.user_id == user_id)
+                stmt = (
+                    select(UserSettings)
+                    .options(
+                        joinedload(UserSettings.role),
+                        joinedload(UserSettings.intonation),
+                        joinedload(UserSettings.language)
+                    )
+                    .where(UserSettings.user_id == user_id)
+                )
                 result = await session.execute(stmt)
-                return result.scalars().first()
+                user_settings = result.scalars().first()
+                return user_settings
         except SQLAlchemyError as e:
             raise e
 
@@ -140,4 +165,3 @@ class UserRepository:
         except SQLAlchemyError as e:
             await session.rollback()
             raise e
-

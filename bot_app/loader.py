@@ -3,7 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-from data import settings
+from bot_app import settings
 
 logging.basicConfig(level=logging.DEBUG)
 
