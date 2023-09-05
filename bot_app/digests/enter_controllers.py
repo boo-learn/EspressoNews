@@ -35,8 +35,6 @@ class DigestMailingManager(HandlersTools):
         logger.info(f"Starting to create mail rule for user {user_id}...")
         logger.info(f"Got settings option for user {user_id}.")
 
-        periodicity_option = '* * * * *'
-
         if periodicity_option is None:
             periodicity_option = '0 */1 */1 */1 */1'
 
