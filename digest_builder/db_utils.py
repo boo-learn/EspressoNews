@@ -1,16 +1,25 @@
-from sqlalchemy import select, tuple_, and_, not_, exists
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, joinedload, aliased
-
-from shared.models import Post, GPTAccount, Role, Intonation, Summary
+from shared.models import GPTAccount, Summary
 from shared.database import async_session
 
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 
 
-async def update_post_summary_async(session, post_id: int, summary: str, role_id: str, intonation_id: int):
-    new_summary = Summary(content=summary, role_id=role_id, intonation_id=intonation_id, post_id=post_id)
+async def update_post_summary_async(
+        session,
+        post_id: int,
+        summary: str,
+        role_id: str,
+        intonation_id: int,
+        language_id: int
+):
+    new_summary = Summary(
+        content=summary,
+        role_id=role_id,
+        intonation_id=intonation_id,
+        language_id=language_id,
+        post_id=post_id
+    )
+
     session.add(new_summary)
 
 
