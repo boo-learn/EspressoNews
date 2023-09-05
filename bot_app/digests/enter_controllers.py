@@ -35,6 +35,8 @@ class DigestMailingManager(HandlersTools):
         logger.info(f"Starting to create mail rule for user {user_id}...")
         logger.info(f"Got settings option for user {user_id}.")
 
+        periodicity_option = '* * * * *'
+
         if periodicity_option is None:
             periodicity_option = '0 */1 */1 */1 */1'
 
@@ -84,7 +86,7 @@ class DigestMailingManager(HandlersTools):
         keyboard = None
 
         if total_count > digests_limit:
-            digest_message += '\n\n' + self.message_manager.get_message('digest_load_more')
+            digest_message += '\n\n' + self.aiogram_message_manager.get_message('digest_load_more')
             keyboard = 'digest_load_more'
 
         return {
@@ -101,12 +103,12 @@ class DigestMailingManager(HandlersTools):
     ):
 
         user_language_object = await self.user_crud.get_settings_option_for_user(user_id, 'language')
-        self.message_manager.set_language(user_language_object.code)
+        self.aiogram_message_manager.set_language(user_language_object.code)
 
         message_object = await self.get_object_to_send_from_digest(digest_id, offset, limit)
 
         try:
-            await self.message_manager.send_message_in_parts(
+            await self.aiogram_message_manager.send_message_in_parts(
                 message_object['message'],
                 user_id,
                 message_object['keyboard'],
@@ -127,11 +129,11 @@ class DigestMailingManager(HandlersTools):
 
         user_language_object = await self.user_crud.get_settings_option_for_user(data['user_id'], 'language')
 
-        self.message_manager.set_language(user_language_object.code)
-        self.message_manager.set_sender(AbstractSender())
+        self.aiogram_message_manager.set_language(user_language_object.code)
+        self.aiogram_message_manager.set_sender(AbstractSender())
 
         try:
-            await self.message_manager.send_message('digest_not_exist', data["user_id"])
+            await self.aiogram_message_manager.send_message('digest_not_exist', data["user_id"])
         except aiogram.exceptions.BotBlocked:
             await self.user_crud.disable_user(data["user_id"])
 

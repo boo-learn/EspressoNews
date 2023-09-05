@@ -15,26 +15,26 @@ logger = logging.getLogger(__name__)
 class ChannelsHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.register_handlers()
+        self.register_routes()
         self.channel_crud = ChannelCRUD()
         self.logic_handler = ChannelLogicHandler()
         self.subscription_crud = SubscriptionCRUD()
 
-    def register_handlers(self):
-        self.registrar.simply_handler_registration(
+    def register_routes(self):
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_callback_query_handler,
             self.choose_channel_callback,
             'choose_channel_',
             'text_contains'
         )
-        self.registrar.simply_handler_registration(
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_callback_query_handler,
             self.unsubscribe_from_channel,
             'unsubscribe',
             'text',
             ChannelStates.choose_channel_for_delete
         )
-        self.registrar.simply_handler_registration(
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_callback_query_handler,
             self.unsubscribe_from_channel,
             'do not unsubscribe',
@@ -46,7 +46,7 @@ class ChannelsHandlers(HandlersTools):
         choose_channel: str = call.data.split('_')[-1]
         await ChannelStates.choose_channel_for_delete.set()
         await state.update_data(choose_channel_for_delete=choose_channel)
-        await self.message_manager.send_message('sure_unsubscribe', channel_title=choose_channel)
+        await self.aiogram_message_manager.send_message('sure_unsubscribe', channel_title=choose_channel)
         logger.info('Exiting choose_channel_callback')
 
     async def unsubscribe_from_channel(self, call: types.CallbackQuery, state: FSMContext):
@@ -54,7 +54,7 @@ class ChannelsHandlers(HandlersTools):
         state_data = await state.get_data('choose_channel_for_delete')
         channel_id = state_data['choose_channel_for_delete']
 
-        await self.message_manager.delete_before_message()
+        await self.aiogram_message_manager.delete_before_message()
         await call.message.delete()
 
         logger.info(f'Channel username for delete {channel_id}')
@@ -68,7 +68,7 @@ class ChannelsHandlers(HandlersTools):
         await self.subscription_crud.check_channel_and_delete_if_empty(channel)
 
         await self.logic_handler.send_channels_list_to_user_after_remove(
-            self.message_manager,
+            self.aiogram_message_manager,
             channel.channel_name,
             call.from_user.id,
             state,
@@ -79,11 +79,12 @@ class ChannelsHandlers(HandlersTools):
         logger.debug('Entering do_not_unsubscribe_from_channel')
         user_id = call.from_user.id
 
-        await self.message_manager.delete_before_message()
+        await self.aiogram_message_manager.delete_before_message()
         await call.message.delete()
 
         await state.finish()
 
         logic_handler = ChannelLogicHandler()
-        await logic_handler.send_channels_list_to_user(self.message_manager, user_id)
+        await logic_handler.send_channels_list_to_user(self.aiogram_message_manager, user_id)
         logger.info('Exiting do_not_unsubscribe_from_channel')
+

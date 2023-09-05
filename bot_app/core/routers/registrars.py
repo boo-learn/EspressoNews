@@ -5,13 +5,16 @@ from bot_app.core.middlewares.i18n_middleware import i18n
 
 from aiogram.dispatcher.filters import Command
 
+from bot_app.core.types import base
+from shared.config import RABBIT_HOST
+from shared.rabbitmq import Subscriber, QueuesType
 
 logger = logging.getLogger(__name__)
 
 
-class HandlerRegistrar:
+class AiogramRoutesRegistrar:
     """
-    This class serves as a registrar for handlers in aiogram.
+    This class serves as a registrar for routers in aiogram.
     It provides utilities for simple as well as multilingual handler registrations.
     """
 
@@ -103,7 +106,7 @@ class HandlerRegistrar:
             state=None
     ):
         """
-        Register handlers for multilingual commands.
+        Register routers for multilingual commands.
 
         :param aiogram_register_func: The aiogram function to register the handler.
         :param handler: The handler function.
@@ -139,3 +142,37 @@ class HandlerRegistrar:
         :return: List of translated items.
         """
         return [i18n.gettext(singular=item, locale=code) for item in list_]
+
+
+class RabbitMQRoutesRegistrar:
+    def __init__(self):
+        self.recipient = None
+        self.queue_name = None
+
+    def _set_recipient(self):
+        self.recipient = Subscriber(host=RABBIT_HOST, queue=QueuesType[self.queue_name])
+
+    def _ensure_queue_name_exists(self):
+        if not self.queue_name:
+            raise ValueError(f"Queue_name is not set!")
+
+    def set_queue_name(self, queue_name):
+        self.queue_name = queue_name
+        self._set_recipient()
+
+    async def register_message_handler(self, message_key, callback_endpoint):
+        self._ensure_queue_name_exists()
+        self.recipient.subscribe(message_type=message_key, callback=callback_endpoint)
+        await self.recipient.run()
+
+
+# class RabbitMQRouterRegistry:
+#     _routers = []
+#
+#     @classmethod
+#     def register_router(cls, router: base.Router):
+#         cls._routers.append(router)
+#
+#     @classmethod
+#     def get_all_routers(cls):
+#         return cls._routers

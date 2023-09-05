@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 class DigestsHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.register_handlers()
+        self.register_routes()
         self.user_crud = UserCRUD()
         self.mailing_manager = DigestMailingManager()
 
-    def register_handlers(self):
-        self.registrar.simply_handler_registration(
+    def register_routes(self):
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_message_handler,
             self.send_summaries_with_offset,
             None,

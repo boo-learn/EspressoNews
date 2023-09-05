@@ -6,8 +6,6 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from bot_app.core.users.crud import UserCRUD
 from bot_app.digests.cruds import DigestCRUD
 from bot_app.digests.enter_controllers import DigestMailingManager
-from bot_app.loader import dp
-from bot_app.core.messages.manager import MessageManager
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +15,7 @@ class RegistrarMiddleware(BaseMiddleware):
     Middleware for updating message data and registering default bot commands.
 
     Attributes:
-        handlers (list): List of handlers for processing incoming messages.
+        handlers (list): List of routers for processing incoming messages.
         user_crud (UserCRUD): CRUD operations for users.
         mailing_manager (DigestMailingManager): Handles digest mailing.
         digest_crud (DigestCRUD): CRUD operations for digests.
@@ -25,9 +23,9 @@ class RegistrarMiddleware(BaseMiddleware):
 
     def __init__(self, handlers: list):
         """
-        Initializes the Registrar middleware with the provided handlers and required dependencies.
+        Initializes the Registrar middleware with the provided routers and required dependencies.
 
-        :param handlers: List of handlers for processing incoming messages.
+        :param handlers: List of routers for processing incoming messages.
         """
         self.handlers = handlers
         self.user_crud = UserCRUD()
@@ -45,15 +43,15 @@ class RegistrarMiddleware(BaseMiddleware):
         user = await self.registration_user(message)
         user_lang_code = user.settings.language.code
 
-        self.update_handlers_message_manager(message, user_lang_code)
+        self.update_handlers_aiogram_message_manager(message, user_lang_code)
 
-    def update_handlers_message_manager(
+    def update_handlers_aiogram_message_manager(
             self,
             message: types.Message,
             language: str = 'en'
     ) -> None:
         """
-        Updates the message based on the provided handlers.
+        Updates the message based on the provided routers.
 
         :param message: Aiogram message object.
         :param language: User language for user's messages.

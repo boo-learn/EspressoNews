@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from bot_app.channels.endpoints import ChannelRouter
+from bot_app.channels.endpoints import ChannelHandlers
 from bot_app.databases.repositories import ChannelRepository
 from bot_app.databases.repositories import SubscriptionRepository
 from shared.models import Channel
@@ -67,8 +67,8 @@ class ChannelCRUD:
             channel = await self.repository.get(username)
 
         # send_message_subscribe
-        channel_router = ChannelRouter()
-        await channel_router.send_to_subscribe("subscribe", username)
+        channel_handlers = ChannelHandlers()
+        await channel_handlers.send_to_subscribe("subscribe", username)
         return channel
 
     # скорее всего ещё передать user_id
@@ -80,8 +80,8 @@ class ChannelCRUD:
             logger.debug(f"Channel {channel} is empty, deleting")
             await self.repository.delete(channel)
 
-            channel_router = ChannelRouter()
-            await channel_router.send_to_unsubscribe(
+            channel_handlers = ChannelHandlers()
+            await channel_handlers.send_to_unsubscribe(
                 "unsubscribe",
                 channel.channel_username,
                 channel.account_id
@@ -129,8 +129,8 @@ class SubscriptionCRUD:
             channel_crud = ChannelCRUD()
             await channel_crud.delete_channel(channel)
 
-            channel_router = ChannelRouter()
-            await channel_router.send_to_unsubscribe(
+            channel_handlers = ChannelHandlers()
+            await channel_handlers.send_to_unsubscribe(
                 "unsubscribe",
                 channel.channel_username,
                 channel.account_id
