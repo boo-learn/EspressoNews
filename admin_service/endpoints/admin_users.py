@@ -12,6 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from admin_service.models.admin_user import AdminUser
 from admin_service.core import depends
+# from admin_service.core.depends import PermissionChecker
+from admin_service.permissions import models_permissions
 from admin_service.core.const import (
     USERS_TAGS,
 )
@@ -48,7 +50,7 @@ async def get_user_by_id(
 async def create_user(
         user_data: schemas.UserCreateSchema,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: AdminUser = Depends(depends.get_current_user)
+        permission=Depends(depends.PermissionChecker([models_permissions.AdminUsers.permissions.CREATE]))
 ):
     user = await crud.admin_user.get_by_email(session, email=user_data.email)
     if user:

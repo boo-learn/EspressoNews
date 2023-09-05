@@ -15,11 +15,13 @@ from sqlalchemy import select, insert, Table
 from sqlalchemy import exc
 from sqlalchemy.sql import text as sa_text
 
+from pydantic import ValidationError
+
 from shared.models import User, Channel, Subscription, Post, Digest
 from shared.database import sync_session, sync_engine, async_session
 from shared.models import Base
 
-import schemas, repository
+import schemas, repository, crud
 
 BASE_DIR = Path(__file__).parent
 
@@ -79,8 +81,6 @@ def clear_db():
         trans.commit()
 
 
-
-
 @cli.command()
 @click.argument('filename')
 def dump_db(filename="data.json"):
@@ -115,23 +115,28 @@ def load_db(filename="data.json"):
 @click.option("--name", type=str, help="User name")
 @click.option("--email", type=str, help="Email")
 @click.option("--password", type=str, help="Password")
+@click.option("--role", type=str, default="ADMINISTRATOR", help="Role")
 @coro
-async def create_user(name: str, email: str, password: str) -> None:
+async def create_user(name: str, email: str, password: str, role: str) -> None:
     """Create new user.
 
     Write new user (with hashed password) to corresponding database table.
 
     \b
     Examples:
-        myapi --name 'test user' --email test_user@myapi.com --password qwerty
+        python admin_service/cli.py create-user --name admin --email admin@mail.ru --password admin
     """
 
     # initialize user schema
-    user = schemas.UserCreateSchema(name=name, email=email, password=password)
+    try:
+        user = schemas.UserCreateSchema(name=name, email=email, password=password, role=role)
+    except ValidationError as e:
+        print(e)
+        return
 
     async with async_session_scope() as session:
         try:
-            await repository.admin_users.create(session, obj_data=user)
+            await crud.admin_user.create(session, obj_data=user)
         except exc.IntegrityError:
             logger.info("SuperUser already created")
             await session.rollback()

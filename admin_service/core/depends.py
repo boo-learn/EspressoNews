@@ -84,14 +84,18 @@ async def get_current_user(
     return user
 
 
-# class PermissionChecker:
-#     def __init__(self, permissions_required: list[ModelPermission]):
-#         self.permissions_required = permissions_required
-#
-#     def __call__(self, user: AdminUser = Depends(get_current_user)):
-#         for permission_required in self.permissions_required:
-#             if permission_required not in get_role_permissions(user.role):
-#                 raise HTTPException(
-#                     status_code=status.HTTP_403_FORBIDDEN,
-#                     detail="Not enough permissions to access this resource")
-#         return user
+from admin_service.permissions.base import ModelPermission
+from admin_service.permissions.roles import get_role_permissions
+
+
+class PermissionChecker:
+    def __init__(self, permissions_required: list[ModelPermission]):
+        self.permissions_required = permissions_required
+
+    def __call__(self, user: AdminUser = Depends(get_current_user)):
+        for permission_required in self.permissions_required:
+            if permission_required not in get_role_permissions(user.role):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Not enough permissions to access this resource")
+        return user
