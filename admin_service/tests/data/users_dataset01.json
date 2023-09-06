@@ -3,22 +3,26 @@
     {
       "email": "test1@mail.ru",
       "name": "test-user1",
-      "password": "test"
+      "password": "test",
+      "role": "USER"
     },
     {
       "email": "test2@mail.ru",
       "name": "test-user2",
-      "password": "test"
+      "password": "test",
+      "role": "USER"
     },
     {
       "email": "test3@mail.ru",
       "name": "test-user3",
-      "password": "test"
+      "password": "test",
+      "role": "USER"
     },
     {
       "email": "test4@mail.ru",
       "name": "test-user4",
-      "password": "test"
+      "password": "test",
+      "role": "USER"
     }
   ]
 }

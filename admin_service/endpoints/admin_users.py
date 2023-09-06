@@ -12,11 +12,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from admin_service.models.admin_user import AdminUser
 from admin_service.core import depends
+# from admin_service.core.depends import PermissionChecker
+from admin_service.permissions import models_permissions
 from admin_service.core.const import (
     USERS_TAGS,
 )
 
-from admin_service import repository, schemas
+from admin_service import repository, schemas, crud
 
 router = APIRouter(prefix="", tags=USERS_TAGS)
 
@@ -27,7 +29,7 @@ async def get_users(
         skip: int = 0,
         limit: int = 100,
 ):
-    return await repository.admin_users.get_multi(session, skip=skip, limit=limit)
+    return await crud.admin_user.get_multi(session, skip=skip, limit=limit)
 
 
 @router.get("/users/{id}", response_model=schemas.UserSchema)
@@ -35,7 +37,7 @@ async def get_user_by_id(
         id: int,
         session: AsyncSession = Depends(depends.get_db_session),
 ):
-    user = await repository.admin_users.get_by_id(session, id=id)
+    user = await crud.admin_user.get(session, id=id)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -48,13 +50,13 @@ async def get_user_by_id(
 async def create_user(
         user_data: schemas.UserCreateSchema,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: AdminUser = Depends(depends.get_current_user)
+        permission=Depends(depends.PermissionChecker([models_permissions.AdminUsers.permissions.CREATE]))
 ):
-    user = await repository.admin_users.get_by_email(session, email=user_data.email)
+    user = await crud.admin_user.get_by_email(session, email=user_data.email)
     if user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The user with this username already exists in the system.",
         )
-    user = await repository.admin_users.create(session, obj_data=user_data)
+    user = await crud.admin_user.create(session, obj_data=user_data)
     return user
