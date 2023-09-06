@@ -11,23 +11,39 @@ class HelpHandlers(HandlersTools):
         self.register_handlers()
 
     def register_handlers(self):
-        self.registrar.simply_handler_registration(
-            dp.register_message_handler,
-            self.cmd_help,
-            'help',
-            'command'
+        self.registrar.multilingual_handler_registration(
+            aiogram_register_func=dp.register_message_handler,
+            handler=self.help_main,
+            pattern_or_list='kb_reply_help',
+            handler_type='text'
         )
-        self.registrar.simply_handler_registration(
-            dp.register_callback_query_handler,
-            self.answers_to_the_questions,
-            'question_',
-            'text_contains'
+        self.registrar.multilingual_handler_registration(
+            aiogram_register_func=dp.register_message_handler,
+            handler=self.contact,
+            pattern_or_list='kb_reply_contact',
+            handler_type='text'
+        )
+        self.registrar.multilingual_handler_registration(
+            aiogram_register_func=dp.register_message_handler,
+            handler=self.about,
+            pattern_or_list='kb_reply_about',
+            handler_type='text'
+        )
+        self.registrar.multilingual_handler_registration(
+            aiogram_register_func=dp.register_message_handler,
+            handler=self.to_main,
+            pattern_or_list='kb_reply_main_menu',
+            handler_type='text'
         )
 
-    async def cmd_help(self, message: types.Message):
-        await self.message_manager.send_message('help', first_name=message.from_user.first_name)
-        await self.message_manager.send_message('frequent_questions')
+    async def help_main(self, message: types.Message):
+        await self.message_manager.send_message('help_main')
 
-    async def answers_to_the_questions(self, call: CallbackQuery):
-        message_key = 'answer_to_question_' + call.data.split('_')[-1]
-        await self.message_manager.send_message(message_key)
+    async def contact(self, message: types.Message):
+        await self.message_manager.send_message('contact_text')
+
+    async def about(self, message: types.Message):
+        await self.message_manager.send_message('about')
+
+    async def to_main(self, message: types.Message):
+        await self.message_manager.send_message('to_main_menu')
