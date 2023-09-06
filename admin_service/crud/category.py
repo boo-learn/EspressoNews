@@ -11,7 +11,10 @@ from admin_service import schemas
 
 
 class CRUDTgAccount(CRUDBase[Category, schemas.CategoryCreateSchema, schemas.CategoryUpdateSchema]):
-    pass
+    async def relation_with_users(self, session: AsyncSession, category: Category, user_ids: list[int]):
+        category.user_ids.extend(user_ids)
+        session.add(category)
+        await session.commit()
 
 
 category = CRUDTgAccount(Category)

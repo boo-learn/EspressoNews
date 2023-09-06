@@ -8,6 +8,7 @@ from fastapi import (
 )
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from admin_service.core import depends
 from admin_service.core.const import (
@@ -68,7 +69,7 @@ async def update_category(
         id: int,
         category_data: schemas.CategoryUpdateSchema,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: AdminUser = Depends(depends.get_current_user)
+        permission=Depends(PermissionChecker([models_permissions.Categories.permissions.UPDATE]))
 ):
     db_object = await crud.category.get(session, id=id)
     if not db_object:
@@ -77,11 +78,38 @@ async def update_category(
     return db_object
 
 
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
+
+@router.put("/{id}/users", status_code=204)
+async def add_relationship(
+        id: int,  # category_id
+        user_ids: list[int],
+        session: AsyncSession = Depends(depends.get_db_session),
+        permission=Depends(PermissionChecker([models_permissions.Categories.permissions.UPDATE]))
+):
+    category = await crud.category.get(session, id=id)
+    # TODO: move to CRUD or lazy='joined'
+    # result = await session.scalars(
+    #     select(Category).where(Category.id == id).options(selectinload(Category.category_recs))
+    # )
+    # category = result.unique().first()
+    if not category:
+        raise HTTPException(status_code=404, detail=f"Telegram Account with id={id} does not exist")
+    try:
+        await crud.category.relation_with_users(session, category=category, user_ids=user_ids)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User already has this category")
+
+
 @router.delete("/{id}", status_code=204)
 async def delete_category(
         id: int,
         session: AsyncSession = Depends(depends.get_db_session),
-        current_user: AdminUser = Depends(depends.get_current_user)
+        permission=Depends(PermissionChecker([models_permissions.Categories.permissions.DELETE]))
 ):
     db_object = await crud.category.get(session, id=id)
     if not db_object:

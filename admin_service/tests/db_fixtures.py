@@ -1,4 +1,5 @@
 from loguru import logger
+from collections.abc import Callable
 import pytest
 from typing import Generator
 from sqlalchemy import create_engine, select, func, insert, Table, inspect
@@ -47,7 +48,7 @@ def create_objects(session):
 
 
 @pytest.fixture(scope="function")
-def create_object(session):
+def create_object(session) -> Callable[[type[BaseModel], dict], BaseModel]:
     def _create_object(object_type: type[BaseModel], object_data: dict) -> BaseModel:
         obj = object_type(**object_data)
         session.add(obj)

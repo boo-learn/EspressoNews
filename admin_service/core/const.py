@@ -33,3 +33,7 @@ GPTACCOUNTS_URL: Final = "/gpt-accounts"
 # Categories constants
 CATEGORIES_TAGS: Final[List[str | Enum] | None] = ["Categories"]
 CATEGORIES_URL: Final = "/categories"
+
+# Categories constants
+TGUSERS_TAGS: Final[List[str | Enum] | None] = ["TgUsers"]
+TGUSERS_URL: Final = "/tg-users"

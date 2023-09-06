@@ -19,9 +19,10 @@ from pydantic import ValidationError
 
 from shared.models import User, Channel, Subscription, Post, Digest
 from shared.database import sync_session, sync_engine, async_session
-from shared.models import Base
+from shared.models import Base, Category, User
 
 import schemas, repository, crud
+from admin_service.models.admin_user import AdminUser
 
 BASE_DIR = Path(__file__).parent
 
@@ -126,8 +127,6 @@ async def create_user(name: str, email: str, password: str, role: str) -> None:
     Examples:
         python admin_service/cli.py create-user --name admin --email admin@mail.ru --password admin
     """
-
-    # initialize user schema
     try:
         user = schemas.UserCreateSchema(name=name, email=email, password=password, role=role)
     except ValidationError as e:
@@ -142,6 +141,45 @@ async def create_user(name: str, email: str, password: str, role: str) -> None:
             await session.rollback()
         else:
             logger.info(f"New SuperUser created successfully")
+
+
+@cli.command()
+@coro
+async def create_tg_users():
+    category_people = Category(name="People")
+    category_beast = Category(name="Beast")
+
+    tg_users = [
+        {
+            "username": "Alex",
+            "categories": [category_people]
+        },
+        {
+            "username": "Tom",
+            "categories": [category_people]
+        },
+        {
+            "username": "Bob",
+            "categories": [category_people]
+        },
+        {
+            "username": "Wolf",
+            "categories": [category_beast]
+        },
+        {
+            "username": "Cow",
+            "categories": [category_beast]
+        },
+        {
+            "username": "WereWolf",
+            "categories": [category_beast, category_people]
+        },
+    ]
+    async with async_session_scope() as session:
+        for user_data in tg_users:
+            user = User(**user_data)
+            session.add(user)
+        await session.commit()
 
 
 if __name__ == '__main__':

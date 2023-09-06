@@ -9,7 +9,8 @@ from admin_service.endpoints import (
     admin_users,
     tg_accounts,
     gpt_accounts,
-    categories
+    categories,
+    tg_users
 )
 from admin_service.version import __version__
 
@@ -25,3 +26,4 @@ app.include_router(admin_users.router)
 app.include_router(tg_accounts.router)
 app.include_router(gpt_accounts.router)
 app.include_router(categories.router)
+app.include_router(tg_users.router)

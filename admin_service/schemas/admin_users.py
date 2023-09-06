@@ -5,6 +5,7 @@ from admin_service.permissions.roles import Role
 class BaseUserSchema(BaseModel):
     name: str
     email: EmailStr
+    # TODO: add examples(https://fastapi.tiangolo.com/tutorial/schema-extra-example/)
     role: Role
 
 
