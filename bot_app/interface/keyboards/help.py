@@ -33,7 +33,7 @@ class HelpKeyboards(KeyboardsTools):
             KeyboardType.INLINE,
             [
                 [
-                    ('kb_inline_contact', None, 'https://t.me/nekone')
+                    ('kb_inline_contact', None, 'https://t.me/booblegum42')
                 ]
             ]
         )
@@ -42,7 +42,7 @@ class HelpKeyboards(KeyboardsTools):
             KeyboardType.REPLY,
             [
                 [
-                    ('kb_reply_search', 'kb_reply_search'),
+                    # ('kb_reply_search', 'kb_reply_search'),
                     ('kb_reply_lk', 'kb_reply_lk'),
                 ],
                 [

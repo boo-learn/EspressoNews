@@ -9,13 +9,6 @@ class StartKeyboards(KeyboardsTools):
 
     def init_keyboards(self):
         self.register(
-            'after_start_btn', KeyboardType.INLINE, [
-                [('Животные', 'Животные')],
-                [('Война', 'Война')],
-                [('Ужасы', 'Ужасы')],
-            ]
-        )
-        self.register(
             'start',
             KeyboardType.REPLY,
             [
@@ -47,7 +40,7 @@ class StartKeyboards(KeyboardsTools):
             KeyboardType.REPLY,
             [
                 [
-                    ('kb_reply_search', 'kb_reply_search'),
+                    # ('kb_reply_search', 'kb_reply_search'),
                     ('kb_reply_lk', 'kb_reply_lk'),
                 ],
                 [
@@ -62,7 +55,7 @@ class StartKeyboards(KeyboardsTools):
             KeyboardType.REPLY,
             [
                 [
-                    ('kb_reply_search', 'kb_reply_search'),
+                    # ('kb_reply_search', 'kb_reply_search'),
                     ('kb_reply_lk', 'kb_reply_lk'),
                 ],
                 [

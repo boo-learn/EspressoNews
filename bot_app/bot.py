@@ -9,12 +9,15 @@ from bot_app.interface.handlers.digests import DigestsHandlers
 from bot_app.interface.handlers.error import ErrorsHandlers
 from bot_app.interface.handlers.forward_message import ForwardHandlers
 from bot_app.interface.handlers.help import HelpHandlers
+from bot_app.interface.handlers.account import AccountHandlers
+
 from bot_app.interface.handlers.load_test import LoadDataHandlers
 from bot_app.interface.handlers.menu import MenuHandlers
 from bot_app.interface.handlers.settings import SettingsHandlers
 from bot_app.interface.keyboards.channels import ChannelsKeyboards
 from bot_app.interface.keyboards.digests import DigestsKeyboards
 from bot_app.interface.keyboards.help import HelpKeyboards
+from bot_app.interface.keyboards.account import AccountKeyboards
 from bot_app.interface.keyboards.menu import MenuKeyboards
 from bot_app.interface.keyboards.settings import SettingsKeyboards
 from bot_app.interface.keyboards.start import StartKeyboards
@@ -52,15 +55,16 @@ class BotApp:
 
     async def registration_user_and_his_handlers(self):
         self.dp.middleware.setup(RegistrarMiddleware([
-            LoadDataHandlers(),
+            # LoadDataHandlers(),
             StartHandlers(),
             HelpHandlers(),
-            MenuHandlers(),
-            ChannelsHandlers(),
-            SettingsHandlers(),
-            ForwardHandlers(),
-            DigestsHandlers(),
-            ErrorsHandlers(),
+            AccountHandlers()
+            # MenuHandlers(),
+            # ChannelsHandlers(),
+            # SettingsHandlers(),
+            # ForwardHandlers(),
+            # DigestsHandlers(),
+            # ErrorsHandlers(),
         ]))
 
     async def registration_default_commands(self):
@@ -80,11 +84,12 @@ class BotApp:
     @staticmethod
     async def keyboard_registration():
         StartKeyboards()
-        SettingsKeyboards()
-        MenuKeyboards()
+        # SettingsKeyboards()
+        # MenuKeyboards()
         HelpKeyboards()
-        DigestsKeyboards()
-        ChannelsKeyboards()
+        AccountKeyboards()
+        # DigestsKeyboards()
+        # ChannelsKeyboards()
 
     async def on_startup_notify(self):
         for admin in admins:

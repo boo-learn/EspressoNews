@@ -215,6 +215,17 @@ async def get_language(language_name: str):
         raise e
 
 
+async def get_language_by_code(language_code: str):
+    try:
+        async with async_session() as session:
+            result = await session.execute(select(Language).filter(Language.code == language_code))
+            return result.scalars().first()
+    except SQLAlchemyError as e:
+        logger.error('Caught error, rollback', error=e)
+        await session.rollback()
+        raise e
+
+
 async def get_user_settings(user_id: int):
     local_logger = logger.bind(user_id=user_id, mode='async')
     local_logger.info('Getting user settings')
