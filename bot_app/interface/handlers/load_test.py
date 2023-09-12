@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.utils.exceptions import RetryAfter
 
 from bot_app.core.tools.handler_tools import HandlersTools
-from bot_app.databases.cruds import ChannelCRUD, SubscriptionCRUD
+from bot_app.channels.cruds import ChannelCRUD, SubscriptionCRUD
 from bot_app.loader import dp, bot
 
 
@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 class LoadDataHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.register_handlers()
+        self.register_routes()
         self.channel_crud = ChannelCRUD()
         self.subscription_crud = SubscriptionCRUD()
 
-    def register_handlers(self):
-        self.registrar.simply_handler_registration(
+    def register_routes(self):
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_message_handler,
             self.load_accounts,
             'load_accounts_for_test',

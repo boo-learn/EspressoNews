@@ -77,7 +77,7 @@ class UserCRUD:
 
     async def update_user_settings_option(
             self,
-            message_manager,
+            aiogram_message_manager,
             user_id: int,
             option: str,
             value
@@ -87,7 +87,7 @@ class UserCRUD:
             return await self.repository.update_setting(user_id, option, language)
 
         updated_settings_value_mappings = {
-            message_manager.get_message(key): value for key, value in UserCRUD.settings_value_mappings.items()
+            aiogram_message_manager.get_message(key): value for key, value in UserCRUD.settings_value_mappings.items()
         }
 
         mapped_value = updated_settings_value_mappings[value]
@@ -144,6 +144,3 @@ class UserCRUD:
         user = await self.repository.get(user_id)
         user = await self.repository.update(user, first_name=first_name)
         return user
-
-    def get_language(self, param):
-        pass

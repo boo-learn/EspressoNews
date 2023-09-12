@@ -1,3 +1,6 @@
+import json
+import logging
+
 from shared.rabbitmq import Subscriber, QueuesType
 from shared.config import RABBIT_HOST
 

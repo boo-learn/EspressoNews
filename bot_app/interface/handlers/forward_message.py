@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 class ForwardHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.register_handlers()
+        self.register_routes()
         self.channel_crud = ChannelCRUD()
         self.subscription_crud = SubscriptionCRUD()
 
-    def register_handlers(self):
-        self.registrar.simply_handler_registration(
+    def register_routes(self):
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_message_handler,
             self.action_forward_message,
             types.ContentTypes.ANY,
@@ -41,11 +41,11 @@ class ForwardHandlers(HandlersTools):
             channel_username = message.forward_from_chat.username
             members_count = await message.forward_from_chat.get_members_count()
 
-            self.message_manager.set_sender(ReplySender())
+            self.aiogram_message_manager.set_sender(ReplySender())
 
             if not channel_username:
                 logger.warning('Channel username not found')
-                await self.message_manager.send_message('subscribe_failed')
+                await self.aiogram_message_manager.send_message('subscribe_failed')
                 return False
 
             await ChannelStates.forward_message_channel.set()
@@ -67,7 +67,7 @@ class ForwardHandlers(HandlersTools):
 
             await self.subscription_crud.update_subscription(message.from_user.id, channel, True)
 
-            await self.message_manager.send_message(
+            await self.aiogram_message_manager.send_message(
                 'success_subscribe',
                 dynamic_keyboard_parameters=channel_username,
                 channel_title=message.forward_from_chat.full_name
@@ -76,26 +76,23 @@ class ForwardHandlers(HandlersTools):
             await state.finish()
             logger.debug('Finished action_forward_message function')
 
-    # async def unsubscribe_to_the_channel(self, call: types.CallbackQuery):
-    #     channel_username = call.data.split('&slash&')[-1]
-    #
-    #     logger.debug(f'Channel username: {channel_username}')
-    #
-    #     await self.message_manager.delete_before_message()
-    #     logger.debug('Deleted previous message for feedback')
-    #
-    #     await call.message.delete()
-    #     logger.debug('Deleted call message')
-    #
-    #     channel = await self.channel_crud.get_channel(channel_username)
-    #     logger.debug(f'Fetched channel: {channel}')
-    #
-    #     await self.subscription_crud.update_subscription(call.from_user.id, channel, False)
-    #     logger.debug('Updated subscription')
-    #
-    #     channel = await self.channel_crud.get_channel(channel_username)
-    #     logger.debug(f'Fetched channel: {channel}')
-    #
-    #     await self.channel_crud.check_channel_and_delete_if_empty(channel)
-    #     logger.debug('Checked channel and deleted if empty')
-    #     logger.debug('Finished unsubscribe_to_the_channel function')
+    async def unsubscribe_to_the_channel(self, call: types.CallbackQuery):
+        channel_username = call.data.split('&slash&')[-1]
+
+        logger.debug(f'Channel username: {channel_username}')
+
+        await call.message.delete()
+        logger.debug('Deleted call message')
+
+        channel = await self.channel_crud.get_channel(channel_username)
+        logger.debug(f'Fetched channel: {channel}')
+
+        await self.subscription_crud.update_subscription(call.from_user.id, channel, False)
+        logger.debug('Updated subscription')
+
+        channel = await self.channel_crud.get_channel(channel_username)
+        logger.debug(f'Fetched channel: {channel}')
+
+        await self.channel_crud.check_channel_and_delete_if_empty(channel)
+        logger.debug('Checked channel and deleted if empty')
+        logger.debug('Finished unsubscribe_to_the_channel function')

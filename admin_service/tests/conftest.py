@@ -11,6 +11,7 @@ from docker.errors import ImageNotFound
 from fastapi.testclient import TestClient
 from typing import Generator
 from admin_service.main import app
+from admin_service.models.admin_user import AdminUser
 
 pytest_plugins = ['db_fixtures', 'auth_fixtures']
 

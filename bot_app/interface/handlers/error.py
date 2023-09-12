@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 class ErrorsHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.register_handlers()
+        self.register_routes()
 
-    def register_handlers(self):
-        self.registrar.simply_handler_registration(
+    def register_routes(self):
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_message_handler,
             self.error,
             None,
@@ -22,4 +22,4 @@ class ErrorsHandlers(HandlersTools):
         )
 
     async def error(self, message: types.Message):
-        await self.message_manager.send_message('error')
+        await self.aiogram_message_manager.send_message('error')

@@ -15,45 +15,45 @@ logger = logging.getLogger(__name__)
 class StartHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.register_handlers()
+        self.register_routes()
         self.user_crud = UserCRUD()
 
-    def register_handlers(self):
-        self.registrar.simply_handler_registration(
+    def register_routes(self):
+        self.aiogram_registrar.simply_handler_registration(
             aiogram_register_func=dp.register_message_handler,
             handler=self.start_command,
             pattern_or_list='start',
             handler_type='command'
         )
-        self.registrar.multilingual_handler_registration(
+        self.aiogram_registrar.multilingual_handler_registration(
             aiogram_register_func=dp.register_message_handler,
             handler=self.ask_for_name,
             pattern_or_list='setup_now',
             handler_type='text',
             # state=StartStates.overall
         )
-        self.registrar.multilingual_handler_registration(
+        self.aiogram_registrar.multilingual_handler_registration(
             aiogram_register_func=dp.register_message_handler,
             handler=self.default_settings,
             pattern_or_list='setup_later',
             handler_type='text',
             # state=StartStates.overall
         )
-        self.registrar.simply_handler_registration(
+        self.aiogram_registrar.simply_handler_registration(
             aiogram_register_func=dp.register_message_handler,
             handler=self.read_new_name,
             pattern_or_list=None,
             handler_type='always',
             state=StartStates.reading_name
         )
-        self.registrar.simply_handler_registration(
+        self.aiogram_registrar.simply_handler_registration(
             aiogram_register_func=dp.register_callback_query_handler,
             handler=self.keep_name,
             pattern_or_list='keep_name_cb',
             handler_type='text',
             state=StartStates.reading_name
         )
-        self.registrar.simply_handler_registration(
+        self.aiogram_registrar.simply_handler_registration(
             aiogram_register_func=dp.register_callback_query_handler,
             handler=self.read_intonation,
             pattern_or_list='cb_intonation_',
@@ -62,14 +62,14 @@ class StartHandlers(HandlersTools):
         )
 
     async def start_command(self, message: types.Message):
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='start',
             first_name=message.from_user.first_name
         )
         await StartStates.overall.set()
 
     async def ask_for_name(self, message: types.Message):
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='ask_for_name',
             first_name=message.from_user.first_name,
         )
@@ -81,24 +81,24 @@ class StartHandlers(HandlersTools):
             user_id=message.from_user.id,
             first_name=new_name,
         )
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='accepted_new_name',
             first_name=user.first_name,
         )
         await StartStates.overall.set()
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='ask_for_intonation'
         )
 
     async def keep_name(self, call: CallbackQuery, state: FSMContext):
         await call.message.delete_reply_markup()
         await call.answer()
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='accepted_new_name',
             first_name=call.from_user.first_name,
         )
         await state.reset_state(with_data=False)
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='ask_for_intonation'
         )
 
@@ -114,23 +114,23 @@ class StartHandlers(HandlersTools):
             intonation
         )
         if intonation == 'Official':
-            await self.message_manager.send_message(
+            await self.aiogram_message_manager.send_message(
                 key='intonation_set_official_start',
                 intonation=intonation
             )
         else:
-            await self.message_manager.send_message(
+            await self.aiogram_message_manager.send_message(
                 key='intonation_set_sarcastic_start',
                 intonation=intonation
             )
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='settings_complete',
             intonation=intonation
         )
 
     async def default_settings(self, message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)
-        await self.message_manager.send_message(
+        await self.aiogram_message_manager.send_message(
             key='default_settings',
             first_name=message.from_user.first_name
         )

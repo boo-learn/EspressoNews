@@ -23,7 +23,7 @@ from jose import jwt
 
 from shared.database import DATABASE_URI
 
-from admin_service import schemas, repository
+from admin_service import schemas, repository, crud
 from admin_service.models.admin_user import AdminUser
 from admin_service.core.config import settings
 from admin_service.core import const
@@ -78,7 +78,24 @@ async def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = await repository.admin_users.get_by_id(session, id=token_data.user_id)
+    user = await crud.admin_user.get(session, id=token_data.user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
+
+
+from admin_service.permissions.base import ModelPermission
+from admin_service.permissions.roles import get_role_permissions
+
+
+class PermissionChecker:
+    def __init__(self, permissions_required: list[ModelPermission]):
+        self.permissions_required = permissions_required
+
+    def __call__(self, user: AdminUser = Depends(get_current_user)):
+        for permission_required in self.permissions_required:
+            if permission_required not in get_role_permissions(user.role):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Not enough permissions to access this resource")
+        return user

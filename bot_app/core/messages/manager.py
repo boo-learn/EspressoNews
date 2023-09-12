@@ -1,15 +1,20 @@
 import asyncio
 import logging
 
-from bot_app.core.messages.senders import AnswerSender, MessageSender
+import aiogram
+
+from bot_app.core.messages.senders import AnswerSender
+from bot_app.core.types import base
 from bot_app.loader import bot
 from bot_app.core.keyboards.generator import KeyboardGenerator
 from bot_app.core.middlewares.i18n_middleware import i18n
+from shared.config import RETRY_LIMIT, RABBIT_HOST
+from shared.rabbitmq import QueuesType, Producer, MessageData
 
 logger = logging.getLogger(__name__)
 
 
-class MessageManager:
+class AiogramMessageManager:
     """
     Manages the sending of messages from different senders, taking into account the language of the user who gets from
     the cache
@@ -17,7 +22,7 @@ class MessageManager:
 
     def __init__(self, sender=None):
         """
-        Initializes a new MessageManager instance.
+        Initializes a new AiogramMessageManager instance.
 
         :param sender: Optional message sender implementation.
         """
@@ -39,7 +44,7 @@ class MessageManager:
     def set_message(self, message):
         self.message_obj = message
 
-    def set_sender(self, sender: MessageSender):
+    def set_sender(self, sender: base.AiogramMessageSender):
         """
         Sets the message sender implementation.
 
@@ -68,11 +73,6 @@ class MessageManager:
             return message_key
 
     async def _get_reply_markup(self, key, dynamic_keyboard_parameters=None):
-        logger.info(
-            f'Семнадцатый шаг - генерация клавиатуры \n \n'
-            f'{key} \n \n'
-            f'{dynamic_keyboard_parameters} \n \n'
-        )
         keyboard_generator = KeyboardGenerator()
         return await keyboard_generator.generate_keyboard(self, key, dynamic_keyboard_parameters)
 
@@ -93,20 +93,10 @@ class MessageManager:
         :param off_preview: Optional flag to disable web page preview.
         :param message_kwargs: Additional keyword arguments for message content formatting.
         """
-        logging.info(
-            f'Пятнадцатый шаг - вторая проверка объекта сообщения \n \n'
-            f'{self.lang_code} \n \n'
-        )
         self._ensure_language_exists()
-        logging.info(
-            f'Шестнадцатый шаг - проверка  пройдена \n \n'
-            f'{self.message_obj}'
-        )
+
         reply_markup = await self._get_reply_markup(key, dynamic_keyboard_parameters)
-        logger.info(
-            f'23 шаг - клавиатура готова \n \n'
-            f'{reply_markup} \n \n'
-        )
+
         await self.sender.send(
             self,
             key,
@@ -133,12 +123,20 @@ class MessageManager:
             is_last_message = i == len(text_parts) - 1
             keyboard = keyboard if is_last_message else None
 
-            await bot.send_message(
-                chat_id=chat_id,
-                text=text_part,
-                disable_web_page_preview=True,
-                reply_markup=keyboard
-            )
+            for _ in range(RETRY_LIMIT):
+                try:
+                    await bot.send_message(
+                        chat_id=chat_id,
+                        text=text_part,
+                        disable_web_page_preview=True,
+                        reply_markup=keyboard
+                    )
+                except aiogram.exceptions.RetryAfter as error:
+                    await asyncio.sleep(error.timeout)
+                else:
+                    break
+            else:
+                logger.info(f'Failed to send digest after {RETRY_LIMIT} retries')
 
             await asyncio.sleep(1)
 
@@ -159,3 +157,27 @@ class MessageManager:
             chat_id=self.message_obj.chat.id,
             message_id=self.message_obj.message_id - 2
         )
+
+
+class RabbitMQMessageManager:
+    def __init__(self):
+        self.sender = None
+        self.queue_name = None
+
+    def _set_sender(self):
+        self.sender = Producer(host=RABBIT_HOST, queue=QueuesType[self.queue_name])
+
+    def _ensure_queue_name_exists(self):
+        if not self.queue_name:
+            raise ValueError(f"Queue_name is not set!")
+
+    def set_queue_name(self, queue_name):
+        self.queue_name = queue_name
+        self._set_sender()
+
+    async def send_message(self, message: MessageData, queue_name):
+        self._ensure_queue_name_exists()
+        await self.sender.send_message(message_with_data=message, queue=QueuesType[queue_name])
+        # Поменять блять producer так, чтобы в нём использовался общий queue_name, а не приходилось передавать
+        # в двух местах
+

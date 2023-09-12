@@ -1,30 +1,20 @@
-from shared.rabbitmq import Producer, QueuesType, MessageData
-from shared.config import RABBIT_HOST
+from bot_app.core.tools.handler_tools import HandlersTools
+from shared.rabbitmq import MessageData
 
 
-class ChannelRouter:
-    def __init__(self):
-        self.producer = Producer(host=RABBIT_HOST, queue=QueuesType.subscription_service)
-
-    async def send_to_subscribe(
-            self,
-            type: str,
-            msg: str
-    ):
+class ChannelHandlers(HandlersTools):
+    async def send_to_subscribe(self, type: str, msg: str):
         message: MessageData = {
             "type": type,
             "data": msg
         }
-        await self.producer.send_message(message, QueuesType.subscription_service)
+        self.update_queue('subscription_service')
+        await self.rmq_message_manager.send_message(message, 'subscription_service')
 
-    async def send_to_unsubscribe(
-            self,
-            type: str,
-            msg: str,
-            account_id: int
-    ):
+    async def send_to_unsubscribe(self, type: str, msg: str, account_id: int):
         message: MessageData = {
             "type": type,
             "data": (msg, account_id)
         }
-        await self.producer.send_message(message, QueuesType.subscription_service)
+        self.update_queue('subscription_service')
+        await self.rmq_message_manager.send_message(message, 'subscription_service')

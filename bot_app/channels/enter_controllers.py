@@ -10,20 +10,20 @@ logger = logging.getLogger(__name__)
 class ChannelLogicHandler:
     @staticmethod
     async def send_channels_list_to_user(
-            message_manager,
+            aiogram_message_manager,
             user_id,
     ):
         subscription_crud = SubscriptionCRUD()
         subscribed_channels: List[Channel] = await subscription_crud.get_subscribed_channels(user_id)
 
         if subscribed_channels:
-            await message_manager.send_message('channel_list', dynamic_keyboard_parameters=subscribed_channels)
+            await aiogram_message_manager.send_message('channel_list', dynamic_keyboard_parameters=subscribed_channels)
         else:
-            await message_manager.send_message('not_subscribed_channels')
+            await aiogram_message_manager.send_message('not_subscribed_channels')
 
     async def send_channels_list_to_user_after_remove(
             self,
-            message_manager,
+            aiogram_message_manager,
             channel_name,
             user_id,
             state,
@@ -37,10 +37,10 @@ class ChannelLogicHandler:
         await state.finish()
 
         if subscribed_channels:
-            await message_manager.send_message('channel_list', dynamic_keyboard_parameters=subscribed_channels)
+            await aiogram_message_manager.send_message('channel_list', dynamic_keyboard_parameters=subscribed_channels)
             logger.info(f"Sent updated channel list to user {user_id}.")
         else:
-            await message_manager.send_message('not_subscribed_channels')
+            await aiogram_message_manager.send_message('not_subscribed_channels')
             logger.info(f"Informed user {user_id} that they have no channel subscriptions.")
 
     @staticmethod

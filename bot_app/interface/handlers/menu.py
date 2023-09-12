@@ -1,7 +1,6 @@
 import logging
 
 from aiogram import types
-from aiogram.dispatcher.filters import Command
 
 from bot_app.loader import dp
 from bot_app.channels.enter_controllers import ChannelLogicHandler
@@ -14,34 +13,34 @@ logger = logging.getLogger(__name__)
 class MenuHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.register_handlers()
+        self.register_routes()
 
-    def register_handlers(self):
-        self.registrar.simply_handler_registration(
+    def register_routes(self):
+        self.aiogram_registrar.simply_handler_registration(
             dp.register_message_handler,
             self.cmd_menu,
             'menu',
             'command'
         )
-        self.registrar.multilingual_handler_registration(
+        self.aiogram_registrar.multilingual_handler_registration(
             dp.register_message_handler,
             self.menu_button_my_channels,
             'regexp_my_channels',
             'regexp'
         )
-        self.registrar.multilingual_handler_registration(
+        self.aiogram_registrar.multilingual_handler_registration(
             dp.register_message_handler,
             self.menu_button_settings,
             'regexp_settings',
             'regexp'
         )
-        self.registrar.multilingual_handler_registration(
+        self.aiogram_registrar.multilingual_handler_registration(
             dp.register_message_handler,
             self.menu_button_donate,
             'regexp_donat',
             'regexp'
         )
-        self.registrar.multilingual_handler_registration(
+        self.aiogram_registrar.multilingual_handler_registration(
             dp.register_message_handler,
             self.menu_button_help,
             'regexp_help',
@@ -53,18 +52,21 @@ class MenuHandlers(HandlersTools):
         logger.info(
             f'14 шаг - проверка handler menu подходим к отрпавке сообщения'
         )
-        await self.message_manager.send_message('menu')
+        await self.aiogram_message_manager.send_message('menu')
 
     async def menu_button_my_channels(self, message: types.Message):
         user_id = message.from_user.id
         logic_handler = ChannelLogicHandler()
-        await logic_handler.send_channels_list_to_user(self.message_manager, user_id)
+        await logic_handler.send_channels_list_to_user(
+            self.aiogram_message_manager,
+            user_id
+        )
 
     async def menu_button_settings(self, message: types.Message):
-        await self.message_manager.send_message('settings')
+        await self.aiogram_message_manager.send_message('settings')
 
     async def menu_button_donate(self, message: types.Message):
-        await self.message_manager.send_message('thank_you')
+        await self.aiogram_message_manager.send_message('thank_you')
 
     async def menu_button_help(self, message: types.Message):
-        await self.message_manager.send_message('frequent_questions')
+        await self.aiogram_message_manager.send_message('frequent_questions')

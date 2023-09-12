@@ -60,6 +60,32 @@ class Intonation(Base):
     summaries = relationship("Summary", back_populates="intonation")
 
 
+users_categories = Table(
+    "users_categories",
+    Base.metadata,
+    Column("user_id", ForeignKey("users.user_id"), primary_key=True),
+    Column("category_id", ForeignKey("categories.id"), primary_key=True),
+)
+
+
+# black-magic: category.user_ids.extend([3, 4]), where 3,4 - user_id
+class CategoryAssociation(Base):
+    __table__ = users_categories
+    category: Mapped["Category"] = relationship('Category', back_populates="category_recs")
+
+
+class Category(Base):
+    __tablename__ = 'categories'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str]
+    users: Mapped[List["User"]] = relationship(secondary=users_categories, viewonly=True)
+    category_recs: Mapped[list["CategoryAssociation"]] = relationship("CategoryAssociation", back_populates="category",
+                                                                      cascade="all, delete-orphan", lazy="joined")
+    user_ids: Mapped[list[int]] = association_proxy(
+        "category_recs", "id",
+        creator=lambda uid: CategoryAssociation(user_id=uid))
+
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -70,6 +96,7 @@ class User(Base):
     language_code = Column(Enum('ru', 'en', name='language_code'), nullable=True)
 
     is_active = Column(Boolean, default=True)
+    # TODO: удалить поля is_admin и is_staff ,после merge с develop
     is_admin = Column(Boolean, default=False)
     is_staff = Column(Boolean, default=False)
 
@@ -79,6 +106,9 @@ class User(Base):
     subscriptions = relationship('Subscription', back_populates='user')
     settings = relationship("UserSettings", back_populates="user", uselist=False)
     digests: Mapped["Digest"] = relationship("Digest", back_populates="user", uselist=False)
+    categories: Mapped[List["Category"]] = relationship(
+        lazy="joined", secondary=users_categories, back_populates="users"
+    )
     # access_channels = relationship("Channel", back_populates="user")
 
 
@@ -152,7 +182,7 @@ class Digest(Base):
     intonation_id = Column(Integer)
     language_id = Column(Integer)
     is_active = Column(Boolean, default=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     user: Mapped["User"] = relationship("User", back_populates="digests")
     posts: Mapped[List["Post"]] = relationship(secondary=digests_posts, viewonly=True)
     # generation_date = Column(DateTime, nullable=False, default=datetime.now)

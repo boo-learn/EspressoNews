@@ -4,6 +4,7 @@ from sqlalchemy import select
 from shared.models import TelegramAccount
 from admin_service.core.const import TGACCOUNTS_URL
 from admin_service import schemas
+from admin_service.permissions.roles import Role
 
 
 def test_get_tg_accounts(create_objects, client: TestClient):
@@ -59,14 +60,15 @@ def test_get_tg_account_by_id_not_found(client: TestClient):
     assert result.status_code == 404
 
 
-def test_create_tg_account(client: TestClient, superuser_token_headers):
+def test_create_tg_account(client: TestClient, user_token_headers):
     account_data = {
         "api_id": 28122381,
         "api_hash": "eb1fc2cc4771b19abcf5e570e4b1fa2b",
         "phone_number": "+18629992207",
         "session_string": "1AZWarzsBuy8qxcdk8hZOrQz7x..."
     }
-    result = client.post(f"{TGACCOUNTS_URL}", json=account_data, headers=superuser_token_headers)
+    token_headers = user_token_headers(user_role=Role.ADMINISTRATOR)
+    result = client.post(f"{TGACCOUNTS_URL}", json=account_data, headers=token_headers)
     account = result.json()
     assert result.status_code == 200
     schemas.TgAccountSchema(**account)
@@ -83,7 +85,7 @@ def test_create_tg_account_without_auth(client: TestClient):
     assert result.status_code == 401
 
 
-def test_tg_account_update(session, create_object, client: TestClient, superuser_token_headers):
+def test_tg_account_update(session, create_object, client: TestClient, user_token_headers):
     account_data = {
         "api_id": 28122381,
         "api_hash": "eb1fc2cc4771b19abcf5e570e4b1fa2b",
@@ -94,9 +96,9 @@ def test_tg_account_update(session, create_object, client: TestClient, superuser
         "api_id": 9999,
         "phone_number": "+9999",
     }
-
+    token_headers = user_token_headers(user_role=Role.ADMINISTRATOR)
     create_object(TelegramAccount, account_data)
-    result = client.put(f"{TGACCOUNTS_URL}/1", json=edited_account_data, headers=superuser_token_headers)
+    result = client.put(f"{TGACCOUNTS_URL}/1", json=edited_account_data, headers=token_headers)
     edited_account = result.json()
     assert result.status_code == 200
     assert edited_account["api_id"] == edited_account_data["api_id"]
@@ -117,14 +119,15 @@ def test_tg_account_delete_without_auth(create_object, client: TestClient):
     assert result.status_code == 401
 
 
-def test_tg_account_delete(session, create_object, client: TestClient, superuser_token_headers):
+def test_tg_account_delete(session, create_object, client: TestClient, user_token_headers):
     account_data = {
         "api_id": 28122381,
         "api_hash": "eb1fc2cc4771b19abcf5e570e4b1fa2b",
         "phone_number": "+18629992207",
         "session_string": "1AZWarzsBuy8qxcdk8hZOrQz7x..."
     }
+    token_headers = user_token_headers(user_role=Role.ADMINISTRATOR)
     create_object(TelegramAccount, account_data)
-    result = client.delete(f"{TGACCOUNTS_URL}/1", headers=superuser_token_headers)
+    result = client.delete(f"{TGACCOUNTS_URL}/1", headers=token_headers)
     assert result.status_code == 204
     assert session.scalar(select(TelegramAccount).where(TelegramAccount.api_id == account_data["api_id"])) is None
