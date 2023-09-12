@@ -23,6 +23,17 @@ class UserCRUD:
     def __init__(self):
         self.repository = UserRepository()
 
+    async def update_user_data_by_user_id(
+            self,
+            user_id,
+            **kwargs
+    ):
+        user = await self.repository.get(user_id)
+        await self.repository.update(user, **kwargs)
+
+    async def get_all_user_ids(self):
+        return self.repository.get_all_ids()
+
     async def check_user_and_create_if_none(
             self,
             user_id: int,

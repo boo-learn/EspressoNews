@@ -3,50 +3,101 @@ from typing import Optional, Tuple, List
 
 import aiogram
 
+from bot_app.core.messages.manager import AiogramMessageManager
+from bot_app.core.types import base
 from bot_app.digests.cruds import DigestCRUD
 
-from bot_app.core.users.crud import UserCRUD
-from bot_app.core.tools.handler_tools import HandlersTools
 from bot_app.core.messages.senders import AbstractSender
 from shared.config import DIGESTS_LIMIT
-from shared.db_utils import update_or_create_schedule_in_db
 
 logger = logging.getLogger(__name__)
 
 
-class DigestMailingManager(HandlersTools):
+class NotificationMailingManager(base.MailingManager):
     def __init__(self):
         super().__init__()
-        self.user_crud = UserCRUD()
+        self.aiogram_message_manager = AiogramMessageManager(sender=AbstractSender())
 
-    async def create_rule_for_all(self):
-        logger.info("Starting to create mail rules...")
-        user_ids, users_list_periodicity_options = await self.user_crud.get_settings_option_for_all_users(
-            'periodicity'
+    async def create_rule_for_all(
+            self,
+            task_name_template: str,
+            task_func: str,
+            cron_periodicity: str = None,
+            setting_option: str = None
+    ):
+        await self._base_create_rule_for_all(
+            task_name_template,
+            task_func,
+            cron_periodicity,
+            setting_option,
         )
 
-        for user_id, option in zip(user_ids, users_list_periodicity_options):
-            await self.create_rule(user_id, option)
+    async def create_rule(
+            self,
+            user_id: int,
+            cron_periodicity: str,
+            task_name_template: str,
+            task_func: str
+    ):
+        await self._base_create_rule(
+            user_id,
+            cron_periodicity,
+            task_name_template,
+            task_func
+        )
 
-        logger.info("Finished creating mail rules.")
+    def send(
+            self,
+            message_key,
+    ):
+        users = self.user_crud.get_all_users()
 
-    @staticmethod
-    async def create_rule(user_id: int, periodicity_option: str):
-        logger.info(f"Starting to create mail rule for user {user_id}...")
-        logger.info(f"Got settings option for user {user_id}.")
+        for user in users:
+            user_language_object = await self.user_crud.get_settings_option_for_user(user.user_id, 'language')
+            self.aiogram_message_manager.set_language(user_language_object.code)
 
-        if periodicity_option is None:
-            periodicity_option = '0 */1 */1 */1 */1'
+            try:
+                await self.aiogram_message_manager.send_message(
+                    message_key,
+                    user.user_id,
+                    name=user.first_name
+                )
+            except aiogram.exceptions.BotBlocked:
+                await self.user_crud.disable_user(user.user_id)
 
-        task_name = f'generate-digest-for-{str(user_id)}'
-        task_schedule = {
-            'task': 'tasks.generate_digest_for_user',
-            'schedule': periodicity_option,
-            'args': (user_id,),
-        }
-        logging.info(f"{task_schedule}")
-        await update_or_create_schedule_in_db(task_name, task_schedule)
-        logger.info(f"Finished creating mail rule for user {user_id}.")
+
+class DigestMailingManager(base.MailingManager):
+    def __init__(self):
+        super().__init__()
+        self.aiogram_message_manager = AiogramMessageManager(sender=AbstractSender())
+
+    async def create_rule_for_all(
+            self,
+            task_name_template: str,
+            task_func: str,
+            cron_periodicity: str = None,
+            setting_option: str = None
+    ):
+        await self._base_create_rule_for_all(
+            task_name_template,
+            task_func,
+            cron_periodicity,
+            setting_option,
+        )
+
+    async def create_rule(
+            self,
+            user_id: int,
+            cron_periodicity: str,
+            task_name_template: str,
+            task_func: str
+    ):
+        await self._base_create_rule(
+            user_id,
+            cron_periodicity,
+            task_name_template,
+            task_func
+        )
 
     @staticmethod
     async def fetch_and_format_digest(
@@ -128,7 +179,6 @@ class DigestMailingManager(HandlersTools):
         user_language_object = await self.user_crud.get_settings_option_for_user(data['user_id'], 'language')
 
         self.aiogram_message_manager.set_language(user_language_object.code)
-        self.aiogram_message_manager.set_sender(AbstractSender())
 
         try:
             await self.aiogram_message_manager.send_message('digest_not_exist', data["user_id"])

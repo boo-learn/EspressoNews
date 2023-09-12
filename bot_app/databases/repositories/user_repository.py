@@ -39,14 +39,24 @@ class UserRepository:
                 stmt = (select(User)
                         .options(joinedload(User.settings))
                         .options(
-                            joinedload(User.settings).joinedload(UserSettings.intonation))
+                    joinedload(User.settings).joinedload(UserSettings.intonation))
                         .options(
-                            joinedload(User.settings).joinedload(UserSettings.role))
+                    joinedload(User.settings).joinedload(UserSettings.role))
                         .options(
-                            joinedload(User.settings).joinedload(UserSettings.language))
+                    joinedload(User.settings).joinedload(UserSettings.language))
                         .where(User.user_id == user_id))
                 result = await session.execute(stmt)
                 return result.scalars().first()
+        except SQLAlchemyError as e:
+            raise e
+
+    @staticmethod
+    async def get_all_ids():
+        try:
+            async with async_session() as session:
+                stmt = select(User.user_id)
+                result = await session.execute(stmt)
+                return result.scalars().all()
         except SQLAlchemyError as e:
             raise e
 

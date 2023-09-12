@@ -71,6 +71,13 @@ class AiogramRoutesRegistrar:
                     state=state
                 )
             ),
+            "only_state": (
+                lambda x, y: None,
+                lambda aiogram_register_func, func, state: aiogram_register_func(
+                    func,
+                    state=state
+                )
+            ),
             "always": (
                 lambda x, y: None,
                 lambda aiogram_register_func, func, _, state: aiogram_register_func(func, state=state)

@@ -21,7 +21,7 @@ from bot_app.interface.keyboards.start import StartKeyboards
 from bot_app.settings import admins
 from bot_app.interface.handlers.start import StartHandlers
 from bot_app.loader import dp
-from bot_app.digests.enter_controllers import DigestMailingManager
+from bot_app.digests.enter_controllers import DigestMailingManager, NotificationMailingManager
 from bot_app.core.middlewares.i18n_middleware import i18n
 from bot_app.core.middlewares.registrar_middleware import RegistrarMiddleware
 
@@ -33,6 +33,7 @@ class BotApp:
     def __init__(self, dispatcher):
         self.dp = dispatcher
         self.digest_mailing_manager = DigestMailingManager()
+        self.notification_mailing_manager = NotificationMailingManager()
 
     async def on_startup(self, dispatcher):
         self.dp.middleware.setup(i18n)
@@ -91,7 +92,16 @@ class BotApp:
                 logging.exception(err)
 
     async def create_mail_rules(self):
-        await self.digest_mailing_manager.create_rule_for_all()
+        await self.digest_mailing_manager.create_rule_for_all(
+            task_name_template="generate-digest",
+            task_func="tasks.generate_digest_for_user",
+            setting_option="periodicity"
+        )
+        await self.notification_mailing_manager.create_rule_for_all(
+            task_name_template="generate-notification-email",
+            task_func="tasks.generate_notification_email_for_user",
+            cron_periodicity="* * * * *"
+        )
 
     @staticmethod
     async def gradual_mailing_digests_to_users():

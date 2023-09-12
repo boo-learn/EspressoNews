@@ -287,3 +287,11 @@ class BeatSchedule(Base):
     kwargs = Column(JSON, nullable=True)
     last_run_at = Column(DateTime, nullable=True)
     total_run_count = Column(Integer, default=0)
+
+
+class Route(Base):
+    id = Column(Integer, primary_key=True)
+    key = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+
+    labeles = relationship()
