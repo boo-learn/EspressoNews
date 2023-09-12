@@ -4,6 +4,9 @@ from aiogram import types
 from aiogram.types import CallbackQuery
 
 from bot_app.core.users.crud import UserCRUD
+from bot_app.channels.cruds import SubscriptionCRUD, ChannelCRUD
+from bot_app.channels.enter_controllers import ChannelLogicHandler
+from bot_app.channels.cruds import SubscriptionCRUD
 from bot_app.loader import dp
 from bot_app.core.tools.handler_tools import HandlersTools
 from bot_app.interface.states import AccountStates
@@ -17,6 +20,10 @@ class AccountHandlers(HandlersTools):
         super().__init__()
         self.register_handlers()
         self.user_crud = UserCRUD()
+        self.subscription_crud = SubscriptionCRUD()
+        self.channel_crud = ChannelCRUD()
+        self.logic_handler = ChannelLogicHandler()
+
 
     def register_handlers(self):
         self.registrar.multilingual_handler_registration(
@@ -62,6 +69,25 @@ class AccountHandlers(HandlersTools):
             pattern_or_list='cb_language_set_',
             handler_type='text_contains',
         )
+        self.registrar.multilingual_handler_registration(
+            aiogram_register_func=dp.register_message_handler,
+            handler=self.show_channels,
+            pattern_or_list='kb_reply_my_channels',
+            handler_type='text'
+        )
+        self.registrar.simply_handler_registration(
+            aiogram_register_func=dp.register_callback_query_handler,
+            handler=self.unsubscribe_from_channel,
+            pattern_or_list='unsubscribe_',
+            handler_type='text_contains',
+        )
+        self.registrar.simply_handler_registration(
+            aiogram_register_func=dp.register_callback_query_handler,
+            handler=self.navigate_channels,
+            pattern_or_list='^channels_.+',
+            handler_type='regexp',
+        )
+
 
     async def account_main(self, message: types.Message):
         await self.message_manager.send_message(
@@ -82,11 +108,11 @@ class AccountHandlers(HandlersTools):
         )
         if intonation == 'Official':
             await self.message_manager.send_message(
-                key='intonation_set_official'
+                key='intonation_set_official_from_account'
             )
         else:
             await self.message_manager.send_message(
-                key='intonation_set_sarcastic'
+                key='intonation_set_sarcastic_from_account'
             )
 
     async def ask_for_name(self, message: types.Message):
@@ -123,3 +149,69 @@ class AccountHandlers(HandlersTools):
         await self.message_manager.send_message(
             key='language_updated'
         )
+
+    async def show_channels(self, message: types.Message, state: FSMContext):
+        subscribed_channels = await self.subscription_crud.get_subscribed_channels(message.from_user.id)
+        await state.update_data({
+            'subscribed_channels': subscribed_channels,
+            'limit': 3,
+            'offset': 0
+        })
+
+        if subscribed_channels:
+            await self.message_manager.send_message(
+                'channel_list',
+                dynamic_keyboard_parameters=(subscribed_channels, 3, 0)
+            )
+        else:
+            await self.message_manager.send_message('not_subscribed_channels')
+
+    async def navigate_channels(self, call: CallbackQuery, state: FSMContext):
+        data = await state.get_data()
+        subscribed_channels = data['subscribed_channels']
+        limit = data['limit']
+        offset = data['offset']
+        if call.data == 'channels_current':
+            await call.answer(str((len(subscribed_channels))))
+            return
+        await call.message.delete()
+        if call.data == 'channels_prev':
+            offset = offset - limit
+        else:
+            offset = offset + limit
+        await state.update_data({'offset': offset})
+        await self.message_manager.send_message(
+            'channel_list',
+            dynamic_keyboard_parameters=(subscribed_channels, limit, offset)
+        )
+
+    async def unsubscribe_from_channel(self, call: CallbackQuery, state: FSMContext):
+        channel_id_parts = call.data.split('_')[1:]
+        channel_id = '_'.join(channel_id_parts)
+        channel = await self.channel_crud.get_channel_by_id(channel_id)
+        subscription_for_delete = await self.subscription_crud.get_subscription(
+            call.from_user.id,
+            channel
+        )
+        await self.subscription_crud.delete_subscription(
+            subscription_for_delete
+        )
+        await self.subscription_crud.check_channel_and_delete_if_empty(channel)
+        await self.message_manager.send_message('unsubscribed_from', channel=channel.channel_name)
+        await call.message.delete()
+        subscribed_channels = await self.subscription_crud.get_subscribed_channels(call.from_user.id)
+        data = await state.get_data()
+        await state.update_data({'subscribed_channels': subscribed_channels})
+        limit = data['limit']
+        offset = data['offset']
+        if len(subscribed_channels) <= offset:
+            offset -= limit
+            await state.update_data({'offset': offset})
+        if subscribed_channels:
+            await self.message_manager.send_message(
+                'channel_list',
+                dynamic_keyboard_parameters=(subscribed_channels, limit, offset)
+            )
+        else:
+            await self.message_manager.send_message('not_subscribed_channels')
+

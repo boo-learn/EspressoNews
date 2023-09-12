@@ -13,8 +13,8 @@ class StartKeyboards(KeyboardsTools):
             KeyboardType.REPLY,
             [
                 [
-                    ('Настроить сейчас ✅',),
-                    ('Настроить позже ➡',),
+                    ('setup_now',),
+                    ('setup_later',),
                 ],
             ]
         )

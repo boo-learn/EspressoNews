@@ -1,5 +1,44 @@
+import logging
+
 from bot_app.core.keyboards.creators import KeyboardType
 from bot_app.core.tools.keyboards_tools import KeyboardsTools
+
+
+def build_channels_list(data):
+    channels, limit, offset = data
+    logging.error(channels)
+    logging.error(f'===================\n{limit}\n{offset}\n===============')
+    result = []
+    if len(channels) <= limit:
+        for channel in channels:
+            btn_text = channel[0].channel_name + ' ❌'
+            btn_cb = f"unsubscribe_{channel[0].channel_id}"
+            result.append([(btn_text, btn_cb)])
+    else:
+        for channel in channels[offset:limit+offset]:
+            btn_text = channel[0].channel_name + ' ❌'
+            btn_cb = f"unsubscribe_{channel[0].channel_id}"
+            result.append([(btn_text, btn_cb)])
+        # if offset == 0:
+        #     result.append([
+        #         ('<', 'prev'),
+                # (str(int(offset/limit + 1)), 'channels_current'),
+                # ('>', 'channels_next')
+            # ])
+        # elif len(channels) - offset - limit < limit:
+        #     result.append([
+        #         ('<', 'channels_prev'),
+        #         (str(int(offset/limit + 1)), 'channels_current'),
+        #         ('>', 'next')
+            # ])
+        # else:
+        result.append([
+            ('<', 'channels_prev'),
+            (str(int(offset/limit + 1)), 'channels_current'),
+            ('>', 'channels_next')
+        ])
+
+    return result
 
 
 class AccountKeyboards(KeyboardsTools):
@@ -36,18 +75,47 @@ class AccountKeyboards(KeyboardsTools):
                 [
                     ("🇷🇺 Русский", "cb_language_set_ru"),
                     ("🇺🇸 English", "cb_language_set_en"),
-                    ("🇮🇳 हिन्दी", "cb_language_set_hi"),
+                    #("🇮🇳 हिन्दी", "cb_language_set_hi"),
 
                 ],
+                # [
+                #     ("🇨🇳 中文", "cb_language_set_zh"),
+                #     ("🇸🇦 العربية", "cb_language_set_ar"),
+                #     ("🇧🇩 বাংলা", "cb_language_set_bn"),
+                # ],
+                # [
+                #     ("🇪🇸 Español", "cb_language_set_es"),
+                #     ("🇵🇹 Português", "cb_language_set_pt"),
+                #     ("🇯🇵 日本語", "cb_language_set_ja"),
+                # ],
+            ]
+        )
+        self.register(
+            'channel_list',
+            KeyboardType.INLINE,
+            build_channels_list
+            # lambda channels: [
+            #     [
+            #         (
+            #             channel[0].channel_name + ' ❌',
+            #             f"unsubscribe_{channel[0].channel_id}"
+            #         )
+            #     ]
+            #     for channel in channels
+            # ]
+        )
+        self.register(
+            'language_updated', KeyboardType.REPLY, [
                 [
-                    ("🇨🇳 中文", "cb_language_set_zh"),
-                    ("🇸🇦 العربية", "cb_language_set_ar"),
-                    ("🇧🇩 বাংলা", "cb_language_set_bn"),
+                    ('kb_reply_my_channels', )
                 ],
                 [
-                    ("🇪🇸 Español", "cb_language_set_es"),
-                    ("🇵🇹 Português", "cb_language_set_pt"),
-                    ("🇯🇵 日本語", "cb_language_set_ja"),
+                    ('kb_reply_change_intonation', ),
+                    ('kb_reply_change_name', ),
+                ],
+                [
+                    ('kb_reply_change_language', ),
+                    ('kb_reply_to_main', ),
                 ],
             ]
         )

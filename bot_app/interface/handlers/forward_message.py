@@ -27,12 +27,12 @@ class ForwardHandlers(HandlersTools):
             'content_types',
 
         )
-        self.registrar.simply_handler_registration(
-            dp.register_callback_query_handler,
-            self.unsubscribe_to_the_channel,
-            'do not subscribe',
-            'text_contains'
-        )
+        # self.registrar.simply_handler_registration(
+        #     dp.register_callback_query_handler,
+        #     self.unsubscribe_to_the_channel,
+        #     'do not subscribe',
+        #     'text_contains'
+        # )
 
     # в функцию не передаётся members count
     async def action_forward_message(self, message: types.Message, state: FSMContext):
@@ -76,26 +76,26 @@ class ForwardHandlers(HandlersTools):
             await state.finish()
             logger.debug('Finished action_forward_message function')
 
-    async def unsubscribe_to_the_channel(self, call: types.CallbackQuery):
-        channel_username = call.data.split('&slash&')[-1]
-
-        logger.debug(f'Channel username: {channel_username}')
-
-        await self.message_manager.delete_before_message()
-        logger.debug('Deleted previous message for feedback')
-
-        await call.message.delete()
-        logger.debug('Deleted call message')
-
-        channel = await self.channel_crud.get_channel(channel_username)
-        logger.debug(f'Fetched channel: {channel}')
-
-        await self.subscription_crud.update_subscription(call.from_user.id, channel, False)
-        logger.debug('Updated subscription')
-
-        channel = await self.channel_crud.get_channel(channel_username)
-        logger.debug(f'Fetched channel: {channel}')
-
-        await self.channel_crud.check_channel_and_delete_if_empty(channel)
-        logger.debug('Checked channel and deleted if empty')
-        logger.debug('Finished unsubscribe_to_the_channel function')
+    # async def unsubscribe_to_the_channel(self, call: types.CallbackQuery):
+    #     channel_username = call.data.split('&slash&')[-1]
+    #
+    #     logger.debug(f'Channel username: {channel_username}')
+    #
+    #     await self.message_manager.delete_before_message()
+    #     logger.debug('Deleted previous message for feedback')
+    #
+    #     await call.message.delete()
+    #     logger.debug('Deleted call message')
+    #
+    #     channel = await self.channel_crud.get_channel(channel_username)
+    #     logger.debug(f'Fetched channel: {channel}')
+    #
+    #     await self.subscription_crud.update_subscription(call.from_user.id, channel, False)
+    #     logger.debug('Updated subscription')
+    #
+    #     channel = await self.channel_crud.get_channel(channel_username)
+    #     logger.debug(f'Fetched channel: {channel}')
+    #
+    #     await self.channel_crud.check_channel_and_delete_if_empty(channel)
+    #     logger.debug('Checked channel and deleted if empty')
+    #     logger.debug('Finished unsubscribe_to_the_channel function')

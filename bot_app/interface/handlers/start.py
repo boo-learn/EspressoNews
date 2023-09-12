@@ -28,16 +28,16 @@ class StartHandlers(HandlersTools):
         self.registrar.multilingual_handler_registration(
             aiogram_register_func=dp.register_message_handler,
             handler=self.ask_for_name,
-            pattern_or_list='Настроить сейчас ✅',
+            pattern_or_list='setup_now',
             handler_type='text',
-            state=StartStates.overall
+            # state=StartStates.overall
         )
         self.registrar.multilingual_handler_registration(
             aiogram_register_func=dp.register_message_handler,
             handler=self.default_settings,
-            pattern_or_list='Настроить позже ➡',
+            pattern_or_list='setup_later',
             handler_type='text',
-            state=StartStates.overall
+            # state=StartStates.overall
         )
         self.registrar.simply_handler_registration(
             aiogram_register_func=dp.register_message_handler,
@@ -58,7 +58,7 @@ class StartHandlers(HandlersTools):
             handler=self.read_intonation,
             pattern_or_list='cb_intonation_',
             handler_type='text_contains',
-            state=StartStates.overall
+            # state=StartStates.overall
         )
 
     async def start_command(self, message: types.Message):
@@ -103,7 +103,7 @@ class StartHandlers(HandlersTools):
         )
 
     async def read_intonation(self, call: CallbackQuery, state: FSMContext):
-        await state.reset_state(with_data=False)
+        # await state.reset_state(with_data=False)
         await call.answer()
         await call.message.delete_reply_markup()
         intonation = call.data[14:]
@@ -115,12 +115,12 @@ class StartHandlers(HandlersTools):
         )
         if intonation == 'Official':
             await self.message_manager.send_message(
-                key='intonation_set_official',
+                key='intonation_set_official_start',
                 intonation=intonation
             )
         else:
             await self.message_manager.send_message(
-                key='intonation_set_sarcastic',
+                key='intonation_set_sarcastic_start',
                 intonation=intonation
             )
         await self.message_manager.send_message(
