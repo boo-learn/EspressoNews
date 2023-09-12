@@ -30,14 +30,14 @@ class StartHandlers(HandlersTools):
             handler=self.ask_for_name,
             pattern_or_list='setup_now',
             handler_type='text',
-            # state=StartStates.overall
+            state=StartStates.overall
         )
         self.aiogram_registrar.multilingual_handler_registration(
             aiogram_register_func=dp.register_message_handler,
             handler=self.default_settings,
             pattern_or_list='setup_later',
             handler_type='text',
-            # state=StartStates.overall
+            state=StartStates.overall
         )
         self.aiogram_registrar.simply_handler_registration(
             aiogram_register_func=dp.register_message_handler,
@@ -58,7 +58,7 @@ class StartHandlers(HandlersTools):
             handler=self.read_intonation,
             pattern_or_list='cb_intonation_',
             handler_type='text_contains',
-            # state=StartStates.overall
+            state=StartStates.overall
         )
 
     async def start_command(self, message: types.Message):
@@ -101,9 +101,9 @@ class StartHandlers(HandlersTools):
         await self.aiogram_message_manager.send_message(
             key='ask_for_intonation'
         )
+        await StartStates.overall.set()
 
     async def read_intonation(self, call: CallbackQuery, state: FSMContext):
-        # await state.reset_state(with_data=False)
         await call.answer()
         await call.message.delete_reply_markup()
         intonation = call.data[14:]
@@ -127,6 +127,7 @@ class StartHandlers(HandlersTools):
             key='settings_complete',
             intonation=intonation
         )
+        await state.reset_state(with_data=False)
 
     async def default_settings(self, message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)

@@ -44,8 +44,16 @@ msgstr "Select the desired intonation for our communication:"
 
 msgid "intonation_set_official"
 msgstr "✅ Intonation set: <b>Official</b>"
+msgid "intonation_set_official_start"
+msgstr "✅ Intonation set: <b>Official</b>"
+msgid "intonation_set_official_from_account"
+msgstr "✅ Intonation set: <b>Official</b>"
 
 msgid "intonation_set_sarcastic"
+msgstr "✅ Intonation set: <b>Sarcastic-joking</b>"
+msgid "intonation_set_sarcastic_start"
+msgstr "✅ Intonation set: <b>Sarcastic-joking</b>"
+msgid "intonation_set_sarcastic_from_account"
 msgstr "✅ Intonation set: <b>Sarcastic-joking</b>"
 
 msgid "settings_complete"

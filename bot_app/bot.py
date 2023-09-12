@@ -53,6 +53,7 @@ class BotApp:
         self.dp.middleware.setup(RegistrarMiddleware([
             StartHandlers(),
             HelpHandlers(),
+            MenuHandlers(),
             AccountHandlers(),
             ForwardHandlers(),
         ]))

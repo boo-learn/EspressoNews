@@ -6,8 +6,6 @@ from bot_app.core.tools.keyboards_tools import KeyboardsTools
 
 def build_channels_list(data):
     channels, limit, offset = data
-    logging.error(channels)
-    logging.error(f'===================\n{limit}\n{offset}\n===============')
     result = []
     if len(channels) <= limit:
         for channel in channels:
@@ -19,19 +17,6 @@ def build_channels_list(data):
             btn_text = channel[0].channel_name + ' ❌'
             btn_cb = f"unsubscribe_{channel[0].channel_id}"
             result.append([(btn_text, btn_cb)])
-        # if offset == 0:
-        #     result.append([
-        #         ('<', 'prev'),
-                # (str(int(offset/limit + 1)), 'channels_current'),
-                # ('>', 'channels_next')
-            # ])
-        # elif len(channels) - offset - limit < limit:
-        #     result.append([
-        #         ('<', 'channels_prev'),
-        #         (str(int(offset/limit + 1)), 'channels_current'),
-        #         ('>', 'next')
-            # ])
-        # else:
         result.append([
             ('<', 'channels_prev'),
             (str(int(offset/limit + 1)), 'channels_current'),
@@ -94,15 +79,6 @@ class AccountKeyboards(KeyboardsTools):
             'channel_list',
             KeyboardType.INLINE,
             build_channels_list
-            # lambda channels: [
-            #     [
-            #         (
-            #             channel[0].channel_name + ' ❌',
-            #             f"unsubscribe_{channel[0].channel_id}"
-            #         )
-            #     ]
-            #     for channel in channels
-            # ]
         )
         self.register(
             'language_updated', KeyboardType.REPLY, [

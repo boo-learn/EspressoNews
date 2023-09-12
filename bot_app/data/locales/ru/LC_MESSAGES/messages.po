@@ -44,7 +44,19 @@ msgstr "Выберите желаемую интонацию для нашего
 msgid "intonation_set_official"
 msgstr "✅ Установлена интонация: <b>Официальная</b>"
 
+msgid "intonation_set_official_start"
+msgstr "✅ Установлена интонация: <b>Официальная</b>"
+
+msgid "intonation_set_official_from_account"
+msgstr "✅ Установлена интонация: <b>Официальная</b>"
+
 msgid "intonation_set_sarcastic"
+msgstr "✅ Установлена интонация: <b>Саркастично-шутливая</b>"
+
+msgid "intonation_set_sarcastic_start"
+msgstr "✅ Установлена интонация: <b>Официальная</b>"
+
+msgid "intonation_set_sarcastic_from_account"
 msgstr "✅ Установлена интонация: <b>Саркастично-шутливая</b>"
 
 msgid "settings_complete"
