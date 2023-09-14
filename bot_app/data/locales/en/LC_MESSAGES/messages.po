@@ -103,6 +103,28 @@ msgstr "Role"
 msgid 'change_option_language'
 msgstr "Language"
 
+msgid 'suggestion_enter_mail'
+msgstr "<b>Hello, {name}!</b> 😊 \n\n"
+       "I would like to offer you a convenient opportunity to save your "
+       "settings and data. To do this, I suggest <b>You need to enter an email</b> 📬. \n \n"
+       "After adding mail, you don't have to worry about losing settings when deleting a channel "
+       "or exiting the bot. It will always be enough for you to simply enter your email for "
+       "authorization, and all your settings and channels will remain safe 🔒."
+
+msgid 'no_send_email'
+msgstr "I understand your choice! If in the future you want to take advantage of the convenience of saving settings "
+       "through adding mail, feel free to return to this option."
+
+msgid 'enter_email'
+msgstr "Please enter your email address ⬇️"
+
+msgid 'thanks_for_email'
+msgstr '✅ Great! Thank you for agreeing to enter the mail. This will help me provide you with the best '
+       'experience using the bot 🤖.'
+
+msgid 'fake_mail'
+msgstr 'The mail you entered did not pass validation.'
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions
 # ---------------------------------------------------------------------------------------------------------------------

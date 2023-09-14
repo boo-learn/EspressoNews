@@ -102,6 +102,28 @@ msgstr "Papel"
 msgid 'change_option_language'
 msgstr "Idioma"
 
+msgid 'suggestion_enter_mail'
+msgstr "<b>Olá, {name}!</b> 😊 \n\n"
+       "Eu gostaria de oferecer-lhe uma oportunidade conveniente para manter seus"
+       "configurações e dados. Para fazer isso, sugiro <b>que você insira um e-mail</b> 📬. \n \n"
+       "Depois de adicionar o e-mail, você não precisa se preocupar em perder as configurações ao excluir o canal "
+       "ou sair do bot. Você sempre terá o suficiente para inserir seu e-mail para "
+       "a autenticação e todas as suas configurações e canais serão mantidos em segurança 🔒."
+
+msgid 'no_send_email'
+msgstr "Entendo sua escolha! Se, no futuro, você quiser usar a conveniência de salvar as configurações "
+       "através da adição de E-mail, não hesite em voltar para esta opção."
+
+msgid 'enter_email'
+msgstr "Por favor insira o seu e-mail ⬇️"
+
+msgid 'thanks_for_email'
+msgstr '✅ Óptimo! Obrigado pelo seu consentimento para inserir o e-mail. Isso me ajudará a fornecer o melhor '
+       'experiência com bot 🤖.'
+
+msgid 'fake_mail'
+msgstr 'O e-mail que você inseriu não foi validado.'
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions
 # ---------------------------------------------------------------------------------------------------------------------

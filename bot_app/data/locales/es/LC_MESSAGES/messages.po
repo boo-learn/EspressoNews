@@ -102,6 +102,29 @@ msgstr "Rol"
 
 msgid 'change_option_language'
 msgstr "Idioma"
+
+msgid 'suggestion_enter_mail'
+msgstr "<b>Hola, {name}!</b> 😊 \n\n"
+       "Me gustaría ofrecerle una oportunidad conveniente para mantener sus "
+       "configuración y datos. Para hacer esto, sugiero <b> que ingrese el correo electrónico</b> 📬. \n \n"
+       "Después de agregar el correo, usted no tiene que preocuparse de perder la configuración cuando se elimina el canal "
+       "o salir del bot. Siempre será suficiente con ingresar Su correo electrónico para "
+       "autorizaciones, y todos Sus ajustes y canales permanecerán seguros 🔒."
+
+msgid 'no_send_email'
+msgstr "Entiendo Su elección! Si en el futuro desea aprovechar la conveniencia de guardar la configuración "
+       "a través de la adición de correo, no dude en volver a esta opción."
+
+msgid 'enter_email'
+msgstr "Por favor ingrese Su correo electrónico ⬇️"
+
+msgid 'thanks_for_email'
+msgstr '✅ ¡Excelente! Gracias por su consentimiento para ingresar el correo. Esto me ayudará a proporcionarle la mejor '
+       'experiencia en el uso del bot 🤖.'
+
+msgid 'fake_mail'
+msgstr 'El correo que ingresó no fue validado.'
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions
 # ---------------------------------------------------------------------------------------------------------------------
