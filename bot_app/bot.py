@@ -9,12 +9,15 @@ from bot_app.interface.handlers.digests import DigestsHandlers
 from bot_app.interface.handlers.error import ErrorsHandlers
 from bot_app.interface.handlers.forward_message import ForwardHandlers
 from bot_app.interface.handlers.help import HelpHandlers
+from bot_app.interface.handlers.account import AccountHandlers
+
 from bot_app.interface.handlers.load_test import LoadDataHandlers
 from bot_app.interface.handlers.menu import MenuHandlers
 from bot_app.interface.handlers.settings import SettingsHandlers
 from bot_app.interface.keyboards.channels import ChannelsKeyboards
 from bot_app.interface.keyboards.digests import DigestsKeyboards
 from bot_app.interface.keyboards.help import HelpKeyboards
+from bot_app.interface.keyboards.account import AccountKeyboards
 from bot_app.interface.keyboards.menu import MenuKeyboards
 from bot_app.interface.keyboards.settings import SettingsKeyboards
 from bot_app.interface.keyboards.start import StartKeyboards
@@ -42,7 +45,6 @@ class BotApp:
             self.keyboard_registration(),
             self.create_mail_rules(),
             self.gradual_mailing_digests_to_users(),
-            self.registration_default_commands(),
             self.on_startup_notify(),
         )
 
@@ -50,39 +52,18 @@ class BotApp:
 
     async def registration_user_and_his_handlers(self):
         self.dp.middleware.setup(RegistrarMiddleware([
-            LoadDataHandlers(),
             StartHandlers(),
             HelpHandlers(),
             MenuHandlers(),
-            ChannelsHandlers(),
-            SettingsHandlers(),
+            AccountHandlers(),
             ForwardHandlers(),
-            DigestsHandlers(),
-            ErrorsHandlers(),
         ]))
-
-    @staticmethod
-    async def registration_default_commands():
-        cmd_keys = [
-            ('menu', 'Menu'),
-            ('help', 'Need help?')
-        ]
-
-        await dp.bot.set_my_commands([
-            types.BotCommand(
-                key[0],
-                key[1]
-            ) for key in cmd_keys
-        ])
 
     @staticmethod
     async def keyboard_registration():
         StartKeyboards()
-        SettingsKeyboards()
-        MenuKeyboards()
         HelpKeyboards()
-        DigestsKeyboards()
-        ChannelsKeyboards()
+        AccountKeyboards()
 
     async def on_startup_notify(self):
         for admin in admins:

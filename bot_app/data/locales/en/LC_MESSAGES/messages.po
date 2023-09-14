@@ -1,4 +1,4 @@
-# English translations for EspressoNews.
+# Russian translations for EspressoNews.
 # Copyright (C) 2023 EspressoNews
 # This file is distributed under the same license as the EspressoNews.
 # Roman Ignatov <ignatov.roman.a@mail.ru>, 2023.
@@ -8,91 +8,166 @@
 # Bot interface messages
 # ---------------------------------------------------------------------------------------------------------------------
 
-msgid "manual"
-msgstr "I'll quickly notify you so that you won't have any questions for me. \n \n"
-       "We have a fantastic feature. You can forward me any message from an open channel, and I'll add "
-       "it to your subscriptions."
+# msgid "manual"
+# msgstr "Быстренько оповещу тебя, чтобы ко мне не было вопросов сверху. \n \n"
+#        "У нас есть офигенная фишка. Ты можешь переслать мне любое сообщение "
+#        "с открытого канала, и я добавлю его в твои подписки."
 
 msgid "start"
-msgstr "Hello, <b>{first_name}</b>!\n\n"
-        "Welcome to the era of personalized news! Our bot is your personal guide in the world of information. "
-        "🚀\n\n"
-        "Tired of the information noise? We've done everything so that you can focus only on what truly "
-        "matters. Our daily news digests are not just news; they are your personalized collection tailored to "
-        "your preferences. 👓\n\n"
-        "And now, get ready for the magic! ✨ You can customize your news feed by adding any open Telegram "
-        "channels. Just forward a message from a channel to us, and we\"ll process it with the magic of "
-        "personalization.\n\n"
-        "So, are you ready to start? Let's dive into the world of information headfirst! 🌊\n\n"
+msgstr "👋🏻 Welcome, {first_name}! I am your personal bot assistant for "
+        "receiving the most important news. "
+        "With me you will be aware of everything,"
+        "what's going on in the world. You can tune me in now,"
+        "or later in your <b>personal account</b>👤."
+
+msgid "setup_now"
+msgstr "Set up now ✅"
+
+msgid "setup_later"
+msgstr "Set up later ➡"
+
+msgid "default_settings"
+msgstr "As you say, {first_name}! The settings are set to default."
+        "You can edit your channel list and settings in your personal account at any time 👤.\n\n"
+        "📌 You can add a channel by forwarding any message from it, or use the search 🔍."
+# Так же я добавил Вам 5 каналов в избранное на популярные темы.
+
+msgid "ask_for_name"
+msgstr "Your default name is {first_name}.\n"
+        "You can leave it, or specify something else ⬇️ ✏️."
+
+msgid "accepted_new_name"
+msgstr "✅ As you say, {first_name}"
+
+msgid "ask_for_intonation"
+msgstr "Select the desired intonation for our communication:"
+
+msgid "intonation_set_official"
+msgstr "✅ Intonation set: <b>Official</b>"
+msgid "intonation_set_official_start"
+msgstr "✅ Intonation set: <b>Official</b>"
+msgid "intonation_set_official_from_account"
+msgstr "✅ Intonation set: <b>Official</b>"
+
+msgid "intonation_set_sarcastic"
+msgstr "✅ Intonation set: <b>Sarcastic-joking</b>"
+msgid "intonation_set_sarcastic_start"
+msgstr "✅ Intonation set: <b>Sarcastic-joking</b>"
+msgid "intonation_set_sarcastic_from_account"
+msgstr "✅ Intonation set: <b>Sarcastic-joking</b>"
+
+msgid "settings_complete"
+msgstr "Settings complete!\n"
+        "You can edit your channel list and settings in your personal account at any time 👤.\n\n"
+        "📌 You can add a channel by forwarding any message from it"
+# ", либо воспользуйтесь поиском 🔍 ."
+# "Так же я добавил Вам 5 каналов в избранное на популярные темы."
+
+msgid "contact_text"
+msgstr "📍 To contact us, you can write to us by email - news@gmail.com,"
+        "or go to chat with the operator."
+        "We will promptly answer your questions."
+
+msgid "about"
+msgstr "I am a news bot 🤖.\n"
+        "I will help you keep abreast of events from around the world."
+        "You won't have to scroll through every channel looking for a new one,"
+        "just forward any entry and I will save it in your collection."
+        "I will highlight the most important and interesting news and will gladly share it with you!"
+# "добавить свои любимые каналы с помощью поиска, "
+
+msgid "to_main_menu"
+msgstr "Main menu"
+
+msgid "help_main"
+msgstr "How can i help you?"
+
+msgid "account_main"
+msgstr "Personal account"
+
+
+msgid "account_ask_for_language"
+msgstr "📝 Choose new language"
+
+msgid "language_updated"
+msgstr "✅ Your language has been successfully changed to <b>English</b>"
+
+msgid "account_ask_for_name"
+msgstr "📝 Enter new name:"
+
+
+msgid "unsubscribed_from"
+msgstr "You have unsubscribed from {channel}"
 
 msgid "after_start_btn"
-msgstr "<b>{first_name}</b>, look, now you'll need to choose the categories that interest you. \n\n"
+msgstr "<b>{first_name}</b>, смотри, сейчас нужно будет выбрать интересные тебе категории. \n\n"
 
 msgid "help"
-msgstr "Hello, <b>{first_name}</b>! \n\n Do you need help? \n \n"
+msgstr "Привет, <b>{first_name}</b>! \n\n Тебе нужна помощь? \n \n"
 
 msgid "answer_to_question_1"
-msgstr "Answer to question 1"
+msgstr "Ответ на вопрос 1"
 
 msgid "answer_to_question_2"
-msgstr "Answer to question 2"
+msgstr "Ответ на вопрос 2"
 
 msgid "answer_to_question_3"
-msgstr "Answer to question 3"
+msgstr "Ответ на вопрос 3"
 
 msgid "answer_to_question_4"
-msgstr "Answer to question 4"
+msgstr "Ответ на вопрос 4"
 
 msgid "answer_to_question_5"
-msgstr "Answer to question 5"
+msgstr "Ответ на вопрос 5"
 
 msgid "menu"
-msgstr "Open Sesame!!!"
+msgstr "Сезам, откройся!!!"
 
 msgid "error"
-msgstr "Oops! No such command =)"
+msgstr "Упс! Такой команды нет =)"
 
 msgid "adding_users_channels"
-msgstr "Now, you'll have to think a bit. \n \n What category of channels are you interested in?"
+msgstr "Так, тут уже придётся немного подумать. \n \n Каналы какой категории тебе интересны, говоришь?"
 
 msgid "sure_unsubscribe"
-msgstr "Are you sure you want to unsubscribe from the channel {channel_title}?\n \n"
+msgstr "Вы уверены, что хотите удалить канал {channel_title}?\n \n"
 
 msgid "subscribe_failed"
-msgstr "Unfortunately, you cannot subscribe to a private channel!"
+msgstr "К сожалению, вы не можете подписаться на закрытый канал!"
 
 msgid "success_subscribe"
-msgstr "You have subscribed to the channel {channel_title}"
+msgstr "Вы подписались на канал {channel_title}"
 
 msgid "return"
-msgstr "To go to the menu, click here -> /menu"
+msgstr "Для перехода в меню тыкни сюда -> /menu"
 
 msgid "digest_not_exist"
-msgstr "Unfortunately, there has been no new information on your channels."
+msgstr "К сожалению, новой информации по вашим каналам не появлялось."
 
 msgid "digest_load_more"
-msgstr "To go to the next page, click \"Next\"."
+msgstr "Для перехода на следующую страницу нажмите \"Далее\"."
 
 msgid "thank_you"
-msgstr "Thank you in advance, as our developers will be a little happier in just a minute."
+msgstr "Заранее благодарим вас, ведь уже через минуту наши разработчики станут чуточку счастливее."
 
 msgid "settings"
-msgstr "List of settings"
+msgstr "Список настроек"
 
 msgid "settings_save_success"
-msgstr "Changes have been saved successfully!"
+msgstr "Изменения успешно сохранены!"
 
 msgid "frequent_questions"
-msgstr "Frequent questions"
+msgstr "Частые вопросы"
 
 msgid "channel_list"
-msgstr "Channel List:"
+msgstr "📝 List of your channels:\n\n"
+        "To remove a channel from the list, click on it."
 
 msgid "not_subscribed_channels"
-msgstr "So far, you are not subscribed to any channels."
+msgstr "Пока что вы не подписаны не на какие каналы."
 
 msgid 'change_option_periodicity'
-msgstr "Frequency"
+msgstr "Периодичность"
 
 msgid 'change_option_intonation'
 msgstr "Intonation"
@@ -128,51 +203,50 @@ msgstr 'The mail you entered did not pass validation.'
 # ---------------------------------------------------------------------------------------------------------------------
 # Drop-down list with command suggestions
 # ---------------------------------------------------------------------------------------------------------------------
-
 msgid "desc_cmd_menu"
-msgstr "Menu"
+msgstr "Меню"
 
 msgid "desc_cmd_help"
-msgstr "Need help?"
+msgstr "Нужна помощь?"
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Handlers comands
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "cmd_menu"
-msgstr "menu"
+msgstr "меню"
 
 msgid "cmd_start"
-msgstr "start"
+msgstr "начать"
 
 msgid "cmd_help"
-msgstr "help"
+msgstr "помощь"
 
 msgid "regexp_my_channels"
-msgstr "My Channels"
+msgstr "Мои каналы"
 
 msgid "regexp_settings"
-msgstr "Settings"
+msgstr "Настройки"
 
 msgid "regexp_donat"
-msgstr "Donat"
+msgstr "Донат"
 
 msgid "regexp_help"
-msgstr "Help"
+msgstr "Помощь"
 
 msgid "regexp_main_menu"
-msgstr "Main Menu"
+msgstr "Главное меню"
 
 msgid "regexp_periodicity"
-msgstr "Frequency"
+msgstr "Периодичность"
 
 msgid "regexp_intonation"
-msgstr "Intonation"
+msgstr "Интонация"
 
 msgid "regexp_role"
-msgstr "Role"
+msgstr "Роль"
 
 msgid "regexp_language"
-msgstr "Language"
+msgstr "Язык"
 
 msgid "list_official"
 msgstr "Official"
@@ -181,19 +255,19 @@ msgid "list_sarcastic-joking"
 msgstr "Sarcastic-joking"
 
 msgid "list_every_hour"
-msgstr "Every hour"
+msgstr "Каждый час"
 
 msgid "list_every_3_hours"
-msgstr "Every 3 hours"
+msgstr "Каждые 3 часа"
 
 msgid "list_every_6_hours"
-msgstr "Every 6 hours"
+msgstr "Каждые 6 часов"
 
 msgid "list_announcer"
-msgstr "Announcer"
+msgstr "Диктор"
 
 msgid "list_standard"
-msgstr "Standard"
+msgstr "Стандартная"
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Keyboards
@@ -205,13 +279,13 @@ msgid "Меню"
 msgstr "Menu"
 
 msgid "Донат"
-msgstr "Donat"
+msgstr "Donate"
 
 msgid "Настройки"
 msgstr "Settings"
 
 msgid "Мои каналы"
-msgstr "My Channels"
+msgstr "My channels"
 
 #  Settings
 # ---------------------------------------------------------------------------------------------------------------------
@@ -222,18 +296,57 @@ msgid "Интонация"
 msgstr "Intonation"
 
 msgid "Периодичность"
-msgstr "Frequency"
+msgstr "Периодичность"
+
+msgid "kb_reply_search"
+msgstr "Search 🔍"
+
+msgid "kb_reply_lk"
+msgstr "Account 👤"
+
+msgid "kb_reply_donate"
+msgstr "Donate 💰"
+
+msgid "kb_reply_help"
+msgstr "Help ❓"
+
+msgid "kb_reply_about"
+msgstr "About 🤖"
+
+msgid "kb_reply_contact"
+msgstr "Contact us ✉"
+
+msgid "kb_reply_main_menu"
+msgstr "Main menu 🔙"
+
+msgid "kb_inline_contact"
+msgstr "Proceed in chat ➡"
+
+msgid "kb_reply_my_channels"
+msgstr "My channels"
+
+msgid "kb_reply_change_intonation"
+msgstr "Intonation 💬"
+
+msgid "kb_reply_change_name"
+msgstr "Change name ✏"
+
+msgid "kb_reply_change_language"
+msgstr "Change language ✏"
+
+msgid "kb_reply_to_main"
+msgstr "Main menu 🔙"
 
 #  change_option_periodicity
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "Каждый час"
-msgstr "Every hour"
+msgstr "Каждый час"
 
 msgid "Каждые 3 часа"
-msgstr "Every 3 hours"
+msgstr "Каждые 3 часа"
 
 msgid "Каждые 6 часов"
-msgstr "Every 6 hours"
+msgstr "Каждые 6 часов"
 
 #  change_option_intonation
 # ---------------------------------------------------------------------------------------------------------------------
@@ -246,50 +359,50 @@ msgstr "Sarcastic-joking"
 #  change_option_role
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "Диктор"
-msgstr "Announcer"
+msgstr "Диктор"
 
 msgid "Стандартная"
-msgstr "Standard"
+msgstr "Стандартная"
 
 #  thank_you
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "Отблагодарить"
-msgstr "Thank you"
+msgstr "Отблагодарить"
 
 #  frequent_questions
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "Вопрос 1"
-msgstr "Question 1"
+msgstr "Вопрос 1"
 
 msgid "Вопрос 2"
-msgstr "Question 2"
+msgstr "Вопрос 2"
 
 msgid "Вопрос 3"
-msgstr "Question 3"
+msgstr "Вопрос 3"
 
 msgid "Вопрос 4"
-msgstr "Question 4"
+msgstr "Вопрос 4"
 
 msgid "Вопрос 5"
-msgstr "Question 5"
+msgstr "Вопрос 5"
 
 #  success_subscribe
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "Отписаться"
-msgstr "Unsubscribe"
+msgstr "Отписаться"
 
 #  sure_unsubscribe
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "Да"
-msgstr "Yes"
+msgstr "Да"
 
 msgid "Нет"
-msgstr "No"
+msgstr "Нет"
 
 #  Return to main menu btn
 # ---------------------------------------------------------------------------------------------------------------------
 msgid "Главное меню"
-msgstr "Main Menu"
+msgstr "Главное меню"
 
 msgid ""
 msgstr ""

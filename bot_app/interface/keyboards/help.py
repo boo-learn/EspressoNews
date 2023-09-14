@@ -15,3 +15,40 @@ class HelpKeyboards(KeyboardsTools):
             [('Вопрос 4', 'question_4')],
             [('Вопрос 5', 'question_5')],
         ])
+        self.register(
+            'help_main',
+            KeyboardType.REPLY,
+            [
+                [
+                    ('kb_reply_about', 'kb_reply_about'),
+                    ('kb_reply_contact', 'kb_reply_contact')
+                ],
+                [
+                    ('kb_reply_main_menu', 'kb_reply_main_menu')
+                ]
+            ]
+        )
+        self.register(
+            'contact_text',
+            KeyboardType.INLINE,
+            [
+                [
+                    ('kb_inline_contact', None, 'https://t.me/booblegum42')
+                ]
+            ]
+        )
+        self.register(
+            'to_main_menu',
+            KeyboardType.REPLY,
+            [
+                [
+                    # ('kb_reply_search', 'kb_reply_search'),
+                    ('kb_reply_lk', 'kb_reply_lk'),
+                ],
+                [
+                    ('kb_reply_donate', 'kb_reply_donate'),
+                    ('kb_reply_help', 'kb_reply_help'),
+                ],
+            ]
+
+        )

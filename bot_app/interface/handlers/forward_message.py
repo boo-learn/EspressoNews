@@ -27,12 +27,12 @@ class ForwardHandlers(HandlersTools):
             'content_types',
 
         )
-        self.aiogram_registrar.simply_handler_registration(
-            dp.register_callback_query_handler,
-            self.unsubscribe_to_the_channel,
-            'do not subscribe',
-            'text_contains'
-        )
+        # self.registrar.simply_handler_registration(
+        #     dp.register_callback_query_handler,
+        #     self.unsubscribe_to_the_channel,
+        #     'do not subscribe',
+        #     'text_contains'
+        # )
 
     # в функцию не передаётся members count
     async def action_forward_message(self, message: types.Message, state: FSMContext):

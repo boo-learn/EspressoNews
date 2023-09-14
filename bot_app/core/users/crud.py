@@ -2,7 +2,7 @@ import logging
 from typing import Optional, List
 
 from bot_app.databases.repositories import UserRepository
-from shared.db_utils import get_role, get_intonation, get_language
+from shared.db_utils import get_role, get_intonation, get_language, get_language_by_code
 from shared.models import User
 from datetime import datetime
 
@@ -59,6 +59,32 @@ class UserCRUD:
 
     async def get_all_users(self) -> List[Optional[User]]:
         return await self.repository.get_all()
+
+    async def update_user_intonation(self, user_id: int, intonation: str):
+        await self.repository.update_setting(
+            user_id,
+            option='intonation',
+            value=await get_intonation(intonation),
+        )
+
+    async def update_user_language(
+        self,
+        user_id: int,
+        *,
+        language_name: str = None,
+        language_code: str = None
+    ):
+        if language_name:
+            value = await get_language(language_name)
+        elif language_code:
+            value = await get_language_by_code(language_code)
+        else:
+            raise ValueError('Language name or code must be providen')
+        await self.repository.update_setting(
+            user_id,
+            option='language',
+            value=value,
+        )
 
     async def update_user_settings_option(
             self,
@@ -124,3 +150,8 @@ class UserCRUD:
     async def enable_user(self, user):
         await self.repository.update(user, is_active=True)
         await self.repository.update_setting(user.user_id, "periodicity", "*/1 * * * *")
+
+    async def update_user_name(self, user_id: int, first_name: str):
+        user = await self.repository.get(user_id)
+        user = await self.repository.update(user, first_name=first_name)
+        return user

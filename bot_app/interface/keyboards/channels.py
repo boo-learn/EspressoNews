@@ -8,16 +8,16 @@ class ChannelsKeyboards(KeyboardsTools):
         self.init_keyboards()
 
     def init_keyboards(self):
-        self.register(
-            'success_subscribe',
-            KeyboardType.INLINE,
-            lambda channel_username: [[('Отписаться', f'do not subscribe&slash&{channel_username}')]],
-        )
-
-        self.register('sure_unsubscribe', KeyboardType.INLINE, [
-            [('Да', 'unsubscribe')],
-            [('Нет', 'do not unsubscribe')],
-        ])
+        # self.register(
+        #     'success_subscribe',
+        #     KeyboardType.INLINE,
+        #     lambda channel_username: [[('Отписаться', f'do not subscribe&slash&{channel_username}')]],
+        # )
+        #
+        # self.register('sure_unsubscribe', KeyboardType.INLINE, [
+        #     [('Да', 'unsubscribe')],
+        #     [('Нет', 'do not unsubscribe')],
+        # ])
 
         self.register(
             'channel_list',
