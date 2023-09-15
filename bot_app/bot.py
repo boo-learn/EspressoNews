@@ -3,7 +3,7 @@ import logging
 
 from aiogram import executor, types
 
-from bot_app.digests.endpoints import RMQDigestHandlers
+from bot_app.digests.endpoints import RMQDigestHandlers, RMQNotificationHandlers
 from bot_app.interface.handlers.channels import ChannelsHandlers
 from bot_app.interface.handlers.digests import DigestsHandlers
 from bot_app.interface.handlers.error import ErrorsHandlers
@@ -86,7 +86,10 @@ class BotApp:
 
     @staticmethod
     async def gradual_mailing_digests_to_users():
-        RMQDigestHandlers()
+        digest_handlers = RMQDigestHandlers()
+        await digest_handlers.register_routes()
+        notification_handlers = RMQNotificationHandlers()
+        await notification_handlers.register_routes()
 
     def run(self):
         executor.start_polling(self.dp, on_startup=self.on_startup)

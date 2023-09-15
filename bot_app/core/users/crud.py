@@ -32,7 +32,10 @@ class UserCRUD:
         await self.repository.update(user, **kwargs)
 
     async def get_all_user_ids(self):
-        return self.repository.get_all_ids()
+        return await self.repository.get_all_ids()
+
+    async def get_ids_and_first_names(self):
+        return await self.repository.get_ids_and_first_names()
 
     async def check_user_and_create_if_none(
             self,
@@ -56,9 +59,6 @@ class UserCRUD:
         if not user:
             user = await self.repository.create(**data)
         return user
-
-    async def get_all_users(self) -> List[Optional[User]]:
-        return await self.repository.get_all()
 
     async def update_user_intonation(self, user_id: int, intonation: str):
         await self.repository.update_setting(

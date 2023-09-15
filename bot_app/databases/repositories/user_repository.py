@@ -61,12 +61,12 @@ class UserRepository:
             raise e
 
     @staticmethod
-    async def get_all() -> List[Optional[User]]:
+    async def get_ids_and_first_names() -> List[Optional[User]]:
         try:
             async with async_session() as session:
-                stmt = select(User)
+                stmt = select(User.user_id, User.first_name)
                 result = await session.execute(stmt)
-                return result.scalars().all()
+                return result.all()
         except SQLAlchemyError as e:
             raise e
 

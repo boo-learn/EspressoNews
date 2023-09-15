@@ -79,6 +79,11 @@ class RegistrarMiddleware(BaseMiddleware):
                 'periodicity'
             )
 
-            await self.mailing_manager.create_rule(message.from_user.id, periodicity_option)
+            await self.mailing_manager.create_rule(
+                message.from_user.id,
+                periodicity_option,
+                "generate-digest",
+                "tasks.generate_digest_for_user",
+            )
 
         return user

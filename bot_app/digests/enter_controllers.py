@@ -46,24 +46,29 @@ class NotificationMailingManager(base.MailingManager):
             task_func
         )
 
-    def send(
+    async def send(
             self,
             message_key,
     ):
-        users = self.user_crud.get_all_users()
+        users = await self.user_crud.get_ids_and_first_names()
 
-        for user in users:
-            user_language_object = await self.user_crud.get_settings_option_for_user(user.user_id, 'language')
+        logger.info(
+            'Пользователей получил',
+            f'{users}'
+        )
+
+        for user_id, first_name in users:
+            user_language_object = await self.user_crud.get_settings_option_for_user(user_id, 'language')
             self.aiogram_message_manager.set_language(user_language_object.code)
 
             try:
                 await self.aiogram_message_manager.send_message(
                     message_key,
-                    user.user_id,
-                    name=user.first_name
+                    user_id,
+                    name=first_name
                 )
             except aiogram.exceptions.BotBlocked:
-                await self.user_crud.disable_user(user.user_id)
+                await self.user_crud.disable_user(user_id)
 
 
 class DigestMailingManager(base.MailingManager):
