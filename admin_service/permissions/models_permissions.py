@@ -7,3 +7,7 @@ class AdminUsers(ModelPermissions):
 
 class Categories(ModelPermissions):
     pass
+
+
+class Messages(ModelPermissions):
+    pass

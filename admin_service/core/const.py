@@ -37,3 +37,7 @@ CATEGORIES_URL: Final = "/categories"
 # Categories constants
 TGUSERS_TAGS: Final[List[str | Enum] | None] = ["TgUsers"]
 TGUSERS_URL: Final = "/tg-users"
+
+#Messages constants
+MESSAGES_TAGS: Final[List[str | Enum] | None] = ["Messages"]
+MESSAGES_URL: Final = "/messages"

@@ -1,6 +1,6 @@
 from loguru import logger
 from enum import Enum
-from admin_service.permissions.models_permissions import AdminUsers, Categories
+from admin_service.permissions.models_permissions import *
 
 
 class Role(str, Enum):
@@ -29,6 +29,9 @@ ROLE_PERMISSIONS = {
             Categories.permissions.READ,
             Categories.permissions.UPDATE,
             Categories.permissions.DELETE
+        ],
+        [
+            Messages.permissions.CREATE
         ]
     ],
     Role.USER: [
@@ -42,6 +45,9 @@ ROLE_PERMISSIONS = {
             Categories.permissions.READ,
             Categories.permissions.UPDATE,
             Categories.permissions.DELETE
+        ],
+        [
+            Messages.permissions.CREATE
         ]
     ]
 }

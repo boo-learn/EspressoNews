@@ -27,7 +27,7 @@ from bot_app.loader import dp
 from bot_app.digests.enter_controllers import DigestMailingManager, NotificationMailingManager
 from bot_app.core.middlewares.i18n_middleware import i18n
 from bot_app.core.middlewares.registrar_middleware import RegistrarMiddleware
-
+from bot_app.logic.handlers import subscribe_on_rabbit_messages
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,7 @@ class BotApp:
             self.create_mail_rules(),
             self.gradual_mailing_digests_to_users(),
             self.on_startup_notify(),
+            subscribe_on_rabbit_messages()
         )
 
         await self.registration_user_and_his_handlers()

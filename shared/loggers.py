@@ -12,6 +12,7 @@ logging.getLogger('httpcore').setLevel(logging.WARNING)
 logging.getLogger('celery').setLevel(logging.WARNING)
 logging.getLogger('aiormq').setLevel(logging.WARNING)
 logging.getLogger('aio_pika').setLevel(logging.WARNING)
+logging.getLogger('admin_service').setLevel(logging.WARNING)
 
 
 class ConsoleStringRenderer(structlog.dev.ConsoleRenderer):
