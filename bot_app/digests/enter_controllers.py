@@ -5,6 +5,7 @@ import aiogram
 
 from bot_app.core.messages.manager import AiogramMessageManager
 from bot_app.core.types import base
+from bot_app.core.users.crud import UserCRUD
 from bot_app.digests.cruds import DigestCRUD
 
 from bot_app.core.messages.senders import AbstractSender
@@ -13,96 +14,11 @@ from shared.config import DIGESTS_LIMIT
 logger = logging.getLogger(__name__)
 
 
-class NotificationMailingManager(base.MailingManager):
+class DigestMailingManager:
     def __init__(self):
         super().__init__()
+        self.user_crud = UserCRUD()
         self.aiogram_message_manager = AiogramMessageManager(sender=AbstractSender())
-
-    async def create_rule_for_all(
-            self,
-            task_name_template: str,
-            task_func: str,
-            cron_periodicity: str = None,
-            setting_option: str = None
-    ):
-        await self._base_create_rule_for_all(
-            task_name_template,
-            task_func,
-            cron_periodicity,
-            setting_option,
-        )
-
-    async def create_rule(
-            self,
-            user_id: int,
-            cron_periodicity: str,
-            task_name_template: str,
-            task_func: str
-    ):
-        await self._base_create_rule(
-            user_id,
-            cron_periodicity,
-            task_name_template,
-            task_func
-        )
-
-    async def send(
-            self,
-            message_key,
-    ):
-        users = await self.user_crud.get_ids_and_first_names()
-
-        logger.info(
-            'Пользователей получил',
-            f'{users}'
-        )
-
-        for user_id, first_name in users:
-            user_language_object = await self.user_crud.get_settings_option_for_user(user_id, 'language')
-            self.aiogram_message_manager.set_language(user_language_object.code)
-
-            try:
-                await self.aiogram_message_manager.send_message(
-                    message_key,
-                    user_id,
-                    name=first_name
-                )
-            except aiogram.exceptions.BotBlocked:
-                await self.user_crud.disable_user(user_id)
-
-
-class DigestMailingManager(base.MailingManager):
-    def __init__(self):
-        super().__init__()
-        self.aiogram_message_manager = AiogramMessageManager(sender=AbstractSender())
-
-    async def create_rule_for_all(
-            self,
-            task_name_template: str,
-            task_func: str,
-            cron_periodicity: str = None,
-            setting_option: str = None
-    ):
-        await self._base_create_rule_for_all(
-            task_name_template,
-            task_func,
-            cron_periodicity,
-            setting_option,
-        )
-
-    async def create_rule(
-            self,
-            user_id: int,
-            cron_periodicity: str,
-            task_name_template: str,
-            task_func: str
-    ):
-        await self._base_create_rule(
-            user_id,
-            cron_periodicity,
-            task_name_template,
-            task_func
-        )
 
     @staticmethod
     async def fetch_and_format_digest(

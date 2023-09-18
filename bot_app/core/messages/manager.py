@@ -14,7 +14,7 @@ from shared.rabbitmq import QueuesType, Producer, MessageData
 logger = logging.getLogger(__name__)
 
 
-class AiogramMessageManager:
+class AiogramMessageManager(base.MailingManager):
     """
     Manages the sending of messages from different senders, taking into account the language of the user who gets from
     the cache
@@ -26,9 +26,38 @@ class AiogramMessageManager:
 
         :param sender: Optional message sender implementation.
         """
+        super().__init__()
         self.lang_code = None
         self.message_obj = None
         self.sender = sender or AnswerSender()
+
+    async def create_rule_for_all(
+            self,
+            task_name_template: str,
+            task_func: str,
+            cron_periodicity: str = None,
+            setting_option: str = None
+    ):
+        await self._base_create_rule_for_all(
+            task_name_template,
+            task_func,
+            cron_periodicity,
+            setting_option,
+        )
+
+    async def create_rule(
+            self,
+            user_id: int,
+            cron_periodicity: str,
+            task_name_template: str,
+            task_func: str
+    ):
+        await self._base_create_rule(
+            user_id,
+            cron_periodicity,
+            task_name_template,
+            task_func
+        )
 
     def _ensure_language_exists(self):
         if not self.lang_code:
@@ -139,6 +168,33 @@ class AiogramMessageManager:
                 logger.info(f'Failed to send digest after {RETRY_LIMIT} retries')
 
             await asyncio.sleep(1)
+
+    async def send_notification(
+            self,
+            message_key,
+    ):
+        users_params = await self.user_crud.get_all_user_id_and_first_name()
+
+        logger.info(
+            'Пользователей получил',
+            f'{users_params}'
+        )
+
+        if not users_params:
+            return False
+
+        for user_id, first_name in users_params:
+            user_language_object = await self.user_crud.get_settings_option_for_user(user_id, 'language')
+            self.set_language(user_language_object.code)
+
+            try:
+                await self.send_message(
+                    message_key,
+                    user_id,
+                    name=first_name
+                )
+            except aiogram.exceptions.BotBlocked:
+                await self.user_crud.disable_user(user_id)
 
     async def delete_before_message(self):
         """

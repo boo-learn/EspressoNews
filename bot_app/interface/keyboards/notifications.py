@@ -7,7 +7,7 @@ from bot_app.core.tools.keyboards_tools import KeyboardsTools
 logger = logging.getLogger(__name__)
 
 
-class MenuKeyboards(KeyboardsTools):
+class NotificationKeyboards(KeyboardsTools):
     def __init__(self):
         super().__init__()
         self.init_keyboards()

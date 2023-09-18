@@ -32,19 +32,20 @@ class NotificationHandlers(HandlersTools):
         )
         self.aiogram_registrar.simply_handler_registration(
             dp.register_message_handler,
-            self.enter_email,
-            SocialNetworkStates.enter_email,
-            'only_state'
+            self.thanks_for_email,
+            None,
+            'only_state',
+            SocialNetworkStates.enter_email
         )
 
-    def no_send_email(self, call: CallbackQuery):
+    async def no_send_email(self, call: CallbackQuery):
         await self.aiogram_message_manager.send_message('no_send_email')
 
-    def enter_email(self, call: CallbackQuery):
+    async def enter_email(self, call: CallbackQuery):
         await self.aiogram_message_manager.send_message('enter_email')
         await SocialNetworkStates.enter_email.set()
 
-    def thanks_for_email(self, message: types.Message, state: FSMContext):
+    async def thanks_for_email(self, message: types.Message, state: FSMContext):
         email = message.text
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 

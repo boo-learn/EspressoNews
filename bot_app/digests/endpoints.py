@@ -1,9 +1,10 @@
 import asyncio
 import logging
 
+from bot_app.core.messages.senders import AbstractSender
 from bot_app.core.tools.handler_tools import HandlersTools
 from bot_app.core.users.crud import UserCRUD
-from bot_app.digests.enter_controllers import DigestMailingManager, NotificationMailingManager
+from bot_app.digests.enter_controllers import DigestMailingManager
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,6 @@ class RMQDigestHandlers(HandlersTools):
 class RMQNotificationHandlers(HandlersTools):
     def __init__(self):
         super().__init__()
-        self.mailing_manager = NotificationMailingManager()
 
     async def register_routes(self):
         self.rmq_registrar.set_queue_name('bot_service')
@@ -41,4 +41,5 @@ class RMQNotificationHandlers(HandlersTools):
 
     async def send(self, data: dict):
         logger.info(f'Notification trying send')
-        await self.mailing_manager.send('suggestion_enter_mail')
+        self.aiogram_message_manager.set_sender(AbstractSender())
+        await self.aiogram_message_manager.send_notification('suggestion_enter_mail')

@@ -404,6 +404,14 @@ msgstr "Нет"
 msgid "Главное меню"
 msgstr "Главное меню"
 
+#  Notification email
+# ---------------------------------------------------------------------------------------------------------------------
+msgid "Нет, спасибо ❌"
+msgstr "No, thank you. ❌"
+
+msgid "Ввести почту✏️"
+msgstr "Enter email✏️"
+
 msgid ""
 msgstr ""
 "Project-Id-Version: EspressoNews 1.0\n"

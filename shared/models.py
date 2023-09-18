@@ -93,6 +93,7 @@ class User(Base):
     username = Column(String(50), nullable=True)
     first_name = Column(String(50), nullable=True)
     last_name = Column(String(50), nullable=True)
+    email = Column(String(50), nullable=True)
     language_code = Column(Enum('ru', 'en', name='language_code'), nullable=True)
 
     is_active = Column(Boolean, default=True)
