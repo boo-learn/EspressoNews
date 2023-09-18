@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List
+from typing import Optional
 
 from bot_app.databases.repositories import UserRepository
 from shared.db_utils import get_role, get_intonation, get_language, get_language_by_code
@@ -32,7 +32,35 @@ class UserCRUD:
         await self.repository.update(user, **kwargs)
 
     async def get_all_user_ids(self):
-        return self.repository.get_all_ids()
+        return await self.repository.get_all_ids()
+
+    async def get_all_user_id_and_first_name(self):
+        return await self.repository.get_all_user_id_and_first_name()
+
+    async def check_user(self, user_id):
+        return await self.repository.get(user_id)
+
+    async def create_user(
+            self,
+            user_id: int,
+            username: str,
+            first_name: str,
+            last_name: str,
+            language_code: str = 'ru'
+    ):
+        data = {
+            'user_id': user_id,
+            'username': username,
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': None,
+            'language_code': language_code,
+            'is_active': False
+        }
+
+        user = await self.repository.create(**data)
+
+        return user
 
     async def check_user_and_create_if_none(
             self,
@@ -49,6 +77,7 @@ class UserCRUD:
             'username': username,
             'first_name': first_name,
             'last_name': last_name,
+            'email': None,
             'language_code': language_code,
             'is_active': False
         }
@@ -56,9 +85,6 @@ class UserCRUD:
         if not user:
             user = await self.repository.create(**data)
         return user
-
-    async def get_all_users(self) -> List[Optional[User]]:
-        return await self.repository.get_all()
 
     async def update_user_intonation(self, user_id: int, intonation: str):
         await self.repository.update_setting(
@@ -68,11 +94,11 @@ class UserCRUD:
         )
 
     async def update_user_language(
-        self,
-        user_id: int,
-        *,
-        language_name: str = None,
-        language_code: str = None
+            self,
+            user_id: int,
+            *,
+            language_name: str = None,
+            language_code: str = None
     ):
         if language_name:
             value = await get_language(language_name)

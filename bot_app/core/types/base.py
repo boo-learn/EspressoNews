@@ -115,7 +115,7 @@ class MailingManager(ABC):
             )
 
         for user_id, option in zip(user_ids, users_list_periodicity_options):
-            await self.create_rule(user_id, option, task_name_template, task_func)
+            await self._base_create_rule(user_id, option, task_name_template, task_func)
 
         logger.info(f"Finished creating rules for {task_name_template}.")
 

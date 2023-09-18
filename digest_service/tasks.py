@@ -2,23 +2,39 @@ import asyncio
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from shared.database import async_session
 from shared.celery_app import celery_app
 from shared.database import async_session
-from shared.models import User, Digest
+from shared.models import Digest
 from shared.rabbitmq import Producer, QueuesType, MessageData
 from shared.config import RABBIT_HOST
 from shared.loggers import get_logger
 
-
 logger = get_logger('digest-mon.tasks')
 
 
-@celery_app.task(name='tasks.generate_digest_for_user', queue='digest_queue')
+@celery_app.task(name='tasks.generate_digest_for_user', rate_limit='1/m', queue='digest_queue')
 def generate_digest_for_user(user_id):
     logger.info("Task try to start")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(get_user_and_send_in_digest_service(user_id))
+
+
+@celery_app.task(name='tasks.generate_notification_email_for_user', rate_limit='1/m', queue='digest_queue')
+def generate_notification_email_for_user(user_id):
+    logger.info("Task notification try to start")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(send_notification_email(user_id))
+
+
+async def send_notification_email(user_id):
+    producer = Producer(host=RABBIT_HOST, queue=QueuesType.bot_service)
+    message: MessageData = {
+        "type": "send_notification_email",
+        "data": {
+            "user_id": user_id
+        }
+    }
+    await producer.send_message(message_with_data=message, queue=QueuesType.bot_service)
 
 
 async def get_user_and_send_in_digest_service(user_id):

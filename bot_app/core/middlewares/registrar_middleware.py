@@ -3,6 +3,7 @@ import logging
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
 
+from bot_app.core.messages.manager import AiogramMessageManager
 from bot_app.core.users.crud import UserCRUD
 from bot_app.digests.cruds import DigestCRUD
 from bot_app.digests.enter_controllers import DigestMailingManager
@@ -21,6 +22,10 @@ class RegistrarMiddleware(BaseMiddleware):
         digest_crud (DigestCRUD): CRUD operations for digests.
     """
 
+    @property
+    def manager(self):
+        return self._manager
+
     def __init__(self, handlers: list):
         """
         Initializes the Registrar middleware with the provided routers and required dependencies.
@@ -30,7 +35,7 @@ class RegistrarMiddleware(BaseMiddleware):
         self.handlers = handlers
         self.user_crud = UserCRUD()
         self.digest_crud = DigestCRUD()
-        self.mailing_manager = DigestMailingManager()
+        self.mailing_manager = AiogramMessageManager()
         super(RegistrarMiddleware, self).__init__()
 
     async def on_pre_process_message(self, message: types.Message, data: dict) -> None:
@@ -61,12 +66,21 @@ class RegistrarMiddleware(BaseMiddleware):
             handler_class.update_message(message)
 
     async def registration_user(self, message: types.Message):
-        user = await self.user_crud.check_user_and_create_if_none(
-            message.from_user.id,
-            message.from_user.username,
-            message.from_user.first_name,
-            message.from_user.last_name,
-        )
+        user = await self.user_crud.check_user(message.from_user.id)
+
+        if user is None:
+            user = await self.user_crud.create_user(
+                message.from_user.id,
+                message.from_user.username,
+                message.from_user.first_name,
+                message.from_user.last_name,
+            )
+            await self.mailing_manager.create_rule(
+                user.user_id,
+                task_name_template="generate-notification-email",
+                task_func="tasks.generate_notification_email_for_user",
+                cron_periodicity="* * * * *"
+            )
 
         if not user.is_active:
             await self.user_crud.enable_user(user)
@@ -79,6 +93,15 @@ class RegistrarMiddleware(BaseMiddleware):
                 'periodicity'
             )
 
-            await self.mailing_manager.create_rule(message.from_user.id, periodicity_option)
+            await self.mailing_manager.create_rule(
+                message.from_user.id,
+                periodicity_option,
+                "generate-digest",
+                "tasks.generate_digest_for_user",
+            )
 
         return user
+
+    @manager.setter
+    def manager(self, value):
+        self._manager = value
